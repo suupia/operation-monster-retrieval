@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
     public DateMGR dateMGR;
     public MapMGR mapMGR;
 
+    public DebugMGR debugMGR;
+
     private void Awake()
     {
         if (instance == null)
@@ -25,6 +27,7 @@ public class GameManager : MonoBehaviour
     {
         dateMGR = GameObject.Find("DateMGR").GetComponent<DateMGR>();
         mapMGR = GameObject.Find("Tilemap").GetComponent<MapMGR>();
+        debugMGR = GameObject.Find("DebugMGR").GetComponent<DebugMGR>();
 
         mapMGR.SetupMap();
        

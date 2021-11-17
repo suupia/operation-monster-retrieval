@@ -10,6 +10,7 @@ public class InputMGR : MonoBehaviour
     Vector2 mouseStartPos;
     Vector2 mouseCurrentPos;
     Vector2 mouseEndPos;
+    Vector2Int mouseGridPos;
 
     void Update()
     {
@@ -25,9 +26,17 @@ public class InputMGR : MonoBehaviour
         if (touchFlag)
         {
             mouseCurrentPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            mouseGridPos = ToGridPos(mouseCurrentPos);
             Debug.Log($"mouseCurrentPosÇÕ{mouseCurrentPos}");
-            Debug.Log($"mouseCurrentPosÇÃGridPosÇÕ{ToGridPos(mouseCurrentPos)}");
+            Debug.Log($"mouseGridPosÇÕ{mouseGridPos}");
 
+        }
+
+        //Debugóp
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            Debug.Log("DebugMapValue()Çé¿çsÇµÇ‹Ç∑");
+            GameManager.instance.debugMGR.DebugMapValue();
         }
     }
 
@@ -45,5 +54,10 @@ public class InputMGR : MonoBehaviour
     public Vector2Int ToGridPos(Vector2 vector)
     {
         return new Vector2Int(Mathf.FloorToInt(vector.x), Mathf.FloorToInt(vector.y));
+    }
+
+    public void ChangeMapValue()
+    {
+
     }
 }
