@@ -30,12 +30,18 @@ public class InputMGR : MonoBehaviour
             Debug.Log($"mouseCurrentPosÇÕ{mouseCurrentPos}");
             Debug.Log($"mouseGridPosÇÕ{mouseGridPos}");
 
+            GameManager.instance.mapMGR.MakeRoad(mouseGridPos);
+
         }
 
         //Debugóp
         if (Input.GetKeyDown(KeyCode.F5))
         {
             Debug.Log("DebugMapValue()Çé¿çsÇµÇ‹Ç∑");
+            GameManager.instance.debugMGR.DebugMapValue();
+        }
+        if(DebugMGR.isFirstDebugMapValue == false)
+        {
             GameManager.instance.debugMGR.DebugMapValue();
         }
     }
@@ -56,8 +62,4 @@ public class InputMGR : MonoBehaviour
         return new Vector2Int(Mathf.FloorToInt(vector.x), Mathf.FloorToInt(vector.y));
     }
 
-    public void ChangeMapValue()
-    {
-
-    }
 }

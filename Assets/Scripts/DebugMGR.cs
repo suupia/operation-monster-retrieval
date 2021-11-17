@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class DebugMGR : MonoBehaviour
 {
-    public static bool isFirstDebugMapValue=true;
+    public static bool isFirstDebugMapValue=false;
 
     Text[] mapValueTextArray;
 

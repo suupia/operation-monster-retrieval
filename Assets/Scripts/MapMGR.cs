@@ -32,6 +32,8 @@ public class MapMGR : MonoBehaviour
     {
         return map.GetValue(index);
     }
+
+
     public void SetupMap() //これをGameManagerから呼ぶ
     {
         //初期化
@@ -54,8 +56,31 @@ public class MapMGR : MonoBehaviour
         }
 
     }
+    private void SetTileAccordingToValues(Vector2Int vector)
+    {
+        int x = vector.x;
+        int y = vector.y;
 
+        if (0 <= y && y < map.Height && 0 <= x && x < map.Width)
+        {
+            // 1 = タイルあり、0 = タイルなし
+            if (map.GetValue(x,y) == DateMGR.instance.wallID)
+            {
+                //tilemapはタイルマップ全体のこと(Tilemap)。tileは個々のタイルのこと(Tile)
+                tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[CalculateTileType(x, y)]);
+                //Debug.Log($"タイルを{x},{y}に敷き詰めました");
+            }
+            else if (map.GetValue(x, y) == DateMGR.instance.groundID)
+            {
+                tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[UnityEngine.Random.Range(50, 52 + 1)]);
+            }
 
+        }
+        else //mapの領域外
+        {
+            tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[UnityEngine.Random.Range(47, 49 + 1)]); //全方向が壁のタイルを張る(3枚)
+        }
+    }
     private int CalculateTileType(int x, int y)
     {
         bool upIsWall;
@@ -238,34 +263,21 @@ public class MapMGR : MonoBehaviour
         return -100;
     }
 
-    private void SetTileAccordingToValues(Vector2Int vector)
+    public void MakeRoad(Vector2Int vector)
     {
-        int x = vector.x;
-        int y = vector.y;
-
-        if (0 <= y && y < map.Height && 0 <= x && x < map.Width)
+        if (map.GetValue(vector) == DateMGR.instance.wallID)
         {
-            // 1 = タイルあり、0 = タイルなし
-            if (map.GetValue(x,y) == DateMGR.instance.wallID)
-            {
-                //tilemapはタイルマップ全体のこと(Tilemap)。tileは個々のタイルのこと(Tile)
-                tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[CalculateTileType(x, y)]);
-                //Debug.Log($"タイルを{x},{y}に敷き詰めました");
-            }
-            else if (map.GetValue(x, y) == DateMGR.instance.groundID)
-            {
-                tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[UnityEngine.Random.Range(50, 52 + 1)]);
-            }
+            map.SetValue(vector, DateMGR.instance.groundID);
 
+            //周囲9マスのタイルを更新する必要がある
+            for(int y = -1; y <= 1; y++)
+            {
+                for (int x = -1; x<= 1;x++)
+                {
+                    SetTileAccordingToValues(new Vector2Int(vector.x +x,vector.y+y));
+                }
+            }
         }
-        else //mapの領域外
-        {
-            tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[UnityEngine.Random.Range(47, 49 + 1)]); //全方向が壁のタイルを張る(3枚)
-        }
-    }
-    public void ChangeMapValue(Vector2Int pos, int changeID)
-    {
-
     }
 
 
@@ -312,6 +324,10 @@ public class MapDate
             return _outOfRange;
         }
         return _values[ToSubscript(x, y)];
+    }
+    public int GetValue(Vector2Int vector)
+    {
+        return GetValue(vector.x,vector.y);
     }
     public int GetValue(int index)
     {
