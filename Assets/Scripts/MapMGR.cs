@@ -38,7 +38,7 @@ public class MapMGR : MonoBehaviour
     {
         //初期化
         map = null;
-        map = new MapDate(mapWidth,mapHeight); //mapは1つしかないのでとりあえず、numberは0としておく
+        map = new MapDate(mapWidth, mapHeight); //mapは1つしかないのでとりあえず、numberは0としておく
 
         RenderMap();
     }
@@ -51,23 +51,27 @@ public class MapMGR : MonoBehaviour
         {
             for (int x = -outOfStageQ; x < map.Width + outOfStageQ; x++)
             {
-                SetTileAccordingToValues(new Vector2Int(x, y));
+                SetTileAccordingToValues(x, y);
             }
         }
 
     }
-    private void SetTileAccordingToValues(Vector2Int vector)
+    private void SetTileAccordingToValues(int x, int y)
     {
-        int x = vector.x;
-        int y = vector.y;
 
         if (0 <= y && y < map.Height && 0 <= x && x < map.Width)
         {
             // 1 = タイルあり、0 = タイルなし
-            if (map.GetValue(x,y) == DateMGR.instance.wallID)
+            if (map.GetValue(x, y) == DateMGR.instance.wallID)
             {
-                //tilemapはタイルマップ全体のこと(Tilemap)。tileは個々のタイルのこと(Tile)
-                tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[CalculateTileType(x, y)]);
+                if (CalculateTileType(x, y)<47)
+                {
+                    tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[CalculateTileType(x, y)]);
+                }
+                else
+                {
+                    tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[UnityEngine.Random.Range(47, 49 + 1)]);
+                }
                 //Debug.Log($"タイルを{x},{y}に敷き詰めました");
             }
             else if (map.GetValue(x, y) == DateMGR.instance.groundID)
@@ -93,10 +97,22 @@ public class MapMGR : MonoBehaviour
         int uprightWallValue;
         int binarySub;
 
+        if (IsOutRangeOfMap(x,y))
+        {
+            Debug.LogError($"CalculateTileType({x},{y})の引数でmapの範囲外が指定されました");
+            return -100;
+        }
+
+        //そもそもgroundIDの時は0を返すようにする（これはRenderMapでは使わない）
+        if (map.GetValue(x,y) == DateMGR.instance.groundID)
+        {
+            return 0;
+        }
+
         //端のタイルは先に処理する
         if (y == 0 || x == 0 || y == mapHeight - 1 || x == mapWidth - 1)
         {
-            return UnityEngine.Random.Range(47, 49 + 1);//最大値は含まないことに注意
+            return 47;
         }
 
         if (map.GetValue(x, y + 1) == DateMGR.instance.wallID)
@@ -252,9 +268,9 @@ public class MapMGR : MonoBehaviour
                 binarySub = upleftWallValue + 2 * downleftWallValue + 4 * downrightWallValue + 8 * uprightWallValue;
                 return 32 + binarySub;
             }
-            else   //周囲がすべて壁の時はタイルの種類を乱数で決める
+            else   //周囲がすべて壁の時はタイルの種類をあとで乱数で決める
             {
-                return UnityEngine.Random.Range(47, 49 + 1);//最大値は含まないことに注意
+                return 47;
             }
 
         }
@@ -263,28 +279,107 @@ public class MapMGR : MonoBehaviour
         return -100;
     }
 
-    public void MakeRoad(Vector2Int vector)
+    public void MakeRoad(int x, int y)
     {
+        Vector2Int vector = new Vector2Int(x, y);
+
+        if (IsOutRangeOfMap(x,y))
+        {
+            Debug.Log($"MakeRoad({x},{y})の引数でmapの範囲外が指定されました");
+            return;
+        }
+
         if (map.GetValue(vector) == DateMGR.instance.wallID)
         {
+            int[] beforeTileTypes = new int[9];
+            int[] afterTileTypes = new int[9];
+
+            for (int dy =-1; dy <=1; dy++)
+            {
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    if (IsOutRangeOfMap(x+dx,y+dy))
+                    {
+                        beforeTileTypes[(dx + 1) * (dy + 1)] = -10;
+                    }
+                    else
+                    {
+                        beforeTileTypes[(dx + 1) * (dy + 1)] = CalculateTileType(x + dx, y + dy);
+                    }
+                }
+            }
+
             map.SetValue(vector, DateMGR.instance.groundID);
 
             //周囲9マスのタイルを更新する必要がある
-            for(int y = -1; y <= 1; y++)
+            for (int dy = -1; dy <= 1; dy++)
             {
-                for (int x = -1; x<= 1;x++)
+                for (int dx = -1; dx <= 1; dx++)
                 {
-                    SetTileAccordingToValues(new Vector2Int(vector.x +x,vector.y+y));
+                    int i = (dx + 1) * (dy + 1);
+
+                    if (IsOutRangeOfMap(x+dx,y+dy))
+                    {
+                        afterTileTypes[i] = -10;
+                    }
+                    else
+                    {
+                        afterTileTypes[i] = CalculateTileType(x + dx, y + dy);
+                    }
+
+                    if (!(beforeTileTypes[i]==afterTileTypes[i]) || (dx==0&&dy==0))
+                    {
+                        SetTileAccordingToValues(x + dx, y + dy);
+
+                    }
+                    else
+                    {
+                    }
+                    Debug.LogWarning($"EqualsCalculateTileType(beforeTileTypes[i], afterTileTypes[i])が{(beforeTileTypes[i] == afterTileTypes[i])}です\n(dx,dy)=({dx},{dy})");
+                    Debug.LogWarning($"(beforeTileTypes[i], afterTileTypes[i])=({beforeTileTypes[i]}, {afterTileTypes[i]})");
+
+
                 }
             }
+            Debug.LogWarning("########");
+        }
+    }
+
+    //private bool equalscalculatetiletype(int beforetiletype ,int aftertiletype)
+    //{
+    //    if (beforetiletype == aftertiletype)
+    //    {
+    //        return true;
+    //    }
+    //    else if ((47 <= beforetiletype && beforetiletype <= 49) && (47 <= aftertiletype && aftertiletype <= 49)) //すべての辺が壁に接している壁タイルは三種類ある
+    //    {
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        return false;
+    //    }
+    //}
+
+    private bool IsOutRangeOfMap(int x, int y)
+    {
+        if (x < 0 || y < 0 || x > map.Width || y > map.Height)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
 
 
+
+
 }
 
-public class MapDate 
+public class MapDate
 {
     protected int _width;
     protected int _height;
@@ -327,7 +422,7 @@ public class MapDate
     }
     public int GetValue(Vector2Int vector)
     {
-        return GetValue(vector.x,vector.y);
+        return GetValue(vector.x, vector.y);
     }
     public int GetValue(int index)
     {
@@ -398,4 +493,4 @@ public class MapDate
     }
 }
 
- 
+

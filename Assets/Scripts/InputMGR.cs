@@ -30,7 +30,7 @@ public class InputMGR : MonoBehaviour
             Debug.Log($"mouseCurrentPos‚Í{mouseCurrentPos}");
             Debug.Log($"mouseGridPos‚Í{mouseGridPos}");
 
-            GameManager.instance.mapMGR.MakeRoad(mouseGridPos);
+            GameManager.instance.mapMGR.MakeRoad(mouseGridPos.x,mouseGridPos.y);
 
         }
 
