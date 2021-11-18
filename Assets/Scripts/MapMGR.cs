@@ -371,7 +371,7 @@ public class MapMGR : MonoBehaviour
     }
     private bool IsOutRangeOfMap(int x, int y)
     {
-        if (x < 0 || y < 0 || x > map.Width || y > map.Height)
+        if (x < 0 || y < 0 || x > map.Width-1 || y > map.Height-1)
         {
             return true;
         }
@@ -423,7 +423,7 @@ public class MapDate
     {
         if (IsOutOfRange(x, y))
         {
-            Debug.LogError("領域外の値を取得しようとしました");
+            Debug.LogError($"領域外の値を取得しようとしました(x,y)=({x},{y})");
             return _outOfRange;
         }
         return _values[ToSubscript(x, y)];
