@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Bat
+  m_Controller: {fileID: 9100000, guid: 35215a2e81dae904fbcc6a53de55daaa, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 91a1e566af9f5274cb418aa0c681b40b, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 80a14e06b44105c4fa34458200a76e89, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: c0d16bb96b4bee045bf34b1e81274141, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 8c63b2e13a3c82a4a9c3ab20301bfe96, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 810fbd75633179a4a9da143fdb1bbe94, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 045c8c34e27def34da170535e803dba6, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 90cd5db0f7f27c149bb9ae9520d6eb60, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 04b5df76a4716e448884797e37a26f3a, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 0f93344fe22536f4e8dabdf664180b04, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 3f91f60ca052de049adbe5ba9208b654, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: c337376544132fc4aa45038c2086e5ab, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 7cf21bbd7bef2664ea1c46cc06d1f5ff, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: f538722c9c8890647b49516e5e44d260, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 19c789492dd5e0945a98cabd1affc8b6, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 445a0ae17062da345a238340ad5178e6, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 656af9ac5c897374fa6dfec96d040bd6, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: dde67488a6ecf7c4fa70673dc3bae3cf, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 347577415ea0fd64ba29ed8014a90011, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 66ee764c9fe0d5340aa113d45662fef4, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 785bf9ab8271bd941a535f159518865b, type: 2}

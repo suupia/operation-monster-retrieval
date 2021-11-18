@@ -17,6 +17,8 @@ public class MapMGR : MonoBehaviour
 
     [SerializeField] GameObject allysCastle;
     [SerializeField] Vector2Int allysCastlePos;
+    [SerializeField] Vector2Int[] characterSpawnPossFromCastle;
+    [SerializeField] public Vector2Int[] characterSpawnPoss;
     [SerializeField] GameObject enemysCastle;
     [SerializeField] Vector2Int enemysCastlePos;
 
@@ -32,6 +34,10 @@ public class MapMGR : MonoBehaviour
     public int GetMapWidth()
     {
         return mapWidth;
+    }
+    public int GetMapValue(Vector2Int vector)
+    {
+        return map.GetValue(vector);
     }
     public int GetMapValue(int index)
     {
@@ -69,6 +75,13 @@ public class MapMGR : MonoBehaviour
         Instantiate(allysCastle, new Vector3(allysCastlePos.x + 1, allysCastlePos.y + 1, 0), Quaternion.identity); //画像の中心が格子点にくるように、+1していることに注意
         Instantiate(enemysCastle, new Vector3(enemysCastlePos.x + 1, enemysCastlePos.y + 1, 0), Quaternion.identity);
 
+        characterSpawnPoss = new Vector2Int[characterSpawnPossFromCastle.Length];
+        Debug.LogWarning($"characterSpawnPossFromCastle.Length={characterSpawnPossFromCastle.Length}");
+        for(int i = 0; i<characterSpawnPossFromCastle.Length; i++)
+        {
+            characterSpawnPoss[i] = allysCastlePos + characterSpawnPossFromCastle[i];
+            Debug.LogWarning($"characterSpawnPoss[{i}]={allysCastlePos + characterSpawnPossFromCastle[i]}");
+        }
     }
 
 
