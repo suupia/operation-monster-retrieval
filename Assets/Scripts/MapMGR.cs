@@ -15,6 +15,11 @@ public class MapMGR : MonoBehaviour
     [SerializeField] int mapWidth;
     [SerializeField] int outOfStageQ;
 
+    [SerializeField] GameObject allysCastle;
+    [SerializeField] Vector2Int allysCastlePos;
+    [SerializeField] GameObject enemysCastle;
+    [SerializeField] Vector2Int enemysCastlePos;
+
     //Getter
     public int GetMapSize()
     {
@@ -41,6 +46,8 @@ public class MapMGR : MonoBehaviour
         map = new MapDate(mapWidth, mapHeight); //mapは1つしかないのでとりあえず、numberは0としておく
 
         RenderMap();
+
+        PlaceCastle();
     }
     private void RenderMap()
     {
@@ -56,6 +63,15 @@ public class MapMGR : MonoBehaviour
         }
 
     }
+
+    private void PlaceCastle()
+    {
+        Instantiate(allysCastle, new Vector3(allysCastlePos.x + 1, allysCastlePos.y + 1, 0), Quaternion.identity); //画像の中心が格子点にくるように、+1していることに注意
+        Instantiate(enemysCastle, new Vector3(enemysCastlePos.x + 1, enemysCastlePos.y + 1, 0), Quaternion.identity);
+
+    }
+
+
     private void SetTileAccordingToValues(int x, int y)
     {
 
@@ -64,7 +80,7 @@ public class MapMGR : MonoBehaviour
             // 1 = タイルあり、0 = タイルなし
             if (map.GetValue(x, y) == DateMGR.instance.wallID)
             {
-                if (CalculateTileType(x, y)<47)
+                if (CalculateTileType(x, y) < 47) //周りがすべて壁のタイルは3種類ある
                 {
                     tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[CalculateTileType(x, y)]);
                 }
@@ -87,99 +103,109 @@ public class MapMGR : MonoBehaviour
     }
     private int CalculateTileType(int x, int y)
     {
-        bool upIsWall;
-        bool leftIsWall;
-        bool downIsWall;
-        bool rightIsWall;
-        int upleftWallValue;
-        int downleftWallValue;
-        int downrightWallValue;
-        int uprightWallValue;
+        bool upIsWall = false;
+        bool leftIsWall=false;
+        bool downIsWall=false;
+        bool rightIsWall=false;
+        int upleftWallValue =0; //1のときwallがあることを表す
+        int downleftWallValue=0;
+        int downrightWallValue=0;
+        int uprightWallValue=0;
         int binarySub;
 
-        if (IsOutRangeOfMap(x,y))
+        if (IsOutRangeOfMap(x, y))
         {
             Debug.LogError($"CalculateTileType({x},{y})の引数でmapの範囲外が指定されました");
             return -100;
         }
 
         //そもそもgroundIDの時は0を返すようにする（これはRenderMapでは使わない）
-        if (map.GetValue(x,y) == DateMGR.instance.groundID)
+        if (map.GetValue(x, y) == DateMGR.instance.groundID)
         {
             return 0;
         }
 
-        //端のタイルは先に処理する
-        if (y == 0 || x == 0 || y == mapHeight - 1 || x == mapWidth - 1)
-        {
-            return 47;
-        }
+        //if (y == 0 || x == 0 || y == mapHeight - 1 || x == mapWidth - 1)
+        //{
+        //    if (x == 0)
+        //    {
+        //        leftIsWall = true;
+        //        upleftWallValue = 1;
+        //        downleftWallValue = 1;
+        //    }
 
-        if (map.GetValue(x, y + 1) == DateMGR.instance.wallID)
-        {
-            upIsWall = true;
-        }
-        else
-        {
-            upIsWall = false;
-        }
-        if (map.GetValue(x - 1, y) == DateMGR.instance.wallID)
-        {
-            leftIsWall = true;
-        }
-        else
-        {
-            leftIsWall = false;
-        }
-        if (map.GetValue(x, y - 1) == DateMGR.instance.wallID)
-        {
-            downIsWall = true;
-        }
-        else
-        {
-            downIsWall = false;
-        }
-        if (map.GetValue(x + 1, y) == DateMGR.instance.wallID)
-        {
-            rightIsWall = true;
-        }
-        else
-        {
-            rightIsWall = false;
-        }
+        //    if (y == 0) //else ifにしないのは条件が重複する恐れがあるため
+        //    {
+        //        downIsWall = true;
+        //        downleftWallValue = 1;
+        //        downrightWallValue = 1;
+        //    }
 
-        if (map.GetValue(x - 1, y + 1) == DateMGR.instance.wallID)
-        {
-            upleftWallValue = 1;
-        }
-        else
-        {
-            upleftWallValue = 0;
-        }
-        if (map.GetValue(x - 1, y - 1) == DateMGR.instance.wallID)
-        {
-            downleftWallValue = 1;
-        }
-        else
-        {
-            downleftWallValue = 0;
-        }
-        if (map.GetValue(x + 1, y - 1) == DateMGR.instance.wallID)
-        {
-            downrightWallValue = 1;
-        }
-        else
-        {
-            downrightWallValue = 0;
-        }
-        if (map.GetValue(x + 1, y + 1) == DateMGR.instance.wallID)
-        {
-            uprightWallValue = 1;
-        }
-        else
-        {
-            uprightWallValue = 0;
-        }
+        //    if (x == mapWidth - 1)
+        //    {
+        //        rightIsWall = true;
+        //        uprightWallValue = 1;
+        //        downrightWallValue = 1;
+        //    }
+
+        //    if (y == mapHeight - 1)
+        //    {
+        //        upIsWall = true;
+        //        upleftWallValue = 1;
+        //        uprightWallValue = 1;
+        //    }
+
+        //}
+
+        
+            if (y== map.Height-1 ||map.GetValue(x, y + 1) == DateMGR.instance.wallID) //左側の条件式の方が先に判定されるので、mapの範囲外にGetValueすることはない（と思う）
+            {
+                upIsWall = true;
+            }
+
+            if (x== 0|| map.GetValue(x - 1, y) == DateMGR.instance.wallID)
+            {
+                leftIsWall = true;
+            }
+
+            if (y==0||map.GetValue(x, y - 1) == DateMGR.instance.wallID)
+            {
+                downIsWall = true;
+            }
+
+            if (x == map.Width -1||map.GetValue(x + 1, y) == DateMGR.instance.wallID)
+            {
+                rightIsWall = true;
+            }
+
+
+            if (x==0|| y == map.Height-1||map.GetValue(x - 1, y + 1) == DateMGR.instance.wallID) //この4つの場合分けは4隅を調べればよいので、xだけの判定で十分
+            {
+                upleftWallValue = 1;
+            }
+
+            if (x==0||y==0||map.GetValue(x - 1, y - 1) == DateMGR.instance.wallID)
+            {
+                downleftWallValue = 1;
+            }
+
+            if (x== map.Width-1 || y== 0||map.GetValue(x + 1, y - 1) == DateMGR.instance.wallID)
+            {
+                downrightWallValue = 1;
+            }
+
+            if (x== map.Width-1||y==map.Height -1|| map.GetValue(x + 1, y + 1) == DateMGR.instance.wallID)
+            {
+                uprightWallValue = 1;
+            }
+
+        
+
+
+
+
+
+
         //壁と接しないとき
         if (!upIsWall && !leftIsWall && !downIsWall && !rightIsWall)
         {
@@ -278,12 +304,11 @@ public class MapMGR : MonoBehaviour
         Debug.LogError($"CalculateTileNum({y} ,{x})に失敗しました");
         return -100;
     }
-
     public void MakeRoad(int x, int y)
     {
         Vector2Int vector = new Vector2Int(x, y);
 
-        if (IsOutRangeOfMap(x,y))
+        if (IsOutRangeOfMap(x, y))
         {
             Debug.Log($"MakeRoad({x},{y})の引数でmapの範囲外が指定されました");
             return;
@@ -294,11 +319,11 @@ public class MapMGR : MonoBehaviour
             int[] beforeTileTypes = new int[9];
             int[] afterTileTypes = new int[9];
 
-            for (int dy =-1; dy <=1; dy++)
+            for (int dy = -1; dy <= 1; dy++)
             {
                 for (int dx = -1; dx <= 1; dx++)
                 {
-                    if (IsOutRangeOfMap(x+dx,y+dy))
+                    if (IsOutRangeOfMap(x + dx, y + dy))
                     {
                         beforeTileTypes[(dx + 1) * 3 + (dy + 1)] = -10;
                     }
@@ -316,56 +341,34 @@ public class MapMGR : MonoBehaviour
             {
                 for (int dx = -1; dx <= 1; dx++)
                 {
-                    int i = (dx+1)*3+(dy+1); //3進法を利用
+                    int i = (dx + 1) * 3 + (dy + 1); //3進法を利用
 
-                    if (IsOutRangeOfMap(x+dx,y+dy))
+                    if (IsOutRangeOfMap(x + dx, y + dy))
                     {
                         afterTileTypes[i] = -10;
                     }
                     else
                     {
                         afterTileTypes[i] = CalculateTileType(x + dx, y + dy);
-                        if (dx == 0 && dy == -1)
-                        {
-                            Debug.LogError($"CalculateTileType({x + dx}, {y + dy})={CalculateTileType(x + dx, y + dy)}");
-
-                        }
                     }
 
-                    if (!(beforeTileTypes[i]==afterTileTypes[i]) || (dx==0&&dy==0))
+                    if (!(beforeTileTypes[i] == afterTileTypes[i]) || (dx == 0 && dy == 0))
                     {
                         SetTileAccordingToValues(x + dx, y + dy);
 
                     }
                     else
                     {
+                        //TileTypeが変化していなかったら、タイルは張り替えない
                     }
-                    Debug.LogWarning($"EqualsCalculateTileType(beforeTileTypes[i], afterTileTypes[i])が{(beforeTileTypes[i] == afterTileTypes[i])}です\n(dx,dy)=({dx},{dy})");
-                    Debug.LogWarning($"(beforeTileTypes[i], afterTileTypes[i])=({beforeTileTypes[i]}, {afterTileTypes[i]})");
+                    //Debug.LogWarning($"EqualsCalculateTileType(beforeTileTypes[i], afterTileTypes[i])が{(beforeTileTypes[i] == afterTileTypes[i])}です\n(dx,dy)=({dx},{dy})");
+                    //Debug.LogWarning($"(beforeTileTypes[i], afterTileTypes[i])=({beforeTileTypes[i]}, {afterTileTypes[i]})");
 
 
                 }
             }
-            Debug.LogWarning("########");
         }
     }
-
-    //private bool equalscalculatetiletype(int beforetiletype ,int aftertiletype)
-    //{
-    //    if (beforetiletype == aftertiletype)
-    //    {
-    //        return true;
-    //    }
-    //    else if ((47 <= beforetiletype && beforetiletype <= 49) && (47 <= aftertiletype && aftertiletype <= 49)) //すべての辺が壁に接している壁タイルは三種類ある
-    //    {
-    //        return true;
-    //    }
-    //    else
-    //    {
-    //        return false;
-    //    }
-    //}
-
     private bool IsOutRangeOfMap(int x, int y)
     {
         if (x < 0 || y < 0 || x > map.Width || y > map.Height)
