@@ -300,11 +300,11 @@ public class MapMGR : MonoBehaviour
                 {
                     if (IsOutRangeOfMap(x+dx,y+dy))
                     {
-                        beforeTileTypes[(dx + 1) * (dy + 1)] = -10;
+                        beforeTileTypes[(dx + 1) * 3 + (dy + 1)] = -10;
                     }
                     else
                     {
-                        beforeTileTypes[(dx + 1) * (dy + 1)] = CalculateTileType(x + dx, y + dy);
+                        beforeTileTypes[(dx + 1) * 3 + (dy + 1)] = CalculateTileType(x + dx, y + dy);
                     }
                 }
             }
@@ -316,7 +316,7 @@ public class MapMGR : MonoBehaviour
             {
                 for (int dx = -1; dx <= 1; dx++)
                 {
-                    int i = (dx + 1) * (dy + 1);
+                    int i = (dx+1)*3+(dy+1); //3i–@‚ð—˜—p
 
                     if (IsOutRangeOfMap(x+dx,y+dy))
                     {
@@ -325,6 +325,11 @@ public class MapMGR : MonoBehaviour
                     else
                     {
                         afterTileTypes[i] = CalculateTileType(x + dx, y + dy);
+                        if (dx == 0 && dy == -1)
+                        {
+                            Debug.LogError($"CalculateTileType({x + dx}, {y + dy})={CalculateTileType(x + dx, y + dy)}");
+
+                        }
                     }
 
                     if (!(beforeTileTypes[i]==afterTileTypes[i]) || (dx==0&&dy==0))

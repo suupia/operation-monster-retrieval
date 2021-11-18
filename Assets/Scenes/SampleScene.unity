@@ -661,8 +661,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5187beed42d4da7428b388bbec882bef, type: 2}
   - {fileID: 11400000, guid: 443c44487a0ea074b9723abc044d2017, type: 2}
   - {fileID: 11400000, guid: 7051260699a26b247b8be03450306ca2, type: 2}
-  mapHeight: 7
-  mapWidth: 16
+  mapHeight: 9
+  mapWidth: 18
   outOfStageQ: 5
 --- !u!483693784 &1877091974
 TilemapRenderer:
