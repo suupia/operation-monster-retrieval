@@ -9,9 +9,9 @@ public class GameManager : MonoBehaviour
     [System.NonSerialized] public MapMGR mapMGR;
     [System.NonSerialized] public DebugMGR debugMGR;
 
-    public readonly int wallID = 2;
-    public readonly int groundID = 1;
-    public readonly int towerID = 3;
+    public readonly int wallID = 3;
+    public readonly int groundID = 2;
+    public readonly int towerID = 5;
 
     public GameObject[] characterPrefabs;
 

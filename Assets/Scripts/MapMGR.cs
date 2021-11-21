@@ -95,7 +95,7 @@ public class MapMGR : MonoBehaviour
         {
             Instantiate(towerPrefabs[i], new Vector3(towerPoss[i].x+0.5f,towerPoss[i].y+0.75f, 0),Quaternion.identity);
 
-            //map.SetValue(towerPoss[i],GameManager.instance.towerID);
+            map.MultiplySetValue(towerPoss[i],GameManager.instance.towerID);
         }
     }
 
@@ -106,7 +106,7 @@ public class MapMGR : MonoBehaviour
         if (0 <= y && y < map.Height && 0 <= x && x < map.Width)
         {
             // 1 = タイルあり、0 = タイルなし
-            if (map.GetValue(x, y) == GameManager.instance.wallID)
+            if (map.GetValue(x, y) % GameManager.instance.wallID==0)
             {
                 if (CalculateTileType(x, y) < 47) //周りがすべて壁のタイルは3種類ある
                 {
@@ -118,7 +118,7 @@ public class MapMGR : MonoBehaviour
                 }
                 //Debug.Log($"タイルを{x},{y}に敷き詰めました");
             }
-            else if (map.GetValue(x, y) == GameManager.instance.groundID)
+            else if (map.GetValue(x, y) % GameManager.instance.groundID==0)
             {
                 tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[UnityEngine.Random.Range(50, 52 + 1)]);
             }
@@ -148,7 +148,7 @@ public class MapMGR : MonoBehaviour
         }
 
         //そもそもgroundIDの時は0を返すようにする（これはRenderMapでは使わない）
-        if (map.GetValue(x, y) == GameManager.instance.groundID)
+        if (map.GetValue(x, y) % GameManager.instance.groundID ==0)
         {
             return 0;
         }
@@ -186,43 +186,43 @@ public class MapMGR : MonoBehaviour
         //}
 
         
-            if (y== map.Height-1 ||map.GetValue(x, y + 1) == GameManager.instance.wallID) //左側の条件式の方が先に判定されるので、mapの範囲外にGetValueすることはない（と思う）
+            if (y== map.Height-1 ||map.GetValue(x, y + 1) % GameManager.instance.wallID ==0) //左側の条件式の方が先に判定されるので、mapの範囲外にGetValueすることはない（と思う）
             {
                 upIsWall = true;
             }
 
-            if (x== 0|| map.GetValue(x - 1, y) == GameManager.instance.wallID)
+            if (x== 0|| map.GetValue(x - 1, y) % GameManager.instance.wallID ==0)
             {
                 leftIsWall = true;
             }
 
-            if (y==0||map.GetValue(x, y - 1) == GameManager.instance.wallID)
+            if (y==0||map.GetValue(x, y - 1) % GameManager.instance.wallID==0)
             {
                 downIsWall = true;
             }
 
-            if (x == map.Width -1||map.GetValue(x + 1, y) == GameManager.instance.wallID)
+            if (x == map.Width -1||map.GetValue(x + 1, y) % GameManager.instance.wallID==0)
             {
                 rightIsWall = true;
             }
 
 
-            if (x==0|| y == map.Height-1||map.GetValue(x - 1, y + 1) == GameManager.instance.wallID) //この4つの場合分けは4隅を調べればよいので、xだけの判定で十分
+            if (x==0|| y == map.Height-1||map.GetValue(x - 1, y + 1) % GameManager.instance.wallID==0) //この4つの場合分けは4隅を調べればよいので、xだけの判定で十分
             {
                 upleftWallValue = 1;
             }
 
-            if (x==0||y==0||map.GetValue(x - 1, y - 1) == GameManager.instance.wallID)
+            if (x==0||y==0||map.GetValue(x - 1, y - 1) % GameManager.instance.wallID==0)
             {
                 downleftWallValue = 1;
             }
 
-            if (x== map.Width-1 || y== 0||map.GetValue(x + 1, y - 1) == GameManager.instance.wallID)
+            if (x== map.Width-1 || y== 0||map.GetValue(x + 1, y - 1) % GameManager.instance.wallID==0)
             {
                 downrightWallValue = 1;
             }
 
-            if (x== map.Width-1||y==map.Height -1|| map.GetValue(x + 1, y + 1) == GameManager.instance.wallID)
+            if (x== map.Width-1||y==map.Height -1|| map.GetValue(x + 1, y + 1) % GameManager.instance.wallID==0)
             {
                 uprightWallValue = 1;
             }
@@ -481,6 +481,19 @@ public class MapDate
         _values[ToSubscript(x, y)] = value;
     }
 
+    public void MultiplySetValue(Vector2Int vector, int value)
+    {
+        int x = vector.x;
+        int y = vector.y;
+
+        if (IsOutOfRange(x, y))
+        {
+            Debug.LogError($"MultiplySetValue({x},{y})で領域外に値{value}を設定しようとしました");
+            return;
+        }
+
+        _values[ToSubscript(x, y)] *= value;
+    }
     public void SetValue(Vector2Int vector, int value)
     {
         SetValue(vector.x, vector.y, value);

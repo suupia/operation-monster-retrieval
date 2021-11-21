@@ -16,6 +16,7 @@ public class CharacterMGR : MonoBehaviour
 
     public bool isAttacking = false;
     public bool isMoving = false;
+    int movementVector;
 
     [SerializeField] int level;
     [SerializeField] int maxHp;
@@ -31,7 +32,7 @@ public class CharacterMGR : MonoBehaviour
     [SerializeField] private int drawDamageTime;
 
     private Direction direction;
-
+    private State state;
     private enum Direction
     {
         Front,
@@ -43,44 +44,115 @@ public class CharacterMGR : MonoBehaviour
         DiagRightBack,
         DiagLeftBack
     }
+    private enum State
+    {
+        Marching,
+        InBattle
+    }
+
+    //Setter
+    public void SetDirection(Vector2 directionVector)
+    {
+        if (directionVector == Vector2.zero) //引数の方向ベクトルがゼロベクトルの時は何もしない
+        {
+            return;
+        }
+
+        float angle = Vector2.SignedAngle(Vector2.right, directionVector);
+        //Debug.Log($"SetDirectionのangleは{angle}です");
+
+
+        //先に画像の向きを決定する
+        if (directionVector.x > 0)
+        {
+            transform.localScale = new Vector3(-1, 1, 1); //元の画像が左向きのため
+        }
+        else if (directionVector.x < 0)
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+
+        //directionとanimationを決定する
+        if (-22.5f <= angle && angle < 22.5f)
+        {
+            direction = Direction.Right;
+            animator.SetBool("Horizontal", true);
+            animator.SetInteger("Vertical", 0);
+        }
+        else if (22.5f <= angle && angle < 67.5f)
+        {
+            direction = Direction.DiagRightBack;
+            animator.SetBool("Horizontal", true);
+            animator.SetInteger("Vertical", 1);
+        }
+        else if (67.5f <= angle && angle < 112.5f)
+
+        {
+            direction = Direction.Back;
+            animator.SetBool("Horizontal", false);
+            animator.SetInteger("Vertical", 1);
+        }
+        else if (112.5f <= angle && angle < 157.5f)
+        {
+            direction = Direction.DiagLeftBack;
+            animator.SetBool("Horizontal", true);
+            animator.SetInteger("Vertical", 1);
+        }
+        else if (-157.5f <= angle && angle < -112.5f)
+        {
+            direction = Direction.DiagLeftFront;
+            animator.SetBool("Horizontal", true);
+            animator.SetInteger("Vertical", -1);
+        }
+        else if (-112.5f <= angle && angle < -67.5f)
+        {
+            direction = Direction.Front;
+            animator.SetBool("Horizontal", false);
+            animator.SetInteger("Vertical", -1);
+        }
+        else if (-67.5f <= angle && angle < -22.5f)
+        {
+            direction = Direction.DiagRightFront;
+            animator.SetBool("Horizontal", true);
+            animator.SetInteger("Vertical", -1);
+        }
+        else //角度は-180から180までで端点は含まないらしい。そのため、Direction.Leftはelseで処理することにした。
+        {
+            direction = Direction.Left;
+            animator.SetBool("Horizontal", true);
+            animator.SetInteger("Vertical", 0);
+        }
+    }
+
 
     private void Start()
     {
         gridPos = new Vector2Int(Mathf.FloorToInt(transform.position.x - 0.5f), Mathf.FloorToInt(transform.position.y - 0.5f)) ;
     }
 
-    //public bool CanMove(int horizontalInput, int verticalInput)
-    //{
-    //    Vector2Int endGridPos = gridPos + new Vector2Int(horizontalInput, verticalInput);
+    private void Update()
+    {
+        switch (state)
+        {
+            case State.Marching:
+                //Move(new Vector2Int(1,1));
+                break;
+            case State.InBattle:
+                Attack();
+                break;
+        }
+    }
 
-    //    if (GameManager.instance.mapMGR.GetMapValue(endGridPos) % DateMGR.instance.wallID == 0
-    //        || GameManager.instance.mapMGR.GetMapValue(endGridPos) % DateMGR.instance.wallID == 0
-    //        || GameManager.instance.mapMGR.GetMapValue(endGridPos) % GameManager.instance.enemyID == 0)
+
+    //public void Move(Vector2Int vector)
+    //{
+    //    if (GameManager.instance.mapMGR.GetMapValue(gridPos + vector) % GameManager.instance.wallID == 0)
     //    {
-    //        return false;
+    //        Debug.LogWarning("移動先にwallIDがあるため、移動できません");
+    //        return ;
     //    }
 
-    //    //斜め移動の時にブロックの角を移動することはできない
-    //    if (horizontalInput != 0 && verticalInput != 0)
-    //    {
-    //        //水平方向の判定
-    //        if (GameManager.instance.internalData.GetValue(gridPos.x + horizontalInput, gridPos.y) % GameManager.instance.wallID == 0)
-    //        {
-    //            return false;
-    //        }
-
-    //        //垂直方向の判定
-    //        if (GameManager.instance.internalData.GetValue(gridPos.x, gridPos.y + verticalInput) % GameManager.instance.wallID == 0)
-    //        {
-    //            return false;
-    //        }
-    //    }
-    //    return true;
-    //}
-
-    //public void Move()
-    //{
-    //    Vector2Int directionVector = GetDirectionVector();
+    //    SetDirection(vector); //向いている方向を変える
 
     //    hMovementAmount += directionVector.x;
     //    vMovementAmount += directionVector.y;
@@ -167,4 +239,8 @@ public class CharacterMGR : MonoBehaviour
     //    //Debug.Log($"MoveCoroutine()終了時のendPosは{endPos}");
     //}
 
+    public void Attack()
+    {
+        Debug.LogWarning("Attackを実行します");
+    }
 }
