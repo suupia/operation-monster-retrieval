@@ -6,9 +6,12 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    [System.NonSerialized] public DateMGR dateMGR;
     [System.NonSerialized] public MapMGR mapMGR;
     [System.NonSerialized] public DebugMGR debugMGR;
+
+    public readonly int wallID = 2;
+    public readonly int groundID = 1;
+    public readonly int towerID = 3;
 
     public GameObject[] characterPrefabs;
 
@@ -28,7 +31,6 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        dateMGR = GameObject.Find("DateMGR").GetComponent<DateMGR>();
         mapMGR = GameObject.Find("Tilemap").GetComponent<MapMGR>();
         debugMGR = GameObject.Find("DebugMGR").GetComponent<DebugMGR>();
 
@@ -49,9 +51,9 @@ public class GameManager : MonoBehaviour
         }
         for (int i = 0; i< mapMGR.characterSpawnPoss.Length;i++)
         {
-        if (mapMGR.GetMapValue(mapMGR.characterSpawnPoss[i])== dateMGR.groundID)
+        if (mapMGR.GetMapValue(mapMGR.characterSpawnPoss[i])== GameManager.instance.groundID)
         {
-                Debug.LogWarning("SendCharacterCoroutine‚ðŽÀs‚µ‚Ü‚·");
+                Debug.Log("SendCharacterCoroutine‚ðŽÀs‚µ‚Ü‚·");
                 StartCoroutine(SpawnCharacterCoroutine(mapMGR.characterSpawnPoss[i],0)); //‚Æ‚è‚ ‚¦‚¸characterID‚Ìˆø”‚Í0‚É‚µ‚Ä‚¨‚­
         }
 

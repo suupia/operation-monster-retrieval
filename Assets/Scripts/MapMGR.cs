@@ -15,12 +15,15 @@ public class MapMGR : MonoBehaviour
     [SerializeField] int mapWidth;
     [SerializeField] int outOfStageQ;
 
-    [SerializeField] GameObject allysCastle;
+    [SerializeField] GameObject allysCastlePrefab;
     [SerializeField] Vector2Int allysCastlePos;
     [SerializeField] Vector2Int[] characterSpawnPossFromCastle;
     [SerializeField] public Vector2Int[] characterSpawnPoss;
-    [SerializeField] GameObject enemysCastle;
+    [SerializeField] GameObject enemysCastlePrefab;
     [SerializeField] Vector2Int enemysCastlePos;
+
+    [SerializeField] GameObject[] towerPrefabs;
+    [SerializeField] Vector2Int[] towerPoss;
 
     //Getter
     public int GetMapSize()
@@ -54,6 +57,8 @@ public class MapMGR : MonoBehaviour
         RenderMap();
 
         PlaceCastle();
+
+        PlaceTower();
     }
     private void RenderMap()
     {
@@ -72,15 +77,25 @@ public class MapMGR : MonoBehaviour
 
     private void PlaceCastle()
     {
-        Instantiate(allysCastle, new Vector3(allysCastlePos.x + 1, allysCastlePos.y + 1, 0), Quaternion.identity); //画像の中心が格子点にくるように、+1していることに注意
-        Instantiate(enemysCastle, new Vector3(enemysCastlePos.x + 1, enemysCastlePos.y + 1, 0), Quaternion.identity);
+        Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x + 1, allysCastlePos.y + 1, 0), Quaternion.identity); //画像の中心が格子点にくるように、+1していることに注意
+        Instantiate(enemysCastlePrefab, new Vector3(enemysCastlePos.x + 1, enemysCastlePos.y + 1, 0), Quaternion.identity);
 
         characterSpawnPoss = new Vector2Int[characterSpawnPossFromCastle.Length];
-        Debug.LogWarning($"characterSpawnPossFromCastle.Length={characterSpawnPossFromCastle.Length}");
+        Debug.Log($"characterSpawnPossFromCastle.Length={characterSpawnPossFromCastle.Length}");
         for(int i = 0; i<characterSpawnPossFromCastle.Length; i++)
         {
             characterSpawnPoss[i] = allysCastlePos + characterSpawnPossFromCastle[i];
-            Debug.LogWarning($"characterSpawnPoss[{i}]={allysCastlePos + characterSpawnPossFromCastle[i]}");
+            Debug.Log($"characterSpawnPoss[{i}]={allysCastlePos + characterSpawnPossFromCastle[i]}");
+        }
+    }
+
+    private void PlaceTower()
+    {
+        for(int i = 0; i < towerPrefabs.Length; i++)
+        {
+            Instantiate(towerPrefabs[i], new Vector3(towerPoss[i].x+0.5f,towerPoss[i].y+0.75f, 0),Quaternion.identity);
+
+            //map.SetValue(towerPoss[i],GameManager.instance.towerID);
         }
     }
 
@@ -91,7 +106,7 @@ public class MapMGR : MonoBehaviour
         if (0 <= y && y < map.Height && 0 <= x && x < map.Width)
         {
             // 1 = タイルあり、0 = タイルなし
-            if (map.GetValue(x, y) == DateMGR.instance.wallID)
+            if (map.GetValue(x, y) == GameManager.instance.wallID)
             {
                 if (CalculateTileType(x, y) < 47) //周りがすべて壁のタイルは3種類ある
                 {
@@ -103,7 +118,7 @@ public class MapMGR : MonoBehaviour
                 }
                 //Debug.Log($"タイルを{x},{y}に敷き詰めました");
             }
-            else if (map.GetValue(x, y) == DateMGR.instance.groundID)
+            else if (map.GetValue(x, y) == GameManager.instance.groundID)
             {
                 tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[UnityEngine.Random.Range(50, 52 + 1)]);
             }
@@ -133,7 +148,7 @@ public class MapMGR : MonoBehaviour
         }
 
         //そもそもgroundIDの時は0を返すようにする（これはRenderMapでは使わない）
-        if (map.GetValue(x, y) == DateMGR.instance.groundID)
+        if (map.GetValue(x, y) == GameManager.instance.groundID)
         {
             return 0;
         }
@@ -171,43 +186,43 @@ public class MapMGR : MonoBehaviour
         //}
 
         
-            if (y== map.Height-1 ||map.GetValue(x, y + 1) == DateMGR.instance.wallID) //左側の条件式の方が先に判定されるので、mapの範囲外にGetValueすることはない（と思う）
+            if (y== map.Height-1 ||map.GetValue(x, y + 1) == GameManager.instance.wallID) //左側の条件式の方が先に判定されるので、mapの範囲外にGetValueすることはない（と思う）
             {
                 upIsWall = true;
             }
 
-            if (x== 0|| map.GetValue(x - 1, y) == DateMGR.instance.wallID)
+            if (x== 0|| map.GetValue(x - 1, y) == GameManager.instance.wallID)
             {
                 leftIsWall = true;
             }
 
-            if (y==0||map.GetValue(x, y - 1) == DateMGR.instance.wallID)
+            if (y==0||map.GetValue(x, y - 1) == GameManager.instance.wallID)
             {
                 downIsWall = true;
             }
 
-            if (x == map.Width -1||map.GetValue(x + 1, y) == DateMGR.instance.wallID)
+            if (x == map.Width -1||map.GetValue(x + 1, y) == GameManager.instance.wallID)
             {
                 rightIsWall = true;
             }
 
 
-            if (x==0|| y == map.Height-1||map.GetValue(x - 1, y + 1) == DateMGR.instance.wallID) //この4つの場合分けは4隅を調べればよいので、xだけの判定で十分
+            if (x==0|| y == map.Height-1||map.GetValue(x - 1, y + 1) == GameManager.instance.wallID) //この4つの場合分けは4隅を調べればよいので、xだけの判定で十分
             {
                 upleftWallValue = 1;
             }
 
-            if (x==0||y==0||map.GetValue(x - 1, y - 1) == DateMGR.instance.wallID)
+            if (x==0||y==0||map.GetValue(x - 1, y - 1) == GameManager.instance.wallID)
             {
                 downleftWallValue = 1;
             }
 
-            if (x== map.Width-1 || y== 0||map.GetValue(x + 1, y - 1) == DateMGR.instance.wallID)
+            if (x== map.Width-1 || y== 0||map.GetValue(x + 1, y - 1) == GameManager.instance.wallID)
             {
                 downrightWallValue = 1;
             }
 
-            if (x== map.Width-1||y==map.Height -1|| map.GetValue(x + 1, y + 1) == DateMGR.instance.wallID)
+            if (x== map.Width-1||y==map.Height -1|| map.GetValue(x + 1, y + 1) == GameManager.instance.wallID)
             {
                 uprightWallValue = 1;
             }
@@ -327,7 +342,7 @@ public class MapMGR : MonoBehaviour
             return;
         }
 
-        if (map.GetValue(vector) == DateMGR.instance.wallID)
+        if (map.GetValue(vector) == GameManager.instance.wallID)
         {
             int[] beforeTileTypes = new int[9];
             int[] afterTileTypes = new int[9];
@@ -347,7 +362,7 @@ public class MapMGR : MonoBehaviour
                 }
             }
 
-            map.SetValue(vector, DateMGR.instance.groundID);
+            map.SetValue(vector, GameManager.instance.groundID);
 
             //周囲9マスのタイルを更新する必要がある
             for (int dy = -1; dy <= 1; dy++)
@@ -420,7 +435,7 @@ public class MapDate
         _values = new int[width * height];
 
         //mapの初期化は１で行う。あとから部屋や道を空けていく。
-        FillAll(DateMGR.instance.wallID);
+        FillAll(GameManager.instance.wallID);
     }
 
     //プロパティ
