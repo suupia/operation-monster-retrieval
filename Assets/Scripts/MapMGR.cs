@@ -46,7 +46,10 @@ public class MapMGR : MonoBehaviour
     {
         return map.GetValue(index);
     }
-
+    public void MultiplySetMapValue(Vector2Int vector, int value)
+    {
+        map.MultiplySetValue(vector,value);
+    }
 
     public void SetupMap() //‚±‚ê‚ðGameManager‚©‚çŒÄ‚Ô
     {

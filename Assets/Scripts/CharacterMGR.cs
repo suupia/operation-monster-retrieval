@@ -11,12 +11,13 @@ public class CharacterMGR : MonoBehaviour
     Animator animator;
 
     [SerializeField] Vector2Int gridPos;
+    [SerializeField] Vector2Int targetPos;
 
     [SerializeField] int thisCharacterID;
 
     public bool isAttacking = false;
     public bool isMoving = false;
-    int movementVector;
+    Vector2Int movementVector;
 
     [SerializeField] int level;
     [SerializeField] int maxHp;
@@ -48,6 +49,50 @@ public class CharacterMGR : MonoBehaviour
     {
         Marching,
         InBattle
+    }
+    //Getter
+    public Vector2Int GetDirectionVector()
+    {
+        Vector2Int resultVector2Int = new Vector2Int(0, 0);
+        switch (direction)
+        {
+            case Direction.Back:
+                resultVector2Int = new Vector2Int(0, 1);
+                break;
+
+            case Direction.DiagLeftBack:
+                resultVector2Int = new Vector2Int(-1, 1);
+                break;
+
+            case Direction.Left:
+                resultVector2Int = new Vector2Int(-1, 0);
+                break;
+
+            case Direction.DiagLeftFront:
+                resultVector2Int = new Vector2Int(-1, -1);
+                break;
+
+            case Direction.Front:
+                resultVector2Int = new Vector2Int(0, -1);
+                break;
+
+            case Direction.DiagRightFront:
+                resultVector2Int = new Vector2Int(1, -1);
+                break;
+
+            case Direction.Right:
+                resultVector2Int = new Vector2Int(1, 0);
+                break;
+
+            case Direction.DiagRightBack:
+                resultVector2Int = new Vector2Int(1, 1);
+                break;
+        }
+        if (resultVector2Int == new Vector2Int(0, 0))
+        {
+            Debug.LogError("GetDirectionVector()の戻り値が(0,0)になっています");
+        }
+        return resultVector2Int;
     }
 
     //Setter
@@ -135,27 +180,58 @@ public class CharacterMGR : MonoBehaviour
         switch (state)
         {
             case State.Marching:
-                //Move(new Vector2Int(1,1));
+                March();
                 break;
             case State.InBattle:
-                Attack();
+                Battle();
                 break;
         }
     }
 
+    //public void March()
+    //{
+    //    TargetNearestTower();
 
-    //public void Move(Vector2Int vector)
+    //    if (true) //キャラクターの進行するモードによって行動が変わる
+    //    {
+    //        MoveShortestRoute();
+    //    }
+    //    else
+    //    {
+    //        //プレイヤーが進路を選択する
+    //    }
+    //}
+
+    //public void TargetNearestTower()
+    //{
+    //    //
+    //    //最も近いタワーの座標を取得する
+    //    //
+
+    //    targetPos = new Vector2Int(8,3); //仮
+    //}
+    //public void MoveShortestRoute()
+    //{
+
+    //}
+
+    //public bool CanMove(Vector2Int vector)
     //{
     //    if (GameManager.instance.mapMGR.GetMapValue(gridPos + vector) % GameManager.instance.wallID == 0)
     //    {
     //        Debug.LogWarning("移動先にwallIDがあるため、移動できません");
-    //        return ;
+    //        return false;
     //    }
+    //    else
+    //    {
+    //        return true;
+    //    }
+    //}
+    //public void Move()
+    //{
+    //    Vector2Int directionVector = GetDirectionVector();
 
-    //    SetDirection(vector); //向いている方向を変える
-
-    //    hMovementAmount += directionVector.x;
-    //    vMovementAmount += directionVector.y;
+    //    movementVector += directionVector;
 
     //    MoveDate(directionVector);
 
@@ -163,7 +239,6 @@ public class CharacterMGR : MonoBehaviour
     //    {
     //        StartCoroutine(MoveCoroutine());
     //    }
-
     //}
 
     //public void MoveDate(Vector2Int directionVector)
@@ -178,6 +253,13 @@ public class CharacterMGR : MonoBehaviour
     //    {
     //        GameManager.instance.internalData.MoveInternalData(gridPos, gridPos + directionVector, GameManager.instance.enemyID);
     //    }
+
+    //    if (!(GameManager.instance.mapMGR.GetMapValue(gridPos) % GameManager.instance.characterID == 0))
+    //    {
+    //        Debug.LogError("MoveDateで移動前のmapValueにcharacterIDが含まれていません");
+    //    }
+    //    GameManager.instance.mapMGR.MultiplySetMapValue(gridPos,);
+
 
     //    //gridPosを移動させる。これは最後に行うことに注意！
     //    gridPos += directionVector;
@@ -239,8 +321,102 @@ public class CharacterMGR : MonoBehaviour
     //    //Debug.Log($"MoveCoroutine()終了時のendPosは{endPos}");
     //}
 
-    public void Attack()
+    //public void ChasePlayerAvoidingWall()
+    //{
+    //    //前に動けないことは確定していることに注意
+    //    Vector2Int leftFrontGridPos = GameManager.instance.ToGridPosition(GetTransformPosFromGridPos() + GameManager.instance.RotateVector(GetDirectionVector(), 45));
+    //    Vector2Int rightFrontGridPos = GameManager.instance.ToGridPosition(GetTransformPosFromGridPos() + GameManager.instance.RotateVector(GetDirectionVector(), -45));
+
+    //    int horizontalInput;
+    //    int verticalInput;
+
+    //    switch (direction)
+    //    {
+    //        case Direction.Back:
+    //        case Direction.Left:
+    //        case Direction.Front:
+    //        case Direction.Right:
+    //            if (GameManager.instance.internalData.GetValue(leftFrontGridPos) % GameManager.instance.groundID == 0 ||
+    //                GameManager.instance.internalData.GetValue(leftFrontGridPos) % GameManager.instance.aisleID == 0)
+    //            {
+    //                Vector2Int leftGridPos = GameManager.instance.ToGridPosition(GetTransformPosFromGridPos() + GameManager.instance.RotateVector(GetDirectionVector(), 90));
+    //                if (GameManager.instance.internalData.GetValue(leftGridPos) % GameManager.instance.groundID == 0 ||
+    //                GameManager.instance.internalData.GetValue(leftGridPos) % GameManager.instance.aisleID == 0)
+    //                {
+    //                    horizontalInput = Mathf.RoundToInt(GameManager.instance.RotateVector(GetDirectionVector(), 90).x);
+    //                    verticalInput = Mathf.RoundToInt(GameManager.instance.RotateVector(GetDirectionVector(), 90).y);
+
+    //                    if (!CanMove(horizontalInput, verticalInput))
+    //                    {
+    //                        return;
+    //                    }
+    //                    SetDirection(new Vector2(horizontalInput, verticalInput));
+    //                    Move();
+    //                    //Debug.Log($"Move({horizontalInput},{verticalInput})を実行しました");
+    //                }
+    //            }
+
+    //            if (GameManager.instance.internalData.GetValue(rightFrontGridPos) % GameManager.instance.groundID == 0 ||
+    //                GameManager.instance.internalData.GetValue(rightFrontGridPos) % GameManager.instance.aisleID == 0)
+    //            {
+    //                Vector2Int rightGridPos = GameManager.instance.ToGridPosition(GetTransformPosFromGridPos() + GameManager.instance.RotateVector(GetDirectionVector(), -90));
+    //                if (GameManager.instance.internalData.GetValue(rightGridPos) % GameManager.instance.groundID == 0 ||
+    //                GameManager.instance.internalData.GetValue(rightFrontGridPos) % GameManager.instance.aisleID == 0)
+    //                {
+    //                    horizontalInput = Mathf.RoundToInt(GameManager.instance.RotateVector(GetDirectionVector(), -90).x);
+    //                    verticalInput = Mathf.RoundToInt(GameManager.instance.RotateVector(GetDirectionVector(), -90).y);
+
+    //                    if (!CanMove(horizontalInput, verticalInput))
+    //                    {
+    //                        return;
+    //                    }
+    //                    SetDirection(new Vector2(horizontalInput, verticalInput));
+    //                    Move();
+    //                    //Debug.Log($"Move({horizontalInput},{verticalInput})を実行しました");
+    //                }
+    //            }
+
+    //            break;
+
+    //        case Direction.DiagLeftBack:
+    //        case Direction.DiagLeftFront:
+    //        case Direction.DiagRightFront:
+    //        case Direction.DiagRightBack:
+    //            if (GameManager.instance.internalData.GetValue(leftFrontGridPos) % GameManager.instance.groundID == 0 ||
+    //                GameManager.instance.internalData.GetValue(leftFrontGridPos) % GameManager.instance.aisleID == 0)
+    //            {
+    //                horizontalInput = Mathf.RoundToInt(GameManager.instance.RotateVector(GetDirectionVector(), 45).x);
+    //                verticalInput = Mathf.RoundToInt(GameManager.instance.RotateVector(GetDirectionVector(), 45).y);
+    //                if (!CanMove(horizontalInput, verticalInput))
+    //                {
+    //                    return;
+    //                }
+    //                SetDirection(new Vector2(horizontalInput, verticalInput));
+    //                Move();
+    //                //Debug.Log($"Move({horizontalInput},{verticalInput})を実行しました");
+    //            }
+    //            if (GameManager.instance.internalData.GetValue(rightFrontGridPos) % GameManager.instance.groundID == 0 ||
+    //                GameManager.instance.internalData.GetValue(rightFrontGridPos) % GameManager.instance.aisleID == 0)
+    //            {
+    //                horizontalInput = Mathf.RoundToInt(GameManager.instance.RotateVector(GetDirectionVector(), -45).x);
+    //                verticalInput = Mathf.RoundToInt(GameManager.instance.RotateVector(GetDirectionVector(), -45).y);
+    //                if (!CanMove(horizontalInput, verticalInput))
+    //                {
+    //                    return;
+    //                }
+    //                SetDirection(new Vector2(horizontalInput, verticalInput));
+    //                Move();
+    //                //Debug.Log($"Move({horizontalInput},{verticalInput})を実行しました");
+    //            }
+
+    //            break;
+    //    }
+
+    //}
+
+
+    public void Battle()
     {
-        Debug.LogWarning("Attackを実行します");
+        Debug.LogWarning("Battleを実行します");
     }
 }
