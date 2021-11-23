@@ -38,6 +38,10 @@ public class MapMGR : MonoBehaviour
     {
         return mapWidth;
     }
+    public int GetMapValue(int x, int y)
+    {
+        return map.GetValue(x,y);
+    }
     public int GetMapValue(Vector2Int vector)
     {
         return map.GetValue(vector);
@@ -49,6 +53,18 @@ public class MapMGR : MonoBehaviour
     public void MultiplySetMapValue(Vector2Int vector, int value)
     {
         map.MultiplySetValue(vector,value);
+    }
+
+    public void DivisionalSetMapValue(Vector2Int vector, int value)
+    {
+        if (map.GetValue(vector)%value !=0)
+        {
+            Debug.LogError($"DivisionalSetMapValue({vector},{value})でmap({vector})の値を{value}で割り切ることができませんでした。");
+        }
+        else
+        {
+            map.DivisionalSetValue(vector,value);
+        }
     }
 
     public void SetupMap() //これをGameManagerから呼ぶ
@@ -364,8 +380,8 @@ public class MapMGR : MonoBehaviour
                     }
                 }
             }
-
-            map.SetValue(vector, GameManager.instance.groundID);
+            map.DivisionalSetValue(vector, GameManager.instance.wallID);
+            map.MultiplySetValue(vector, GameManager.instance.groundID);
 
             //周囲9マスのタイルを更新する必要がある
             for (int dy = -1; dy <= 1; dy++)
@@ -484,6 +500,11 @@ public class MapDate
         _values[ToSubscript(x, y)] = value;
     }
 
+    public void SetValue(Vector2Int vector, int value)
+    {
+        SetValue(vector.x, vector.y, value);
+    }
+
     public void MultiplySetValue(Vector2Int vector, int value)
     {
         int x = vector.x;
@@ -497,11 +518,20 @@ public class MapDate
 
         _values[ToSubscript(x, y)] *= value;
     }
-    public void SetValue(Vector2Int vector, int value)
-    {
-        SetValue(vector.x, vector.y, value);
-    }
 
+    public void DivisionalSetValue(Vector2Int vector, int value)
+    {
+        int x = vector.x;
+        int y = vector.y;
+
+        if (IsOutOfRange(x, y))
+        {
+            Debug.LogError($"DivisionalSetValue({x},{y})で領域外に値{value}を設定しようとしました");
+            return;
+        }
+
+        _values[ToSubscript(x, y)] /= value;
+    }
     public void SwapMapValue(int startX, int startY, int endX, int endY)
     {
         int startValue = GetValue(startX, startY);

@@ -35,7 +35,7 @@ public class InputMGR : MonoBehaviour
         }
 
         //Debug用
-        if (Input.GetKeyDown(KeyCode.F5))
+        if (Input.GetKeyDown(KeyCode.F5) || true) //今はずっとデバッグしておく
         {
             Debug.Log("DebugMapValue()を実行します");
             GameManager.instance.debugMGR.DebugMapValue();
