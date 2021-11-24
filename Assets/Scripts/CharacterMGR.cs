@@ -22,7 +22,7 @@ public class CharacterMGR : MonoBehaviour
     [SerializeField] int maxHp;
     [SerializeField] int hp;
     [SerializeField] int atk;
-    [SerializeField] float attackInterval;  
+    [SerializeField] float attackInterval;
     [SerializeField] float attackRange;
     [SerializeField] int spd; //1秒間に進むマスの数 [マス/s]  とりあえず１にしておく
     float moveTime; // movetime = 1/spd [s]
@@ -50,7 +50,6 @@ public class CharacterMGR : MonoBehaviour
         Marching,
         InBattle
     }
-
 
 
 
@@ -181,13 +180,12 @@ public class CharacterMGR : MonoBehaviour
         }
     }
 
-
     private void Start()
     {
         animator = GetComponent<Animator>();
 
         moveTime = 1 / spd;
-        gridPos = new Vector2Int(Mathf.FloorToInt(transform.position.x - 0.5f), Mathf.FloorToInt(transform.position.y - 0.5f)) ;
+        gridPos = GameManager.instance.ToGridPosition(transform.position);
     }
 
     private void Update()
@@ -205,16 +203,21 @@ public class CharacterMGR : MonoBehaviour
 
     public void March()
     {
-        TargetNearestTower();
 
         if (true) //キャラクターの進行するモードによって行動が変わる
         {
             //オートモード
 
+            TargetNearestTower();
+
+
             if (!isMoving) //向きは立ち止まっているときのみ、変わる
             {
                 TurnToTarget();
-                TurnToTheDirectionCharacterCanMove();
+                if (CalcDistanceToTarget() > Mathf.Sqrt(2))
+                {
+                    TurnToTheDirectionCharacterCanMove();
+                }
             }
 
             if (CanMove(GetDirectionVector()) && CalcDistanceToTarget() > Mathf.Sqrt(2))
@@ -234,9 +237,28 @@ public class CharacterMGR : MonoBehaviour
 
     public void TargetNearestTower()
     {
-        //
         //最も近いタワーの座標を取得する
-        //
+
+        int lookingForValue =1; //索敵範囲
+        int notLookingForValue =0; //索敵範囲外
+        int centerValue=0; //原点
+
+
+        int[,] searchRangeArray;
+        int maxRange =5; //今は仮に５としておく
+
+        for (int k = 0; k < maxRange; k++)
+        {
+            searchRangeArray = CalcSearchRangeArray(k,lookingForValue,notLookingForValue,centerValue);
+            for(int j = 0; j < searchRangeArray.GetLength(0); j++)
+            {
+                for(int i = 0; i < searchRangeArray.GetLength(1); i++)
+                {
+                    //lookingForValueのとき、タワーがあるかどうか判定する
+                }
+            }
+        }
+
 
         targetGridPos = new Vector2Int(8, 3); //仮
     }
@@ -245,7 +267,7 @@ public class CharacterMGR : MonoBehaviour
     {
         if (GameManager.instance.mapMGR.GetMapValue(gridPos + vector) % GameManager.instance.wallID == 0)
         {
-            Debug.LogWarning($"移動先にwallIDがあるため、移動できません(gridPos:{gridPos}vector:{vector})\nGameManager.instance.mapMGR.GetMapValue(gridPos + vector)={GameManager.instance.mapMGR.GetMapValue(gridPos + vector)} GetDirectionVector={GetDirectionVector()}");
+            Debug.Log($"移動先にwallIDがあるため、移動できません(gridPos:{gridPos}vector:{vector})\nGameManager.instance.mapMGR.GetMapValue(gridPos + vector)={GameManager.instance.mapMGR.GetMapValue(gridPos + vector)} GetDirectionVector={GetDirectionVector()}");
             return false;
         }
 
@@ -273,12 +295,13 @@ public class CharacterMGR : MonoBehaviour
         if (!isMoving)
         {
             StartCoroutine(MoveForwardCoroutine());
+            
         }
     }
 
     IEnumerator MoveForwardCoroutine()  //Characterをゆっくり動かす関数
     {
-        Debug.LogWarning("MoveCoroutineを実行します");
+        Debug.Log("MoveCoroutineを実行します");
         Vector2 startPos;
         Vector2 endPos;
 
@@ -291,24 +314,24 @@ public class CharacterMGR : MonoBehaviour
         isMoving = true;
 
 
-            MoveDate(GetDirectionVector()); //先にMoveDateを行う
+        MoveDate(GetDirectionVector()); //先にMoveDateを行う
 
-            startPos = transform.position;
-            endPos = GetTransformPosFromGridPos();
+        startPos = transform.position;
+        endPos = GetTransformPosFromGridPos();
 
 
-            float remainingDistance = (endPos - startPos).sqrMagnitude;
+        float remainingDistance = (endPos - startPos).sqrMagnitude;
 
-            while (remainingDistance > float.Epsilon)
-            {
-                transform.position = Vector3.MoveTowards(transform.position, endPos, 1f / moveTime * Time.deltaTime);
-                //3つ目の引数は"1フレームの最大移動距離"　単位は実質[m/s](コルーチンが1フレームずつ回っているからTime.deltaTimeが消える。moveTime経った時に1マス進む。)
+        while (remainingDistance > float.Epsilon)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, endPos, 1f / moveTime * Time.deltaTime);
+            //3つ目の引数は"1フレームの最大移動距離"　単位は実質[m/s](コルーチンが1フレームずつ回っているからTime.deltaTimeが消える。moveTime経った時に1マス進む。)
 
-                remainingDistance = (endPos - new Vector2(transform.position.x, transform.position.y)).sqrMagnitude;
+            remainingDistance = (endPos - new Vector2(transform.position.x, transform.position.y)).sqrMagnitude;
 
-                yield return null;  //1フレーム停止させる。
-            }
-            transform.position = endPos;//ループを抜けた時はきっちり移動させる。
+            yield return null;  //1フレーム停止させる。
+        }
+        transform.position = endPos;//ループを抜けた時はきっちり移動させる。
 
 
 
@@ -324,8 +347,8 @@ public class CharacterMGR : MonoBehaviour
             return;
         }
 
-        GameManager.instance.mapMGR.DivisionalSetMapValue(gridPos,GameManager.instance.characterID);
-        GameManager.instance.mapMGR.MultiplySetMapValue(gridPos+directionVector,GameManager.instance.characterID);
+        GameManager.instance.mapMGR.DivisionalSetMapValue(gridPos, GameManager.instance.characterID);
+        GameManager.instance.mapMGR.MultiplySetMapValue(gridPos + directionVector, GameManager.instance.characterID);
 
 
         //gridPosを移動させる。これは最後に行うことに注意！
@@ -438,5 +461,39 @@ public class CharacterMGR : MonoBehaviour
     public void Battle()
     {
         Debug.LogWarning("Battleを実行します");
+    }
+
+    public int[,] CalcSearchRangeArray(int advancingDistance,int lookingForValue,int notLookingForValue, int centerValue)
+    {
+        int t = lookingForValue; //索敵範囲
+        int f = notLookingForValue; //索敵範囲外
+        int o = centerValue; //原点
+
+        int size = 2*(advancingDistance + 1) + 1;
+        int[,] resultArray = new int[size, size];
+
+        for (int j = 0; j < size; j++)
+        {
+            for (int i = 0; i < size; i++)
+            {
+                if (i + j == advancingDistance || i + j == advancingDistance + 1 //左下
+                   || i - j == advancingDistance + 1 || i - j == advancingDistance + 2 //右下
+                   || -i + j == advancingDistance + 1 || -i + j == advancingDistance + 2 //左下
+                   || i + j == 3 * (advancingDistance + 1) || i + j == 3 * (advancingDistance + 1) + 1 //右上
+                    )
+                {
+                    resultArray[i, j] = t;
+                }
+                else if (i == advancingDistance + 1 && j == advancingDistance + 1)
+                {
+                    resultArray[i, j] = o;
+                }
+                else
+                {
+                    resultArray[i, j] = f;
+                }
+            }
+        }
+        return resultArray;
     }
 }

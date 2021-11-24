@@ -85,9 +85,9 @@ public class GameManager : MonoBehaviour
         isSpawnCharacter = false;
     }
 
-    public Vector2 RotateVector(Vector2 vector, float radian)
+    public Vector2 RotateVector(Vector2 vector, float degreeMeasure)
     {
-        return Quaternion.Euler(0, 0, -radian) * vector;
+        return Quaternion.Euler(0, 0, -degreeMeasure) * vector;
     }
 
 }

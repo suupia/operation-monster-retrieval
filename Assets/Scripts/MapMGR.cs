@@ -9,7 +9,7 @@ public class MapMGR : MonoBehaviour
     [SerializeField] Tilemap tilemap;
     [SerializeField] TileBase[] tileArray;
 
-    MapDate map;
+    MapData map;
 
     [SerializeField] int mapHeight;
     [SerializeField] int mapWidth;
@@ -71,7 +71,7 @@ public class MapMGR : MonoBehaviour
     {
         //初期化
         map = null;
-        map = new MapDate(mapWidth, mapHeight); //mapは1つしかないのでとりあえず、numberは0としておく
+        map = new MapData(mapWidth, mapHeight); //mapは1つしかないのでとりあえず、numberは0としておく
 
         RenderMap();
 
@@ -434,15 +434,15 @@ public class MapMGR : MonoBehaviour
 
 }
 
-public class MapDate
+public class MapData
 {
-    protected int _width;
-    protected int _height;
-    protected int[] _values = null;
-    protected int _outOfRange = -1;
+    int _width;
+    int _height;
+    int[] _values = null;
+    int _outOfRange = -1;
 
     //コンストラクタ
-    public MapDate(int width, int height)
+    public MapData(int width, int height)
     {
         if (width <= 0 || height <= 0)
         {
@@ -541,7 +541,7 @@ public class MapDate
     }
 
     //添え字を変換する
-    protected int ToSubscript(int x, int y)
+    int ToSubscript(int x, int y)
     {
         return x + (y * _width);
     }
@@ -553,7 +553,7 @@ public class MapDate
         return new Vector2Int(xSub, ySub);
     }
 
-    protected bool IsOutOfRange(int x, int y)
+    bool IsOutOfRange(int x, int y)
     {
         if (x < 0 || x >= _width) { return true; }
         if (y < 0 || y >= _height) { return true; }
