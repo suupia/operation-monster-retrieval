@@ -40,7 +40,7 @@ public class MapMGR : MonoBehaviour
     }
     public int GetMapValue(int x, int y)
     {
-        return map.GetValue(x,y);
+        return map.GetValue(x, y);
     }
     public int GetMapValue(Vector2Int vector)
     {
@@ -52,18 +52,18 @@ public class MapMGR : MonoBehaviour
     }
     public void MultiplySetMapValue(Vector2Int vector, int value)
     {
-        map.MultiplySetValue(vector,value);
+        map.MultiplySetValue(vector, value);
     }
 
     public void DivisionalSetMapValue(Vector2Int vector, int value)
     {
-        if (map.GetValue(vector)%value !=0)
+        if (map.GetValue(vector) % value != 0)
         {
             Debug.LogError($"DivisionalSetMapValue({vector},{value})でmap({vector})の値を{value}で割り切ることができませんでした。");
         }
         else
         {
-            map.DivisionalSetValue(vector,value);
+            map.DivisionalSetValue(vector, value);
         }
     }
 
@@ -101,7 +101,7 @@ public class MapMGR : MonoBehaviour
 
         characterSpawnPoss = new Vector2Int[characterSpawnPossFromCastle.Length];
         Debug.Log($"characterSpawnPossFromCastle.Length={characterSpawnPossFromCastle.Length}");
-        for(int i = 0; i<characterSpawnPossFromCastle.Length; i++)
+        for (int i = 0; i < characterSpawnPossFromCastle.Length; i++)
         {
             characterSpawnPoss[i] = allysCastlePos + characterSpawnPossFromCastle[i];
             Debug.Log($"characterSpawnPoss[{i}]={allysCastlePos + characterSpawnPossFromCastle[i]}");
@@ -110,11 +110,11 @@ public class MapMGR : MonoBehaviour
 
     private void PlaceTower()
     {
-        for(int i = 0; i < towerPrefabs.Length; i++)
+        for (int i = 0; i < towerPrefabs.Length; i++)
         {
-            Instantiate(towerPrefabs[i], new Vector3(towerPoss[i].x+0.5f,towerPoss[i].y+0.75f, 0),Quaternion.identity);
+            Instantiate(towerPrefabs[i], new Vector3(towerPoss[i].x + 0.5f, towerPoss[i].y + 0.75f, 0), Quaternion.identity);
 
-            map.MultiplySetValue(towerPoss[i],GameManager.instance.towerID);
+            map.MultiplySetValue(towerPoss[i], GameManager.instance.towerID);
         }
     }
 
@@ -125,7 +125,7 @@ public class MapMGR : MonoBehaviour
         if (0 <= y && y < map.Height && 0 <= x && x < map.Width)
         {
             // 1 = タイルあり、0 = タイルなし
-            if (map.GetValue(x, y) % GameManager.instance.wallID==0)
+            if (map.GetValue(x, y) % GameManager.instance.wallID == 0)
             {
                 if (CalculateTileType(x, y) < 47) //周りがすべて壁のタイルは3種類ある
                 {
@@ -137,7 +137,7 @@ public class MapMGR : MonoBehaviour
                 }
                 //Debug.Log($"タイルを{x},{y}に敷き詰めました");
             }
-            else if (map.GetValue(x, y) % GameManager.instance.groundID==0)
+            else if (map.GetValue(x, y) % GameManager.instance.groundID == 0)
             {
                 tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[UnityEngine.Random.Range(50, 52 + 1)]);
             }
@@ -151,13 +151,13 @@ public class MapMGR : MonoBehaviour
     private int CalculateTileType(int x, int y)
     {
         bool upIsWall = false;
-        bool leftIsWall=false;
-        bool downIsWall=false;
-        bool rightIsWall=false;
-        int upleftWallValue =0; //1のときwallがあることを表す
-        int downleftWallValue=0;
-        int downrightWallValue=0;
-        int uprightWallValue=0;
+        bool leftIsWall = false;
+        bool downIsWall = false;
+        bool rightIsWall = false;
+        int upleftWallValue = 0; //1のときwallがあることを表す
+        int downleftWallValue = 0;
+        int downrightWallValue = 0;
+        int uprightWallValue = 0;
         int binarySub;
 
         if (IsOutRangeOfMap(x, y))
@@ -167,7 +167,7 @@ public class MapMGR : MonoBehaviour
         }
 
         //そもそもgroundIDの時は0を返すようにする（これはRenderMapでは使わない）
-        if (map.GetValue(x, y) % GameManager.instance.groundID ==0)
+        if (map.GetValue(x, y) % GameManager.instance.groundID == 0)
         {
             return 0;
         }
@@ -204,49 +204,49 @@ public class MapMGR : MonoBehaviour
 
         //}
 
-        
-            if (y== map.Height-1 ||map.GetValue(x, y + 1) % GameManager.instance.wallID ==0) //左側の条件式の方が先に判定されるので、mapの範囲外にGetValueすることはない（と思う）
-            {
-                upIsWall = true;
-            }
 
-            if (x== 0|| map.GetValue(x - 1, y) % GameManager.instance.wallID ==0)
-            {
-                leftIsWall = true;
-            }
+        if (y == map.Height - 1 || map.GetValue(x, y + 1) % GameManager.instance.wallID == 0) //左側の条件式の方が先に判定されるので、mapの範囲外にGetValueすることはない（と思う）
+        {
+            upIsWall = true;
+        }
 
-            if (y==0||map.GetValue(x, y - 1) % GameManager.instance.wallID==0)
-            {
-                downIsWall = true;
-            }
+        if (x == 0 || map.GetValue(x - 1, y) % GameManager.instance.wallID == 0)
+        {
+            leftIsWall = true;
+        }
 
-            if (x == map.Width -1||map.GetValue(x + 1, y) % GameManager.instance.wallID==0)
-            {
-                rightIsWall = true;
-            }
+        if (y == 0 || map.GetValue(x, y - 1) % GameManager.instance.wallID == 0)
+        {
+            downIsWall = true;
+        }
+
+        if (x == map.Width - 1 || map.GetValue(x + 1, y) % GameManager.instance.wallID == 0)
+        {
+            rightIsWall = true;
+        }
 
 
-            if (x==0|| y == map.Height-1||map.GetValue(x - 1, y + 1) % GameManager.instance.wallID==0) //この4つの場合分けは4隅を調べればよいので、xだけの判定で十分
-            {
-                upleftWallValue = 1;
-            }
+        if (x == 0 || y == map.Height - 1 || map.GetValue(x - 1, y + 1) % GameManager.instance.wallID == 0) //この4つの場合分けは4隅を調べればよいので、xだけの判定で十分
+        {
+            upleftWallValue = 1;
+        }
 
-            if (x==0||y==0||map.GetValue(x - 1, y - 1) % GameManager.instance.wallID==0)
-            {
-                downleftWallValue = 1;
-            }
+        if (x == 0 || y == 0 || map.GetValue(x - 1, y - 1) % GameManager.instance.wallID == 0)
+        {
+            downleftWallValue = 1;
+        }
 
-            if (x== map.Width-1 || y== 0||map.GetValue(x + 1, y - 1) % GameManager.instance.wallID==0)
-            {
-                downrightWallValue = 1;
-            }
+        if (x == map.Width - 1 || y == 0 || map.GetValue(x + 1, y - 1) % GameManager.instance.wallID == 0)
+        {
+            downrightWallValue = 1;
+        }
 
-            if (x== map.Width-1||y==map.Height -1|| map.GetValue(x + 1, y + 1) % GameManager.instance.wallID==0)
-            {
-                uprightWallValue = 1;
-            }
+        if (x == map.Width - 1 || y == map.Height - 1 || map.GetValue(x + 1, y + 1) % GameManager.instance.wallID == 0)
+        {
+            uprightWallValue = 1;
+        }
 
-        
+
 
 
 
@@ -418,7 +418,7 @@ public class MapMGR : MonoBehaviour
     }
     private bool IsOutRangeOfMap(int x, int y)
     {
-        if (x < 0 || y < 0 || x > map.Width-1 || y > map.Height-1)
+        if (x < 0 || y < 0 || x > map.Width - 1 || y > map.Height - 1)
         {
             return true;
         }
@@ -439,7 +439,8 @@ public class MapData
     int _width;
     int _height;
     int[] _values = null;
-    int _outOfRange = -1;
+    int _edgeValue;
+    int _errorValue = -1;
 
     //コンストラクタ
     public MapData(int width, int height)
@@ -471,7 +472,12 @@ public class MapData
         if (IsOutOfRange(x, y))
         {
             Debug.LogError($"領域外の値を取得しようとしました(x,y)=({x},{y})");
-            return _outOfRange;
+            return _errorValue;
+        }
+        if (IsOnTheEdge(x,y))
+        {
+            Debug.Log($"IsOnTheEdge({x},{y})がtrueです");
+            return _edgeValue;
         }
         return _values[ToSubscript(x, y)];
     }
@@ -484,7 +490,7 @@ public class MapData
         if (index < 0 || index > _values.Length)
         {
             Debug.LogError("領域外の値を習得しようとしました");
-            return _outOfRange;
+            return _errorValue;
         }
         return _values[index];
     }
@@ -555,10 +561,17 @@ public class MapData
 
     bool IsOutOfRange(int x, int y)
     {
-        if (x < 0 || x >= _width) { return true; }
-        if (y < 0 || y >= _height) { return true; }
+        if (x < -1 || x > _width) { return true; }
+        if (y < -1 || y > _height) { return true; }
 
-        //領域の中
+        //mapの中
+        return false;
+    }
+
+    bool IsOnTheEdge(int x, int y)
+    {
+        if (x == -1 || x == _width) { return true; }
+        if (y == -1 || y == _height) { return true; }
         return false;
     }
 
@@ -569,9 +582,11 @@ public class MapData
         {
             for (int i = 0; i < _width; i++)
             {
-                SetValue(i, j, value);
+                _values[ToSubscript(i, j)] = value;
             }
         }
+
+        _edgeValue = value;
     }
 }
 
