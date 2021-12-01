@@ -14,26 +14,46 @@ public class CharacterMGR : MonoBehaviour
     [SerializeField] Vector2Int directionVectorToTarget;
 
     [SerializeField] int thisCharacterID;
-
-    public bool isAttacking = false;
-    public bool isMoving = false;
-
     [SerializeField] int level;
     [SerializeField] int maxHp;
     [SerializeField] int hp;
     [SerializeField] int atk;
     [SerializeField] float attackInterval;
     [SerializeField] float attackRange;
-    [SerializeField] int spd; //1秒間に進むマスの数 [マス/s]  とりあえず１にしておく
+    [SerializeField] float spd; //1秒間に進むマスの数 [マス/s]  とりあえず１にしておく
     float moveTime; // movetime = 1/spd [s]
     [SerializeField] int coolTime;
+
+    public bool isAttacking = false;
+    public bool isMoving = false;
+
+    bool isFristMarch = true;
+    bool isFristBattle = true;
 
     private GameObject damageTextGO;
     [SerializeField] private Text damageText;
     [SerializeField] private int drawDamageTime;
 
     private Direction direction;
-    private State state;
+    private State _state;
+    private State state
+    {
+        get { return _state; }
+        set
+        {
+            switch (value)
+            {
+                case State.Marching:
+                    isFristMarch = true;
+                    break;
+                case State.InBattle:
+                    isFristBattle = true;
+                    break;
+            }
+            _state = value;
+        }
+    }
+
     private enum Direction
     {
         Front,
@@ -186,6 +206,7 @@ public class CharacterMGR : MonoBehaviour
 
         moveTime = 1 / spd;
         gridPos = GameManager.instance.ToGridPosition(transform.position);
+        state = State.Marching;
     }
 
     private void Update()
@@ -201,14 +222,19 @@ public class CharacterMGR : MonoBehaviour
         }
     }
 
-    public void March()
+    public void March() //Update()で呼ばれることに注意
     {
 
         if (true) //キャラクターの進行するモードによって行動が変わる
         {
             //オートモード
+            if (isFristMarch)
+            {
+                isFristMarch = false;
+                TargetNearestTower();
+            }
 
-            TargetNearestTower();
+            Debug.Log($"targetGridPos={targetGridPos}");
 
 
             if (!isMoving) //向きは立ち止まっているときのみ、変わる
@@ -218,16 +244,20 @@ public class CharacterMGR : MonoBehaviour
                 {
                     TurnToTheDirectionCharacterCanMove();
                 }
+                else
+                {
+                    TurnToTarget();
+                    state = State.InBattle;
+                    return;
+                }
             }
 
             if (CanMove(GetDirectionVector()) && CalcDistanceToTarget() > Mathf.Sqrt(2))
             {
                 MoveForward();
             }
-            else
-            {
-                return;
-            }
+
+
         }
         else
         {
@@ -235,36 +265,62 @@ public class CharacterMGR : MonoBehaviour
         }
     }
 
-    public void TargetNearestTower()
+    public void TargetNearestTower() //最も近いタワーの座標を取得する
     {
-        //最も近いタワーの座標を取得する
+        
 
-        int lookingForValue =1; //索敵範囲
-        int notLookingForValue =0; //索敵範囲外
-        int centerValue=0; //原点
+        int lookingForValue = 1; //索敵範囲の値
+        int notLookingForValue = 0; //索敵範囲外の値
+        int centerValue = 0; //原点の値
 
+        Vector2Int vector; //ループ内で使い、(i,j)をワールド座標に直したもの
+        List<Vector2Int> nearestTowerList = new List<Vector2Int>();
 
         int[,] searchRangeArray;
-        int maxRange =5; //今は仮に５としておく
+        int maxRange = System.Math.Max(GameManager.instance.mapMGR.GetMapWidth(),GameManager.instance.mapMGR.GetMapHeight()); //探索する範囲はmapの縦横の最大値まで調べれば十分
 
-        for (int k = 0; k < maxRange; k++)
+
+        //Towerの位置をListに追加する
+        for (int k = 0; k < maxRange; k++) //kは中心のマスから何マスまで歩けるかを表す
         {
-            searchRangeArray = CalcSearchRangeArray(k,lookingForValue,notLookingForValue,centerValue);
-            for(int j = 0; j < searchRangeArray.GetLength(0); j++)
+            //Debug.Log($"{k}回目のループを開始します");
+
+            searchRangeArray = CalcSearchRangeArray(k, lookingForValue, notLookingForValue, centerValue);
+            for (int j = 0; j < searchRangeArray.GetLength(0); j++)
             {
-                for(int i = 0; i < searchRangeArray.GetLength(1); i++)
+                for (int i = 0; i < searchRangeArray.GetLength(1); i++)
                 {
-                    //lookingForValueのとき、タワーがあるかどうか判定する
+                    vector = new Vector2Int(gridPos.x - (k + 1) + i, gridPos.y - (k + 1) + j); //ワールド座標に変換する
+
+                    if (vector.x < 0 || vector.y<0)
+                    {
+                        continue;
+                    }
+
+                    if (searchRangeArray[i, j] == lookingForValue && GameManager.instance.mapMGR.GetMapValue(vector) % GameManager.instance.towerID ==0)
+                    {
+                        nearestTowerList.Add(vector);
+                    }
                 }
+            }
+
+            if (nearestTowerList.Count > 0)
+            {
+                Debug.Log($"nearestTowerList[0]={nearestTowerList[0]}");
+                break;
             }
         }
 
+        //Listの中身をソートする
+        nearestTowerList.Sort((a,b) => b.y - a.y); //まずy座標に関して降順でソートする
+        nearestTowerList.Sort((a, b) => b.x - a.x); //次にx座標に関して降順でソートする
 
-        targetGridPos = new Vector2Int(8, 3); //仮
+        targetGridPos = nearestTowerList[0];
     }
 
     public bool CanMove(Vector2Int vector)
     {
+
         if (GameManager.instance.mapMGR.GetMapValue(gridPos + vector) % GameManager.instance.wallID == 0)
         {
             Debug.Log($"移動先にwallIDがあるため、移動できません(gridPos:{gridPos}vector:{vector})\nGameManager.instance.mapMGR.GetMapValue(gridPos + vector)={GameManager.instance.mapMGR.GetMapValue(gridPos + vector)} GetDirectionVector={GetDirectionVector()}");
@@ -295,7 +351,7 @@ public class CharacterMGR : MonoBehaviour
         if (!isMoving)
         {
             StartCoroutine(MoveForwardCoroutine());
-            
+
         }
     }
 
@@ -382,6 +438,7 @@ public class CharacterMGR : MonoBehaviour
             case Direction.Left:
             case Direction.Front:
             case Direction.Right:
+
                 if (GameManager.instance.mapMGR.GetMapValue(leftFrontGridPos) % GameManager.instance.groundID == 0)
                 {
                     Vector2Int leftGridPos = GameManager.instance.ToGridPosition(GetTransformPosFromGridPos() + GameManager.instance.RotateVector(GetDirectionVector(), 90));
@@ -398,6 +455,7 @@ public class CharacterMGR : MonoBehaviour
                         //Debug.Log($"Move({horizontalInput},{verticalInput})を実行しました");
                     }
                 }
+
 
                 if (GameManager.instance.mapMGR.GetMapValue(rightFrontGridPos) % GameManager.instance.groundID == 0)
                 {
@@ -422,6 +480,7 @@ public class CharacterMGR : MonoBehaviour
             case Direction.DiagLeftFront:
             case Direction.DiagRightFront:
             case Direction.DiagRightBack:
+
                 if (GameManager.instance.mapMGR.GetMapValue(leftFrontGridPos) % GameManager.instance.groundID == 0)
                 {
                     vectorInput = Vector2Int.RoundToInt(GameManager.instance.RotateVector(GetDirectionVector(), 45));
@@ -434,6 +493,8 @@ public class CharacterMGR : MonoBehaviour
                     //Move();
                     //Debug.Log($"Move({horizontalInput},{verticalInput})を実行しました");
                 }
+
+
                 if (GameManager.instance.mapMGR.GetMapValue(rightFrontGridPos) % GameManager.instance.groundID == 0)
                 {
                     vectorInput = Vector2Int.RoundToInt(GameManager.instance.RotateVector(GetDirectionVector(), -45));
@@ -463,13 +524,13 @@ public class CharacterMGR : MonoBehaviour
         Debug.LogWarning("Battleを実行します");
     }
 
-    public int[,] CalcSearchRangeArray(int advancingDistance,int lookingForValue,int notLookingForValue, int centerValue)
+    public int[,] CalcSearchRangeArray(int advancingDistance, int lookingForValue, int notLookingForValue, int centerValue)
     {
         int t = lookingForValue; //索敵範囲
         int f = notLookingForValue; //索敵範囲外
         int o = centerValue; //原点
 
-        int size = 2*(advancingDistance + 1) + 1;
+        int size = 2 * (advancingDistance + 1) + 1;
         int[,] resultArray = new int[size, size];
 
         for (int j = 0; j < size; j++)

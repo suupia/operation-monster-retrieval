@@ -116,7 +116,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridPos: {x: 0, y: 0}
-  targetPos: {x: 0, y: 0}
+  targetGridPos: {x: 0, y: 0}
   directionVectorToTarget: {x: 0, y: 0}
   thisCharacterID: 0
   isAttacking: 0
@@ -127,7 +127,7 @@ MonoBehaviour:
   atk: 0
   attackInterval: 0
   attackRange: 0
-  spd: 1
+  spd: 1.5
   coolTime: 0
   damageText: {fileID: 0}
   drawDamageTime: 0
