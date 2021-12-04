@@ -441,6 +441,7 @@ public class MapData
     int[] _values = null;
     int _edgeValue;
     int _errorValue = -1;
+    int[] _routeValues = null;
 
     //コンストラクタ
     public MapData(int width, int height)
@@ -453,9 +454,10 @@ public class MapData
         _width = width;
         _height = height;
         _values = new int[width * height];
+        _routeValues = new int[width * height];
 
-        //mapの初期化は１で行う。あとから部屋や道を空けていく。
-        FillAll(GameManager.instance.wallID);
+        FillAll(GameManager.instance.wallID); //mapの初期化はwallIDで行う
+        InitializeRouteValues();  //routeValuesの初期化は0で行う
     }
 
     //プロパティ
@@ -538,13 +540,20 @@ public class MapData
 
         _values[ToSubscript(x, y)] /= value;
     }
-    public void SwapMapValue(int startX, int startY, int endX, int endY)
+
+    public void InitializeRouteValues()
     {
-        int startValue = GetValue(startX, startY);
-        int endValue = GetValue(endX, endY);
-        SetValue(startX, startY, endValue);
-        SetValue(endX, endY, startValue);
+        for (int i=0;i<_routeValues.Length;i++)
+        {
+            _routeValues[i] = 0;
+        }
     }
+
+    public void NumberingRouteValues(Vector2Int startPos,Vector2Int endPos)
+    {
+
+    }
+
 
     //添え字を変換する
     int ToSubscript(int x, int y)
