@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
 
     [System.NonSerialized] public MapMGR mapMGR;
     [System.NonSerialized] public DebugMGR debugMGR;
+    [System.NonSerialized] public List<CharacterMGR> characterMGRs;
+
 
     public readonly int wallID = 3;
     public readonly int groundID = 2;
@@ -49,6 +51,7 @@ public class GameManager : MonoBehaviour
     {
         mapMGR = GameObject.Find("Tilemap").GetComponent<MapMGR>();
         debugMGR = GameObject.Find("DebugMGR").GetComponent<DebugMGR>();
+        characterMGRs = new List<CharacterMGR>();
 
         mapMGR.SetupMap();
        
@@ -79,7 +82,14 @@ public class GameManager : MonoBehaviour
     private IEnumerator SpawnCharacterCoroutine(Vector2Int vector,int characterTypeNum)
     {
         isSpawnCharacter = true;
-        Instantiate(characterPrefabs[characterTypeNum],new Vector3(vector.x+0.5f,vector.y+0.5f,0),Quaternion.identity);
+        GameObject tempCharaGO;
+        CharacterMGR tempCharaMGR; //デバッグ用
+
+        tempCharaGO =  Instantiate(characterPrefabs[characterTypeNum],new Vector3(vector.x+0.5f,vector.y+0.5f,0),Quaternion.identity);
+        tempCharaMGR = tempCharaGO.GetComponent<CharacterMGR>();
+        characterMGRs.Add(tempCharaMGR);
+
+
         mapMGR.MultiplySetMapValue(vector,characterID);
         yield return new WaitForSeconds(200f); //とりあえずデバッグしやすいように長くしておく
         isSpawnCharacter = false;

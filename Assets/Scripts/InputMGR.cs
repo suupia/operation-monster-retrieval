@@ -35,7 +35,7 @@ public class InputMGR : MonoBehaviour
         }
 
         //Debug用
-        if (Input.GetKeyDown(KeyCode.F5) || true) //今はずっとデバッグしておく
+        if (Input.GetKeyDown(KeyCode.F5)/*||true*/) //今はずっとデバッグしておく
         {
             Debug.Log("DebugMapValue()を実行します");
             GameManager.instance.debugMGR.DebugMapValue();
@@ -43,6 +43,13 @@ public class InputMGR : MonoBehaviour
         if(DebugMGR.isFirstDebugMapValue == false)
         {
             GameManager.instance.debugMGR.DebugMapValue();
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.F6))
+        {
+            Debug.Log("DebugAutoRouteValueを実行します");
+            GameManager.instance.debugMGR.DebugAutoRouteValue();
         }
     }
 

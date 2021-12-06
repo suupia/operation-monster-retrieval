@@ -59,9 +59,10 @@
     <Compile Include="Assets\Scripts\InputMGR.cs" />
     <Compile Include="Assets\Scripts\DebugMGR.cs" />
     <Compile Include="Assets\Scripts\CharacterMGR.cs" />
+    <Compile Include="Assets\Scripts\TowerMGR.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\MapMGR.cs" />
-    <Compile Include="Assets\Scripts\TowerMGR.cs" />
+    <Compile Include="Assets\Scripts\MouseTrailerMGR.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -26,6 +26,10 @@ public class MapMGR : MonoBehaviour
     [SerializeField] Vector2Int[] towerPoss;
 
     //Getter
+    public MapData GetMap()
+    {
+        return map;
+    }
     public int GetMapSize()
     {
         return mapHeight * mapWidth;
@@ -355,9 +359,9 @@ public class MapMGR : MonoBehaviour
     {
         Vector2Int vector = new Vector2Int(x, y);
 
-        if (IsOutRangeOfMap(x, y))
+        if (x < 1 || y < 1 || x > map.Width-2 || y > map.Height-2)
         {
-            Debug.Log($"MakeRoad({x},{y})の引数でmapの範囲外が指定されました");
+            Debug.Log($"MakeRoad({x},{y})の引数で掘れる範囲の外が指定されました。");
             return;
         }
 
@@ -418,7 +422,7 @@ public class MapMGR : MonoBehaviour
     }
     private bool IsOutRangeOfMap(int x, int y)
     {
-        if (x < 0 || y < 0 || x > map.Width - 1 || y > map.Height - 1)
+        if (x < 0 || y < 0 || x > map.Width-1 || y > map.Height-1)
         {
             return true;
         }
@@ -441,7 +445,6 @@ public class MapData
     int[] _values = null;
     int _edgeValue;
     int _errorValue = -1;
-    int[] _routeValues = null;
 
     //コンストラクタ
     public MapData(int width, int height)
@@ -454,10 +457,8 @@ public class MapData
         _width = width;
         _height = height;
         _values = new int[width * height];
-        _routeValues = new int[width * height];
 
         FillAll(GameManager.instance.wallID); //mapの初期化はwallIDで行う
-        InitializeRouteValues();  //routeValuesの初期化は0で行う
     }
 
     //プロパティ
@@ -541,18 +542,6 @@ public class MapData
         _values[ToSubscript(x, y)] /= value;
     }
 
-    public void InitializeRouteValues()
-    {
-        for (int i=0;i<_routeValues.Length;i++)
-        {
-            _routeValues[i] = 0;
-        }
-    }
-
-    public void NumberingRouteValues(Vector2Int startPos,Vector2Int endPos)
-    {
-
-    }
 
 
     //添え字を変換する
