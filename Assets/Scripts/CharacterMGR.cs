@@ -829,7 +829,7 @@ public class AutoRouteData
 
                     inspectPos = centerPos + new Vector2Int(x, y);
                     //Debug.Log($"centerPos:{centerPos},inspectPos:{inspectPos}のとき、CanMove(centerPos, inspectPos):{CanMove(centerPos, inspectPos)}");
-                    if (CanMove(centerPos, inspectPos))
+                    if (GetValue(inspectPos) == _initiValue && CanMoveDiagonally(centerPos, inspectPos))
                     {
                         SetValue(inspectPos, i);
                         searchQue.Enqueue(inspectPos);
@@ -846,32 +846,6 @@ public class AutoRouteData
             }
         }
 
-        bool CanMove(Vector2Int prePos, Vector2Int afterPos)
-        {
-            Vector2Int directionVector = afterPos - prePos;
-            if (GetValue(afterPos) != _initiValue)
-            {
-                return false;
-            }
-
-            //斜め移動の時にブロックの角を移動することはできない
-            if (directionVector.x != 0 && directionVector.y != 0)
-            {
-                //水平方向の判定
-                if (GetValue(prePos.x + directionVector.x, prePos.y) == _wallValue)
-                {
-                    return false;
-                }
-
-                //垂直方向の判定
-                if (GetValue(prePos.x, prePos.y + directionVector.y) == _wallValue)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
 
         void StoreRouteAround(Vector2Int centerPos, int distance)
         {
@@ -903,53 +877,48 @@ public class AutoRouteData
             {
                 Debug.LogWarning($"GetValue({centerPos})は{GetValue(centerPos)}、distance:{distance}");
 
-                // 4 6 8
-                // 1 * 7
-                // 3 2 5 の優先順位で判定していく
+                // 5 7 8
+                // 3 * 6
+                // 1 2 4 の優先順位で判定していく
 
-                if (GetValue(centerPos + Vector2Int.left) == distance)
+                Vector2Int[] orderInDirectionArray = new Vector2Int[] { Vector2Int.left + Vector2Int.down, Vector2Int.down, Vector2Int.left, Vector2Int.right + Vector2Int.down, Vector2Int.left + Vector2Int.up, Vector2Int.right, Vector2Int.up, Vector2Int.right + Vector2Int.up };
+
+                foreach(Vector2Int direction in orderInDirectionArray)
                 {
-                    resultQue.Enqueue(centerPos + Vector2Int.left);
-                    StoreRouteAround(centerPos + Vector2Int.left, distance - 1);
+                    if (GetValue(centerPos + direction) == distance && CanMoveDiagonally(centerPos,centerPos+direction))
+                    {
+                        resultQue.Enqueue(centerPos + direction);
+                        StoreRouteAround(centerPos + direction,distance-1);
+                        break;
+                    }
                 }
-                else if (GetValue(centerPos + Vector2Int.down) == distance)
-                {
-                    resultQue.Enqueue(centerPos + Vector2Int.down);
-                    StoreRouteAround(centerPos + Vector2Int.down, distance - 1);
-                }
-                else if (GetValue(centerPos + Vector2Int.left + Vector2Int.down) == distance)
-                {
-                    resultQue.Enqueue(centerPos + Vector2Int.left + Vector2Int.down);
-                    StoreRouteAround(centerPos + Vector2Int.left + Vector2Int.down, distance - 1);
-                }
-                else if (GetValue(centerPos + Vector2Int.left + Vector2Int.up) == distance)
-                {
-                    resultQue.Enqueue(centerPos + Vector2Int.left + Vector2Int.up);
-                    StoreRouteAround(centerPos + Vector2Int.left + Vector2Int.up, distance - 1);
-                }
-                else if (GetValue(centerPos + Vector2Int.right+ Vector2Int.down) == distance)
-                {
-                    resultQue.Enqueue(centerPos + Vector2Int.right + Vector2Int.down);
-                    StoreRouteAround(centerPos + Vector2Int.right + Vector2Int.down, distance - 1);
-                }
-                else if (GetValue(centerPos + Vector2Int.up) == distance)
-                {
-                    resultQue.Enqueue(centerPos + Vector2Int.up);
-                    StoreRouteAround(centerPos + Vector2Int.up, distance - 1);
-                }
-                else if (GetValue(centerPos + Vector2Int.right) == distance)
-                {
-                    resultQue.Enqueue(centerPos + Vector2Int.right);
-                    StoreRouteAround(centerPos + Vector2Int.right, distance - 1);
-                }
-                else if (GetValue(centerPos + Vector2Int.right + Vector2Int.up) == distance)
-                {
-                    resultQue.Enqueue(centerPos + Vector2Int.right + Vector2Int.up);
-                    StoreRouteAround(centerPos + Vector2Int.right + Vector2Int.up, distance - 1);
-                }
+
+
 
             }
         }
 
+        bool CanMoveDiagonally(Vector2Int prePos, Vector2Int afterPos)
+        {
+            Vector2Int directionVector = afterPos - prePos;
+
+            //斜め移動の時にブロックの角を移動することはできない
+            if (directionVector.x != 0 && directionVector.y != 0)
+            {
+                //水平方向の判定
+                if (GetValue(prePos.x + directionVector.x, prePos.y) == _wallValue)
+                {
+                    return false;
+                }
+
+                //垂直方向の判定
+                if (GetValue(prePos.x, prePos.y + directionVector.y) == _wallValue)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
