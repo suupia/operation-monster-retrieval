@@ -31,6 +31,7 @@ public class CharacterMGR : MonoBehaviour
     bool isFristBattle = true;
 
     AutoRouteData autoRoute;
+    Vector2Int[] autoRouteArray;
 
     private GameObject damageTextGO;
     [SerializeField] private Text damageText;
@@ -242,7 +243,6 @@ public class CharacterMGR : MonoBehaviour
                 isFristMarch = false;
                 TargetNearestTower();
                 SearchAutoRoute();
-
             }
 
             Debug.Log($"targetGridPos={targetGridPos}");
@@ -263,7 +263,7 @@ public class CharacterMGR : MonoBehaviour
             //    }
             //}
 
-            
+
 
 
 
@@ -272,6 +272,7 @@ public class CharacterMGR : MonoBehaviour
             //    MoveForward();
             //}
 
+            MoveAlongWith(autoRouteArray);
 
         }
         else
@@ -285,7 +286,7 @@ public class CharacterMGR : MonoBehaviour
 
     public void TargetNearestTower() //最も近いタワーの座標を取得する
     {
-        
+
 
         int lookingForValue = 1; //索敵範囲の値
         int notLookingForValue = 0; //索敵範囲外の値
@@ -295,7 +296,7 @@ public class CharacterMGR : MonoBehaviour
         List<Vector2Int> nearestTowerList = new List<Vector2Int>();
 
         int[,] searchRangeArray;
-        int maxRange = System.Math.Max(GameManager.instance.mapMGR.GetMapWidth(),GameManager.instance.mapMGR.GetMapHeight()); //探索する範囲はmapの縦横の最大値まで調べれば十分
+        int maxRange = System.Math.Max(GameManager.instance.mapMGR.GetMapWidth(), GameManager.instance.mapMGR.GetMapHeight()); //探索する範囲はmapの縦横の最大値まで調べれば十分
 
 
         //Towerの位置をListに追加する
@@ -310,12 +311,12 @@ public class CharacterMGR : MonoBehaviour
                 {
                     vector = new Vector2Int(gridPos.x - (k + 1) + i, gridPos.y - (k + 1) + j); //ワールド座標に変換する
 
-                    if (vector.x < 0 || vector.y<0 || vector.x > GameManager.instance.mapMGR.GetMapWidth() || vector.y > GameManager.instance.mapMGR.GetMapHeight())
+                    if (vector.x < 0 || vector.y < 0 || vector.x > GameManager.instance.mapMGR.GetMapWidth() || vector.y > GameManager.instance.mapMGR.GetMapHeight())
                     {
                         continue;
                     }
 
-                    if (searchRangeArray[i, j] == lookingForValue && GameManager.instance.mapMGR.GetMapValue(vector) % GameManager.instance.towerID ==0)
+                    if (searchRangeArray[i, j] == lookingForValue && GameManager.instance.mapMGR.GetMapValue(vector) % GameManager.instance.towerID == 0)
                     {
                         nearestTowerList.Add(vector);
                     }
@@ -330,7 +331,7 @@ public class CharacterMGR : MonoBehaviour
         }
 
         //Listの中身をソートする
-        nearestTowerList.Sort((a,b) => b.y - a.y); //まずy座標に関して降順でソートする
+        nearestTowerList.Sort((a, b) => b.y - a.y); //まずy座標に関して降順でソートする
         nearestTowerList.Sort((a, b) => b.x - a.x); //次にx座標に関して降順でソートする
 
         targetGridPos = nearestTowerList[0];
@@ -572,26 +573,34 @@ public class CharacterMGR : MonoBehaviour
 
     public void SearchAutoRoute()
     {
+        Queue<Vector2Int> autoRouteQueue = new Queue<Vector2Int>();
         //まずmapをコピーして、動けない場所を-1にする。
-        for(int y = 0; y < autoRoute.Height; y++)
+        for (int y = 0; y < autoRoute.Height; y++)
         {
-            for(int x=0;x<autoRoute.Width; x++)
+            for (int x = 0; x < autoRoute.Width; x++)
             {
-                if (GameManager.instance.mapMGR.GetMap().GetValue(x,y) % GameManager.instance.wallID == 0)
+                if (GameManager.instance.mapMGR.GetMap().GetValue(x, y) % GameManager.instance.wallID == 0)
                 {
-                    autoRoute.SetWall(x,y);
+                    autoRoute.SetWall(x, y);
                 }
             }
         }
 
-      autoRoute.SearchShortestRoute(gridPos,targetGridPos);
-        
+
+        autoRouteQueue = autoRoute.SearchShortestRoute(gridPos, targetGridPos); //戻り値と処理がセットになっていることに注意
+        autoRouteArray = new Vector2Int[autoRouteQueue.Count];
+        for (int i = 0; i < autoRouteArray.Length; i++)
+        {
+            Debug.LogWarning($"autoRouteArray[{autoRouteArray.Length - 1 - i}]に{autoRouteQueue.Peek()}を代入します。");
+            autoRouteArray[autoRouteArray.Length - 1 - i] = autoRouteQueue.Dequeue();
+        }
+
     }
 
     public void MoveAlongWith(Vector2Int[] route) //配列で指定したルートに沿っての移動
     {
-        Vector2Int prePos, nextPos,nextNextPos;
-        for(int i = 0; i < route.Length; i++)
+        Vector2Int prePos, nextPos, nextNextPos;
+        for (int i = 0; i < route.Length; i++)
         {
             prePos = GetGridPos();
             if (prePos != route[i])
@@ -613,7 +622,7 @@ public class CharacterMGR : MonoBehaviour
             if (i < route.Length - 1)  //↓斜め移動できるときはそうする。
             {
                 nextNextPos = route[i + 2];
-                if(((prePos-nextPos).x ==0 && (nextPos - nextNextPos).y == 0) || ((prePos - nextPos).y == 0 && (nextPos - nextNextPos).x == 0)) //nextPosが角マスのときtrue
+                if (((prePos - nextPos).x == 0 && (nextPos - nextNextPos).y == 0) || ((prePos - nextPos).y == 0 && (nextPos - nextNextPos).x == 0)) //nextPosが角マスのときtrue
                 {
                     if (CanMove(nextNextPos - prePos))
                     {
@@ -622,7 +631,7 @@ public class CharacterMGR : MonoBehaviour
                 }
             }
 
-            if ((prePos.x - nextPos.x > 1)||(prePos.x - nextPos.x < -1)|| (prePos.y - nextPos.y > 1) || (prePos.y - nextPos.y < -1))
+            if ((prePos.x - nextPos.x > 1) || (prePos.x - nextPos.x < -1) || (prePos.y - nextPos.y > 1) || (prePos.y - nextPos.y < -1))
             {
                 Debug.Log("現在のマスと移動先のマスが隣接していません。pre:" + prePos + ",next:" + nextPos);
                 return;
@@ -653,7 +662,7 @@ public class AutoRouteData
     int _height;
     int[] _values = null;
     int _initiValue = -10;
-    int _wallValue = -1; 
+    int _wallValue = -1;
     int _errorValue = -88;
 
 
@@ -673,7 +682,7 @@ public class AutoRouteData
     }
 
     //プロパティ
-    public int Width { get { return _width; } } 
+    public int Width { get { return _width; } }
     public int Height { get { return _height; } }
 
     //Getter
@@ -724,9 +733,9 @@ public class AutoRouteData
     {
         SetValue(vector.x, vector.y, value);
     }
-    public void SetWall(int x,int y)
+    public void SetWall(int x, int y)
     {
-        SetValue(x,y,_wallValue);
+        SetValue(x, y, _wallValue);
     }
     //添え字を変換する
     int ToSubscript(int x, int y)
@@ -756,7 +765,7 @@ public class AutoRouteData
         if (y == -1 || y == _height) { return true; }
         return false;
     }
-    
+
     public void FillAll(int value) //edgeValueまでは書き換えられないことに注意
     {
         for (int j = 0; j < _height; j++)
@@ -768,58 +777,76 @@ public class AutoRouteData
         }
     }
 
-    public void SearchShortestRoute(Vector2Int startPos, Vector2Int endPos)
+    public Queue<Vector2Int> SearchShortestRoute(Vector2Int startPos, Vector2Int targetPos)
     {
-        Queue<Vector2Int> que = new Queue<Vector2Int>();
+        Queue<Vector2Int> searchQue = new Queue<Vector2Int>();
+        Queue<Vector2Int> resultQue = new Queue<Vector2Int>();
         int i = 1; //1から始まることに注意
         bool isComplete = false;
+        int maxDistance = 0;
 
-        SetValue(startPos,0); //startPosの部分だけ周囲の判定を行わないため、ここで個別に設定する
-        que.Enqueue(startPos);
+        SetValue(startPos, 0); //startPosの部分だけ周囲の判定を行わないため、ここで個別に設定する
+        searchQue.Enqueue(startPos);
 
         while (!isComplete)
         {
-            int loopNum = que.Count; //前のループでキューに追加された個数を数える
+            int loopNum = searchQue.Count; //前のループでキューに追加された個数を数える
             Debug.LogWarning($"i:{i}のときloopNum:{loopNum}");
-            for (int k = 0; k < loopNum; k++) 
+            for (int k = 0; k < loopNum; k++)
             {
-                Debug.LogWarning($"PlaceNum({que.Peek()})を実行します");
-                PlaceNumAround(que.Dequeue());
+                Debug.LogWarning($"PlaceNumAround({searchQue.Peek()})を実行します");
+                if (isComplete)
+                {
+                    break;
+                }
+                PlaceNumAround(searchQue.Dequeue());
             }
             i++; //前のループでキューに追加された文を処理しきれたら、インデックスを増やして次のループに移る
 
-            if (i > 100) //無限ループ防ぐ用
+            if (i > 100) //無限ループを防ぐ用
             {
                 isComplete = true;
                 Debug.LogError("SearchShortestRouteのwhile文でループが100回行われてしまいました");
             }
         }
+        Debug.LogWarning($"StoreRouteAround({targetPos},{maxDistance})を実行します");
+        StoreRouteAround(targetPos, maxDistance);
 
+        Debug.LogWarning($"resultQueは{resultQue}");
+        return resultQue;
+
+        //以下ローカル関数
         void PlaceNumAround(Vector2Int centerPos)
         {
             Vector2Int inspectPos;
 
-            //9マス判定する（真ん中のマスの判定は必要ない）
+            //8マス判定する（真ん中のマスの判定は必要ない）
             for (int y = -1; y < 2; y++)
             {
                 for (int x = -1; x < 2; x++)
                 {
+                    if (x == 0 && y == 0) continue; //真ん中のマスは飛ばす
+
                     inspectPos = centerPos + new Vector2Int(x, y);
-                    if (GetValue(inspectPos) == _initiValue && CanMove(centerPos,inspectPos))
+                    //Debug.Log($"centerPos:{centerPos},inspectPos:{inspectPos}のとき、CanMove(centerPos, inspectPos):{CanMove(centerPos, inspectPos)}");
+                    if (CanMove(centerPos, inspectPos))
                     {
                         SetValue(inspectPos, i);
-                        que.Enqueue(inspectPos);
-                        Debug.LogWarning($"({inspectPos})を{i}にし、キューに追加しました。");
+                        searchQue.Enqueue(inspectPos);
+                        Debug.LogWarning($"({inspectPos})を{i}にし、探索用キューに追加しました。");
                     }
-                    if(inspectPos == endPos)
+                    if (inspectPos == targetPos)
                     {
                         isComplete = true;
+                        maxDistance = i - 1;
+                        Debug.LogWarning($"isCompleteをtrueにしました。maxDistance{maxDistance}");
+                        break; //探索終了
                     }
                 }
             }
         }
 
-        bool CanMove(Vector2Int prePos,Vector2Int afterPos)
+        bool CanMove(Vector2Int prePos, Vector2Int afterPos)
         {
             Vector2Int directionVector = afterPos - prePos;
             if (GetValue(afterPos) != _initiValue)
@@ -831,19 +858,97 @@ public class AutoRouteData
             if (directionVector.x != 0 && directionVector.y != 0)
             {
                 //水平方向の判定
-                if (GetValue(prePos.x + directionVector.x, prePos.y) != _initiValue)
+                if (GetValue(prePos.x + directionVector.x, prePos.y) == _wallValue)
                 {
                     return false;
                 }
 
                 //垂直方向の判定
-                if (GetValue(prePos.x, prePos.y + directionVector.y) != _initiValue)
+                if (GetValue(prePos.x, prePos.y + directionVector.y) == _wallValue)
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        void StoreRouteAround(Vector2Int centerPos, int distance)
+        {
+            if (distance < 0)
+            {
+                return; //0までQueに入れれば十分
+            }
+
+            Debug.LogWarning($"dinstance:{distance}、maxDistance:{maxDistance}のため、distance == maxDistanceは{distance == maxDistance}");
+            if (distance == maxDistance) //最終地点の周りだけ周囲8マスに判定を行う(9マス)
+            {
+                Vector2Int inspectPos;
+
+                for (int y = -1; y < 2; y++)
+                {
+                    for (int x = -1; x < 2; x++)
+                    {
+                        inspectPos = centerPos + new Vector2Int(x, y);
+                        if (GetValue(inspectPos) == distance)
+                        {
+                            resultQue.Enqueue(inspectPos);
+                            Debug.LogWarning($"GetValue(inspectPos) ==distanceがtrueなため、resultQue.Enqueue({inspectPos})を実行します。\ndistance:{distance}");
+                            StoreRouteAround(inspectPos, distance - 1);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"GetValue({centerPos})は{GetValue(centerPos)}、distance:{distance}");
+
+                // 4 6 8
+                // 1 * 7
+                // 3 2 5 の優先順位で判定していく
+
+                if (GetValue(centerPos + Vector2Int.left) == distance)
+                {
+                    resultQue.Enqueue(centerPos + Vector2Int.left);
+                    StoreRouteAround(centerPos + Vector2Int.left, distance - 1);
+                }
+                else if (GetValue(centerPos + Vector2Int.down) == distance)
+                {
+                    resultQue.Enqueue(centerPos + Vector2Int.down);
+                    StoreRouteAround(centerPos + Vector2Int.down, distance - 1);
+                }
+                else if (GetValue(centerPos + Vector2Int.left + Vector2Int.down) == distance)
+                {
+                    resultQue.Enqueue(centerPos + Vector2Int.left + Vector2Int.down);
+                    StoreRouteAround(centerPos + Vector2Int.left + Vector2Int.down, distance - 1);
+                }
+                else if (GetValue(centerPos + Vector2Int.left + Vector2Int.up) == distance)
+                {
+                    resultQue.Enqueue(centerPos + Vector2Int.left + Vector2Int.up);
+                    StoreRouteAround(centerPos + Vector2Int.left + Vector2Int.up, distance - 1);
+                }
+                else if (GetValue(centerPos + Vector2Int.right+ Vector2Int.down) == distance)
+                {
+                    resultQue.Enqueue(centerPos + Vector2Int.right + Vector2Int.down);
+                    StoreRouteAround(centerPos + Vector2Int.right + Vector2Int.down, distance - 1);
+                }
+                else if (GetValue(centerPos + Vector2Int.up) == distance)
+                {
+                    resultQue.Enqueue(centerPos + Vector2Int.up);
+                    StoreRouteAround(centerPos + Vector2Int.up, distance - 1);
+                }
+                else if (GetValue(centerPos + Vector2Int.right) == distance)
+                {
+                    resultQue.Enqueue(centerPos + Vector2Int.right);
+                    StoreRouteAround(centerPos + Vector2Int.right, distance - 1);
+                }
+                else if (GetValue(centerPos + Vector2Int.right + Vector2Int.up) == distance)
+                {
+                    resultQue.Enqueue(centerPos + Vector2Int.right + Vector2Int.up);
+                    StoreRouteAround(centerPos + Vector2Int.right + Vector2Int.up, distance - 1);
+                }
+
+            }
         }
 
     }
