@@ -117,7 +117,7 @@ public class MouseTrailerMGR : MonoBehaviour
             return;
         }
 
-        if (!(playerRoute.Count(pos => pos == mouseGridPos) < 2) && playerRoute[playerRoute.Count - 2] != mouseGridPos)           //進もうとしているマスを既に2回以上通っていて、来た道を戻らない場合はなにもしない
+        if (playerRoute.Count(pos => pos == mouseGridPos) >= 2 && playerRoute[playerRoute.Count - 2] != mouseGridPos)           //進もうとしているマスを既に2回以上通っていて、来た道を戻らない場合はなにもしない
         {
             Debug.LogWarning("同じマスを通れるのは2回までです");
             return;

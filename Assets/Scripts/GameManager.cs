@@ -7,7 +7,9 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
 
     [System.NonSerialized] public MapMGR mapMGR;
+    [System.NonSerialized] public InputMGR inputMGR;
     [System.NonSerialized] public DebugMGR debugMGR;
+    [System.NonSerialized] public PointerMGR pointerMGR;
 
     [SerializeField] int numOfCharacterTypes = 5; //とりあえず5としておく
     [SerializeField] AutoRouteData autoRouteData; //インスペクター上でセットする
@@ -55,7 +57,10 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         mapMGR = GameObject.Find("Tilemap").GetComponent<MapMGR>();
+        inputMGR = GameObject.Find("InputMGR").GetComponent<InputMGR>();
         debugMGR = GameObject.Find("DebugMGR").GetComponent<DebugMGR>();
+        pointerMGR = GameObject.Find("Pointer").GetComponent<PointerMGR>();
+        Debug.LogWarning($"pointerMGRを初期化しました。pointerMGR.transform.position:{pointerMGR.transform.position}");
 
         autoRouteDatas = new AutoRouteData[numOfCharacterTypes];  //とりあえず5体分のルートを用意しておく
         manualRouteDatas = new ManualRouteData[numOfCharacterTypes];

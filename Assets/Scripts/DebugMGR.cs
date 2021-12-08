@@ -5,8 +5,11 @@ using UnityEngine;
 
 public class DebugMGR : MonoBehaviour
 {
-    public static bool isFirstDebugMapValue=true;
-    public static bool isFirstDebugAutoRouteValue=true;
+    bool isFirstDebugMap=true;
+    bool isDebuggingMap = false;
+
+    bool isFirstDebugAutoRoute=true;
+    bool isDebuggingAutoRoute = false;
 
     Text[] mapValueTextArray;
     Text[] autoRouteTextArray;
@@ -16,12 +19,44 @@ public class DebugMGR : MonoBehaviour
     [SerializeField] private Text mapValueText;
     [SerializeField] private Text autoRouteText;
 
+    private void Update()
+    {
 
-    public void DebugMapValue()
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            if (!isDebuggingMap)
+            {
+                isDebuggingMap = true;
+                mapValueTextParent.SetActive(true) ;
+                DebugMap();
+            }
+            else
+            {
+                isDebuggingMap = false;
+                mapValueTextParent.SetActive(false);
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.F6))
+        {
+            if (!isDebuggingAutoRoute)
+            {
+                isDebuggingAutoRoute = true;
+                autoRouteTextParent.SetActive(true);
+                DebugAutoRoute();
+            }
+            else
+            {
+                isDebuggingAutoRoute = false;
+                autoRouteTextParent.SetActive(false);
+            }
+        }
+
+    }
+    public void DebugMap()
     {
         int x, y;
 
-        if (isFirstDebugMapValue)
+        if (isFirstDebugMap)
         {
             Vector3 textPosition;
 
@@ -39,7 +74,7 @@ public class DebugMGR : MonoBehaviour
 
             }
 
-            isFirstDebugMapValue = false;
+            isFirstDebugMap = false;
 
         }
         else
@@ -54,11 +89,11 @@ public class DebugMGR : MonoBehaviour
         }
     }
 
-    public void DebugAutoRouteValue()
+    public void DebugAutoRoute()
     {
         int x, y;
 
-        if (isFirstDebugAutoRouteValue)
+        if (isFirstDebugAutoRoute)
         {
             Vector3 textPosition;
 
@@ -76,7 +111,7 @@ public class DebugMGR : MonoBehaviour
 
             }
 
-            isFirstDebugAutoRouteValue = false;
+            isFirstDebugAutoRoute = false;
 
         }
         else
