@@ -11,6 +11,7 @@ public class AutoRouteData
     int _wallValue = -1;
     int _errorValue = -88;
 
+    Vector2Int[] autoRouteArray;
 
     //コンストラクタ
     public AutoRouteData(int width, int height)
@@ -123,84 +124,78 @@ public class AutoRouteData
         }
     }
 
-    public Queue<Vector2Int> SearchShortestRoute(Vector2Int startPos, Vector2Int targetPos)
+    public Vector2Int[] SearchShortestRoute(Vector2Int startPos,Vector2Int targetPos)
     {
         Queue<Vector2Int> searchQue = new Queue<Vector2Int>();
-        Queue<Vector2Int> resultQue = new Queue<Vector2Int>();
         int i = 1; //1から始まることに注意
         bool isComplete = false;
         int maxDistance = 0;
 
-        SetValue(startPos, 0); //startPosの部分だけ周囲の判定を行わないため、ここで個別に設定する
-        searchQue.Enqueue(startPos);
 
-        while (!isComplete)
+        //まずmapをコピーして、動けない場所を-1にする。
+        for (int y = 0; y < Height; y++)
         {
-            int loopNum = searchQue.Count; //前のループでキューに追加された個数を数える
-            Debug.LogWarning($"i:{i}のときloopNum:{loopNum}");
-            for (int k = 0; k < loopNum; k++)
+            for (int x = 0; x < Width; x++)
             {
-                Debug.LogWarning($"PlaceNumAround({searchQue.Peek()})を実行します");
-                if (isComplete)
+                if (GameManager.instance.mapMGR.GetMap().GetValue(x, y) % GameManager.instance.wallID == 0)
                 {
-                    break;
+                    SetWall(x, y);
                 }
-                PlaceNumAround(searchQue.Dequeue());
-            }
-            i++; //前のループでキューに追加された文を処理しきれたら、インデックスを増やして次のループに移る
-
-            if (i > 100) //無限ループを防ぐ用
-            {
-                isComplete = true;
-                Debug.LogError("SearchShortestRouteのwhile文でループが100回行われてしまいました");
             }
         }
-        Debug.LogWarning($"StoreRouteAround({targetPos},{maxDistance})を実行します");
-        StoreRouteAround(targetPos, maxDistance);
 
-        Debug.LogWarning($"resultQueは{resultQue}");
-        return resultQue;
+        //動けるマスに数字を順番に振っていく
+        Debug.Log($"WaveletSearchを実行します");
+        WaveletSearch();
 
+        //先に配列をnewしておく
+        autoRouteArray = new Vector2Int[maxDistance + 1];
+
+        //数字をもとにして最短ルートを配列に格納する
+        Debug.Log($"StoreRouteAround({targetPos},{maxDistance})を実行します");
+        StoreShortestRoute(targetPos, maxDistance);
+
+        Debug.Log($"resultRouteArrayは{autoRouteArray}");
+
+        return autoRouteArray;
+
+        ////////////////////////////////////////////////////////////////////
+        
         //以下ローカル関数
-        void PlaceNumAround(Vector2Int centerPos)
+        void WaveletSearch()
         {
-            Vector2Int inspectPos;
+            SetValue(startPos, 0); //startPosの部分だけ周囲の判定を行わないため、ここで個別に設定する
+            searchQue.Enqueue(startPos);
 
-            //8マス判定する（真ん中のマスの判定は必要ない）
-            for (int y = -1; y < 2; y++)
+            while (!isComplete)
             {
-                for (int x = -1; x < 2; x++)
+                int loopNum = searchQue.Count; //前のループでキューに追加された個数を数える
+                Debug.Log($"i:{i}のときloopNum:{loopNum}");
+                for (int k = 0; k < loopNum; k++)
                 {
-                    if (x == 0 && y == 0) continue; //真ん中のマスは飛ばす
+                    Debug.Log($"PlaceNumAround({searchQue.Peek()})を実行します");
+                    if (isComplete) break;
+                    PlaceNumAround(searchQue.Dequeue());
+                }
+                i++; //前のループでキューに追加された文を処理しきれたら、インデックスを増やして次のループに移る
 
-                    inspectPos = centerPos + new Vector2Int(x, y);
-                    //Debug.Log($"centerPos:{centerPos},inspectPos:{inspectPos}のとき、CanMove(centerPos, inspectPos):{CanMove(centerPos, inspectPos)}");
-                    if (GetValue(inspectPos) == _initiValue && CanMoveDiagonally(centerPos, inspectPos))
-                    {
-                        SetValue(inspectPos, i);
-                        searchQue.Enqueue(inspectPos);
-                        Debug.LogWarning($"({inspectPos})を{i}にし、探索用キューに追加しました。");
-                    }
-                    if (inspectPos == targetPos)
-                    {
-                        isComplete = true;
-                        maxDistance = i - 1;
-                        Debug.LogWarning($"isCompleteをtrueにしました。maxDistance{maxDistance}");
-                        break; //探索終了
-                    }
+                if (i > 100) //無限ループを防ぐ用
+                {
+                    isComplete = true;
+                    Debug.LogError("SearchShortestRouteのwhile文でループが100回行われてしまいました");
                 }
             }
         }
 
-
-        void StoreRouteAround(Vector2Int centerPos, int distance)
+        void StoreShortestRoute(Vector2Int centerPos, int distance)
         {
+
             if (distance < 0)
             {
                 return; //0までQueに入れれば十分
             }
 
-            Debug.LogWarning($"dinstance:{distance}、maxDistance:{maxDistance}のため、distance == maxDistanceは{distance == maxDistance}");
+            Debug.Log($"dinstance:{distance}、maxDistance:{maxDistance}のため、distance == maxDistanceは{distance == maxDistance}");
             if (distance == maxDistance) //最終地点の周りだけ周囲8マスに判定を行う(9マス)
             {
                 Vector2Int inspectPos;
@@ -212,9 +207,9 @@ public class AutoRouteData
                         inspectPos = centerPos + new Vector2Int(x, y);
                         if (GetValue(inspectPos) == distance)
                         {
-                            resultQue.Enqueue(inspectPos);
-                            Debug.Log($"GetValue(inspectPos) ==distanceがtrueなため、resultQue.Enqueue({inspectPos})を実行します。\ndistance:{distance}");
-                            StoreRouteAround(inspectPos, distance - 1);
+                            Debug.Log($"distance:{distance} == maxDistance:{maxDistance}のときの、resultRouteArray[{distance}] = {inspectPos}を実行します");
+                            autoRouteArray[distance] = inspectPos;
+                            StoreShortestRoute(inspectPos, distance - 1);
                         }
                     }
                 }
@@ -233,14 +228,43 @@ public class AutoRouteData
                 {
                     if (GetValue(centerPos + direction) == distance && CanMoveDiagonally(centerPos, centerPos + direction))
                     {
-                        resultQue.Enqueue(centerPos + direction);
-                        StoreRouteAround(centerPos + direction, distance - 1);
+                        Debug.Log($"distance:{distance} != maxDistance:{maxDistance}のときの、resultRouteArray[{distance}] = {centerPos + direction}を実行します");
+                        autoRouteArray[distance] = centerPos + direction;
+                        StoreShortestRoute(centerPos + direction, distance - 1);
                         break;
                     }
                 }
 
+            }
+        }
 
+        void PlaceNumAround(Vector2Int centerPos)
+        {
+            Vector2Int inspectPos;
 
+            //8マス判定する（真ん中のマスの判定は必要ない）
+            for (int y = -1; y < 2; y++)
+            {
+                for (int x = -1; x < 2; x++)
+                {
+                    if (x == 0 && y == 0) continue; //真ん中のマスは飛ばす
+
+                    inspectPos = centerPos + new Vector2Int(x, y);
+                    //Debug.Log($"centerPos:{centerPos},inspectPos:{inspectPos}のとき、CanMove(centerPos, inspectPos):{CanMove(centerPos, inspectPos)}");
+                    if (GetValue(inspectPos) == _initiValue && CanMoveDiagonally(centerPos, inspectPos))
+                    {
+                        SetValue(inspectPos, i);
+                        searchQue.Enqueue(inspectPos);
+                        Debug.Log($"({inspectPos})を{i}にし、探索用キューに追加しました。");
+                    }
+                    if (inspectPos == targetPos)
+                    {
+                        isComplete = true;
+                        maxDistance = i - 1;
+                        Debug.Log($"isCompleteをtrueにしました。maxDistance:{maxDistance}");
+                        break; //探索終了
+                    }
+                }
             }
         }
 
@@ -266,6 +290,7 @@ public class AutoRouteData
 
             return true;
         }
+
     }
 }
 

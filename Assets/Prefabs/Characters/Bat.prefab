@@ -118,16 +118,16 @@ MonoBehaviour:
   gridPos: {x: 0, y: 0}
   targetGridPos: {x: 0, y: 0}
   directionVectorToTarget: {x: 0, y: 0}
-  thisCharacterID: 0
-  isAttacking: 0
-  isMoving: 0
+  characterTypeID: 0
   level: 0
   maxHp: 0
   hp: 0
   atk: 0
   attackInterval: 0
   attackRange: 0
-  spd: 1.5
+  spd: 2
   coolTime: 0
+  isAttacking: 0
+  isMoving: 0
   damageText: {fileID: 0}
   drawDamageTime: 0

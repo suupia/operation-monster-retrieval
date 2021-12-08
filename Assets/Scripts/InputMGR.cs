@@ -27,8 +27,8 @@ public class InputMGR : MonoBehaviour
         {
             mouseCurrentPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             mouseGridPos = ToGridPos(mouseCurrentPos);
-            Debug.Log($"mouseCurrentPosは{mouseCurrentPos}");
-            Debug.Log($"mouseGridPosは{mouseGridPos}");
+            //Debug.Log($"mouseCurrentPosは{mouseCurrentPos}");
+            //Debug.Log($"mouseGridPosは{mouseGridPos}");
 
             GameManager.instance.mapMGR.MakeRoad(mouseGridPos.x,mouseGridPos.y);
 
@@ -37,7 +37,7 @@ public class InputMGR : MonoBehaviour
         //Debug用
         if (Input.GetKeyDown(KeyCode.F5)/*||true*/) //今はずっとデバッグしておく
         {
-            Debug.Log("DebugMapValue()を実行します");
+            //Debug.Log("DebugMapValue()を実行します");
             GameManager.instance.debugMGR.DebugMapValue();
         }
         if(DebugMGR.isFirstDebugMapValue == false)
@@ -48,7 +48,7 @@ public class InputMGR : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F6))
         {
-            Debug.Log("DebugAutoRouteValueを実行します");
+            //Debug.Log("DebugAutoRouteValueを実行します");
             GameManager.instance.debugMGR.DebugAutoRouteValue();
         }
     }
