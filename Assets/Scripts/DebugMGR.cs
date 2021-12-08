@@ -72,7 +72,7 @@ public class DebugMGR : MonoBehaviour
 
                 textPosition = new Vector3(x + 0.5f, y + 0.5f, 0);
                 autoRouteTextArray[i] = Instantiate(autoRouteText, textPosition, Quaternion.identity,autoRouteTextParent.transform);
-                autoRouteTextArray[i].text = GameManager.instance.characterMGRs[0].GetAutoRoute().GetValue(i).ToString();
+                autoRouteTextArray[i].text = GameManager.instance.autoRouteDatas[0].GetValue(i).ToString();
 
             }
 
@@ -84,7 +84,7 @@ public class DebugMGR : MonoBehaviour
             for (int i = 0; i < GameManager.instance.mapMGR.GetMapSize(); i++)
             {
 
-                autoRouteTextArray[i].text = GameManager.instance.characterMGRs[0].GetAutoRoute().GetValue(i).ToString();
+                autoRouteTextArray[i].text = GameManager.instance.autoRouteDatas[0].GetValue(i).ToString();
 
 
             }

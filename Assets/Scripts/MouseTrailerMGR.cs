@@ -27,7 +27,7 @@ public class MouseTrailerMGR : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (mouse)        //斜めの移動をどうにかしなきゃいけない
+        if (!mouse)        //斜めの移動をどうにかしなきゃいけない
         {
             MoveByMouse();
         }
@@ -75,11 +75,11 @@ public class MouseTrailerMGR : MonoBehaviour
             }
             //ここまでで、押したキーに応じてdeltaVec(移動量)を定める
 
-            if (!(playerRoute.Count(pos => pos == gridPos + deltaVec) < 2) && playerRoute[playerRoute.Count - 2] != gridPos + deltaVec)           //進もうとしているマスを既に2回以上通っていて、来た道を戻らない場合はなにもしない
-            {
-                Debug.LogWarning("同じマスを通れるのは2回までです");
-                return;
-            }
+        if (!(playerRoute.Count(pos => pos == gridPos + deltaVec) < 2) && playerRoute[playerRoute.Count - 2] != gridPos + deltaVec)           //進もうとしているマスを既に2回以上通っていて、来た道を戻らない場合はなにもしない
+        {
+            Debug.LogWarning("同じマスを通れるのは2回までです");
+            return;
+        }
 
             if (deltaVec != Vector2Int.zero)       //キーを押していた場合、MouseTrailerを移動する
             {
@@ -94,6 +94,8 @@ public class MouseTrailerMGR : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow))
         {
             count = 0;
+
+
             lastMovingTime = -moveInterval;
 
             pressingArrowKey = false;
@@ -105,11 +107,11 @@ public class MouseTrailerMGR : MonoBehaviour
         if (!Input.GetMouseButton(1))     //右クリックしていない場合はなにもしない
         {
             return;
-        }
+        }            
         Vector3 mousePos = new Vector3(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y, 0);
         Vector2Int mouseGridPos = GameManager.instance.ToGridPosition(mousePos);
 
-        if ((mouseGridPos - GameManager.instance.ToGridPosition(transform.position)).magnitude > Mathf.Sqrt(2))       //MouseTrailerとMouseが隣接していない場合はなにもしない
+        if ((mouseGridPos  - GameManager.instance.ToGridPosition(transform.position)).magnitude > 1)       //MouseTrailerとMouseが隣接していない場合はなにもしない
         {
             Debug.LogWarning("縦横斜めのいずれかで隣接しているマスを選んでください");
             return;
@@ -121,7 +123,7 @@ public class MouseTrailerMGR : MonoBehaviour
             return;
         }
 
-        if (GameManager.instance.mapMGR.GetMapValue(mouseGridPos) % GameManager.instance.groundID != 0)
+        if(GameManager.instance.mapMGR.GetMapValue(mouseGridPos) % GameManager.instance.groundID != 0)
         {
             Debug.LogWarning("groundじゃないので移動不可");
             return;           //groundじゃないので移動不可
@@ -141,7 +143,7 @@ public class MouseTrailerMGR : MonoBehaviour
             Debug.Log(ListToString(playerRoute, "playerRoute"));
 
         }
-        else if (playerRoute.Count == 0 || (playerRoute[playerRoute.Count - 1] != trailerGridPos && playerRoute.Count(pos => pos == trailerGridPos) < 2))           //playerRouteに現在のgridPosが入っていない場合、追加する
+        else if (playerRoute.Count == 0 ||(playerRoute[playerRoute.Count - 1] != trailerGridPos && playerRoute.Count(pos => pos == trailerGridPos) < 2))           //playerRouteに現在のgridPosが入っていない場合、追加する
         {
             playerRoute.Add(trailerGridPos);
             Debug.Log(ListToString(playerRoute, "playerRoute"));
@@ -160,7 +162,7 @@ public class MouseTrailerMGR : MonoBehaviour
 
     private void ManageMouseTrails()
     {
-        while (playerRoute.Count > mouseTrails.Count)
+        while(playerRoute.Count > mouseTrails.Count)
         {
             mouseTrails.Add(Instantiate(mouseTrailPrefab, GameManager.instance.ToWorldPosition(playerRoute[mouseTrails.Count]), mouseTrailPrefab.transform.rotation));
         }

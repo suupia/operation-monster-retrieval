@@ -8,7 +8,12 @@ public class GameManager : MonoBehaviour
 
     [System.NonSerialized] public MapMGR mapMGR;
     [System.NonSerialized] public DebugMGR debugMGR;
-    [System.NonSerialized] public List<CharacterMGR> characterMGRs;
+
+    [SerializeField] int numOfCharacterTypes = 5; //とりあえず5としておく
+    [SerializeField] AutoRouteData autoRouteData; //インスペクター上でセットする
+    [SerializeField] ManualRouteData manualRouteData; //インスペクター上でセットする
+    public AutoRouteData[] autoRouteDatas;
+    public ManualRouteData[] manualRouteDatas;
 
 
     public readonly int wallID = 3;
@@ -18,7 +23,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject[] characterPrefabs;
 
-    bool isSpawnCharacter=false;
+    bool isSpawnCharacter = false;
 
     //座標変換
     public Vector2Int ToGridPosition(Vector3 worldPosition)
@@ -51,15 +56,23 @@ public class GameManager : MonoBehaviour
     {
         mapMGR = GameObject.Find("Tilemap").GetComponent<MapMGR>();
         debugMGR = GameObject.Find("DebugMGR").GetComponent<DebugMGR>();
-        characterMGRs = new List<CharacterMGR>();
+
+        autoRouteDatas = new AutoRouteData[numOfCharacterTypes];  //とりあえず5体分のルートを用意しておく
+        manualRouteDatas = new ManualRouteData[numOfCharacterTypes];
+
+        for (int i=0;i<numOfCharacterTypes;i++)
+        {
+            autoRouteDatas[i] = new AutoRouteData(mapMGR.GetMapWidth(),mapMGR.GetMapHeight());
+            manualRouteDatas[i] = new ManualRouteData(); //今はmanualRouteDataがない
+        }
 
         mapMGR.SetupMap();
-       
+
     }
 
     private void Update()
     {
-        SpawnCharacter();   
+        SpawnCharacter();
     }
 
     private void SpawnCharacter()
@@ -68,30 +81,34 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
-        for (int i = 0; i< mapMGR.characterSpawnPoss.Length;i++)
+        for (int i = 0; i < mapMGR.characterSpawnPoss.Length; i++)
         {
-        if (mapMGR.GetMapValue(mapMGR.characterSpawnPoss[i])% GameManager.instance.groundID ==0)
-        {
-                Debug.Log("SendCharacterCoroutineを実行します");
-                StartCoroutine(SpawnCharacterCoroutine(mapMGR.characterSpawnPoss[i],0)); //とりあえずcharacterIDの引数は0にしておく
-        }
+            if (mapMGR.GetMapValue(mapMGR.characterSpawnPoss[i]) % GameManager.instance.groundID == 0)
+            {
+                Debug.Log("SpawnCharacterCoroutineを実行します");
+                StartCoroutine(SpawnCharacterCoroutine(mapMGR.characterSpawnPoss[i], 0)); //とりあえずcharacterIDの引数は0にしておく
+            }
 
         }
     }
 
-    private IEnumerator SpawnCharacterCoroutine(Vector2Int vector,int characterTypeNum)
+    private IEnumerator SpawnCharacterCoroutine(Vector2Int vector, int characterTypeNum)
     {
         isSpawnCharacter = true;
-        GameObject tempCharaGO;
-        CharacterMGR tempCharaMGR; //デバッグ用
 
-        tempCharaGO =  Instantiate(characterPrefabs[characterTypeNum],new Vector3(vector.x+0.5f,vector.y+0.5f,0),Quaternion.identity);
+        GameObject tempCharaGO; //スコープに注意　このメソッドの中でしか使えない
+        CharacterMGR tempCharaMGR;
+
+        tempCharaGO = Instantiate(characterPrefabs[characterTypeNum], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0), Quaternion.identity);
         tempCharaMGR = tempCharaGO.GetComponent<CharacterMGR>();
-        characterMGRs.Add(tempCharaMGR);
 
+        //キャラクターのデータをここで渡す
+        tempCharaMGR.SetCharacterData(0); //今はCharacterTypeIDとして0を渡しておく。AutoRouteDataも[0]を参照するようになる。
+        
 
-        mapMGR.MultiplySetMapValue(vector,characterID);
+        mapMGR.MultiplySetMapValue(vector, characterID);
         yield return new WaitForSeconds(200f); //とりあえずデバッグしやすいように長くしておく
+
         isSpawnCharacter = false;
     }
 
