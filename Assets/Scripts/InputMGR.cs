@@ -6,6 +6,7 @@ public class InputMGR : MonoBehaviour
 {
     [SerializeField] Camera mainCamera;
 
+    [SerializeField] bool canMovePointer;
     [SerializeField] bool leftTouchFlag;
     [SerializeField] bool rightTouchFlag;
     [SerializeField] bool arrowKeyInputFlag;
@@ -27,21 +28,21 @@ public class InputMGR : MonoBehaviour
         //左クリック用
         if (Input.GetMouseButtonDown(0))
         {
-            mouseDown(0);
+            leftTouchFlag = true;
         }
         if (Input.GetMouseButtonUp(0))
         {
-            mouseUp(0);
+            leftTouchFlag = false;
         }
 
         //右クリック用
         if (Input.GetMouseButtonDown(1))
         {
-            mouseDown(1);
+            rightTouchFlag = true;
         }
         if (Input.GetMouseButtonUp(1))
         {
-            mouseUp(1);
+            rightTouchFlag = false;
         }
 
         //矢印キー用
@@ -66,6 +67,19 @@ public class InputMGR : MonoBehaviour
         {
             arrowKeyInputFlag = false;
             arrowKeyVector = Vector2Int.zero;
+            arrowKeyTimer = 0;
+            GameManager.instance.pointerMGR.ResetLastMovementTime();
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            canMovePointer = !canMovePointer;
+
+            if (!canMovePointer)    //canMovePointerがfalseになったとき、lastMovementTimeとTimerをリセットする
+            {
+                GameManager.instance.pointerMGR.ResetLastMovementTime();
+                arrowKeyTimer = 0;
+            }
         }
 
         if (leftTouchFlag) //道を作る
@@ -78,7 +92,7 @@ public class InputMGR : MonoBehaviour
             GameManager.instance.mapMGR.MakeRoad(mouseGridPos.x,mouseGridPos.y);
         }
 
-        if (rightTouchFlag) //Pointerを動かす
+        if (canMovePointer && rightTouchFlag) //Pointerを動かす
         {
             mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             mouseGridPos = GameManager.instance.ToGridPosition(mousePos);
@@ -88,43 +102,13 @@ public class InputMGR : MonoBehaviour
             GameManager.instance.pointerMGR.MoveByMouse(mouseGridPos); //とりあえず、種類0番のキャラクターのルートを決定するようにする
         }
 
-        if (arrowKeyInputFlag)
+        if (canMovePointer && arrowKeyInputFlag)
         {
             arrowKeyTimer += Time.fixedDeltaTime;
             GameManager.instance.pointerMGR.MoveByArrowKey(arrowKeyVector);
         }
 
 
-    }
-
-    public void mouseDown(int num)
-    {
-        if (num == 0)
-        {
-            leftTouchFlag = true;
-        }else if (num ==1)
-        {
-            rightTouchFlag = true;
-        }
-        else
-        {
-            Debug.LogError($"mouseDownで予期せぬ引数が与えられました。num:{num}");
-        }
-    }
-    public void mouseUp(int num)
-    {
-        if (num == 0)
-        {
-            leftTouchFlag = false;
-        }
-        else if (num == 1)
-        {
-            rightTouchFlag = false;
-        }
-        else
-        {
-            Debug.LogError($"mouseUpで予期せぬ引数が与えられました。num:{num}");
-        }
     }
 
 }

@@ -11,7 +11,7 @@ public class AutoRouteData
     int _wallValue = -1;
     int _errorValue = -88;
 
-    Vector2Int[] autoRouteArray;
+    List<Vector2Int> autoRouteList;
 
     //コンストラクタ
     public AutoRouteData(int width, int height)
@@ -124,7 +124,7 @@ public class AutoRouteData
         }
     }
 
-    public Vector2Int[] SearchShortestRoute(Vector2Int startPos,Vector2Int targetPos)
+    public List<Vector2Int> SearchShortestRoute(Vector2Int startPos,Vector2Int targetPos)
     {
         Queue<Vector2Int> searchQue = new Queue<Vector2Int>();
         int i = 1; //1から始まることに注意
@@ -149,15 +149,20 @@ public class AutoRouteData
         WaveletSearch();
 
         //先に配列をnewしておく
-        autoRouteArray = new Vector2Int[maxDistance + 1];
+        autoRouteList = new List<Vector2Int>();
+
+        //Debug.LogWarning($"autoRouteArray:{autoRouteArray}");
+        //autoRouteArray.Add(new Vector2Int(10,10));
+        //Debug.LogWarning($"autoRouteArray[0]:{autoRouteArray[0]}");
 
         //数字をもとにして最短ルートを配列に格納する
         Debug.Log($"StoreRouteAround({targetPos},{maxDistance})を実行します");
         StoreShortestRoute(targetPos, maxDistance);
 
-        Debug.Log($"resultRouteArrayは{autoRouteArray}");
+        Debug.Log($"resultRouteArrayは{autoRouteList}");
 
-        return autoRouteArray;
+        autoRouteList.Reverse(); //リストを反転させる
+        return autoRouteList;
 
         ////////////////////////////////////////////////////////////////////
         
@@ -208,7 +213,7 @@ public class AutoRouteData
                         if (GetValue(inspectPos) == distance)
                         {
                             Debug.Log($"distance:{distance} == maxDistance:{maxDistance}のときの、resultRouteArray[{distance}] = {inspectPos}を実行します");
-                            autoRouteArray[distance] = inspectPos;
+                            autoRouteList.Add(inspectPos);
                             StoreShortestRoute(inspectPos, distance - 1);
                         }
                     }
@@ -229,7 +234,7 @@ public class AutoRouteData
                     if (GetValue(centerPos + direction) == distance && CanMoveDiagonally(centerPos, centerPos + direction))
                     {
                         Debug.Log($"distance:{distance} != maxDistance:{maxDistance}のときの、resultRouteArray[{distance}] = {centerPos + direction}を実行します");
-                        autoRouteArray[distance] = centerPos + direction;
+                        autoRouteList.Add(centerPos + direction);
                         StoreShortestRoute(centerPos + direction, distance - 1);
                         break;
                     }

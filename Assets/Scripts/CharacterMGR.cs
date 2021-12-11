@@ -24,6 +24,7 @@ public class CharacterMGR : MonoBehaviour
     float moveTime; // movetime = 1/spd [s]
     [SerializeField] int coolTime;
 
+    public bool isMarching = false;
     public bool isAttacking = false;
     public bool isMoving = false;
 
@@ -31,7 +32,9 @@ public class CharacterMGR : MonoBehaviour
     bool isFristBattle = true;
 
     AutoRouteData autoRoute;
-    Vector2Int[] autoRouteArray;
+    List<Vector2Int> routeList;
+
+    int moveAlongWithCounter;
 
 
 
@@ -241,20 +244,18 @@ public class CharacterMGR : MonoBehaviour
                 isFristMarch = false;
 
                 TargetNearestTower();
-                Debug.Log($"targetGridPos={targetGridPos}");
                 SearchAutoRoute();
+                InitiMoveAlongWith();
             }
-
-            MoveAlongWith(autoRouteArray);
-
         }
         else
         {
             //プレイヤーが進路を選択する
             //↓はテスト用の配列
             Vector2Int[] route = { new Vector2Int(1, 0), new Vector2Int(1, 1), new Vector2Int(1, 2), new Vector2Int(1, 3), new Vector2Int(1, 4), new Vector2Int(2, 4), new Vector2Int(3, 4) };
-            MoveAlongWith(route);
         }
+
+        MoveAlongWith();
     }
 
 
@@ -292,7 +293,6 @@ public class CharacterMGR : MonoBehaviour
         if (!isMoving)
         {
             StartCoroutine(MoveForwardCoroutine());
-
         }
     }
 
@@ -404,6 +404,8 @@ public class CharacterMGR : MonoBehaviour
         nearestTowerList.Sort((a, b) => b.x - a.x); //次にx座標に関して降順でソートする
 
         targetGridPos = nearestTowerList[0];
+
+        Debug.Log($"targetGridPos:{targetGridPos}");
     }
     public int[,] CalcSearchRangeArray(int advancingDistance, int lookingForValue, int notLookingForValue, int centerValue)
     {
@@ -441,73 +443,126 @@ public class CharacterMGR : MonoBehaviour
 
     public void SearchAutoRoute()
     {
-        autoRouteArray = autoRoute.SearchShortestRoute(gridPos, targetGridPos); ; //参照渡し
+        Debug.Log("SearchAutoRouteを実行します");
+        routeList = autoRoute.SearchShortestRoute(gridPos, targetGridPos); //参照渡し
+        Debug.Log(string.Join(",",routeList));
     }
 
-
-    public void MoveAlongWith(Vector2Int[] route) //配列で指定したルートに沿っての移動
+    public void InitiMoveAlongWith()
     {
-        Vector2Int prePos, nextPos,nextNextPos;
+        moveAlongWithCounter = 0; //カウンターの初期化
 
-        if (isMoving)
+        if (!routeList.Contains(gridPos)) //キャラクターの位置を含むかどうか確認する
         {
+            Debug.LogError($"routeListがgridPos:{gridPos}を含みません");
+        }
+
+
+
+        //ルートがgridPosを含むかチェックし、斜め移動を作る
+    }
+    //public void MoveAlongWith(Vector2Int[] route) //配列で指定したルートに沿っての移動
+    //{
+    //    Vector2Int prePos, nextPos,nextNextPos;
+
+    //    if (isMoving) return;
+
+    //    prePos = GetGridPos();
+
+    //    for(int i = 0; i < route.Length; i++)
+    //    {
+    //        if (prePos != route[i])
+    //        {
+    //            if (i == route.Length - 1)
+    //            {
+    //                Debug.Log("指定したルートに現在のgridPosが含まれていません。");
+    //            }
+    //            continue;
+    //        }
+    //        else if (i == route.Length - 1)
+    //        {
+    //            Debug.Log("指定したルートの終点にいます。");
+    //            return;
+    //        }
+
+    //        nextPos = route[i + 1];
+
+    //        if (i < route.Length - 2)  //↓斜め移動できるときはそうする。
+    //        {
+    //            nextNextPos = route[i + 2];
+    //            if(((prePos-nextPos).x ==0 && (nextPos - nextNextPos).y == 0) || ((prePos - nextPos).y == 0 && (nextPos - nextNextPos).x == 0)) //nextPosが角マスのときtrue
+    //            {
+    //                if (CanMove(nextNextPos - prePos))
+    //                {
+    //                    nextPos = nextNextPos;
+    //                }
+    //            }
+    //        }
+
+    //        if ((prePos.x - nextPos.x > 1)||(prePos.x - nextPos.x < -1)|| (prePos.y - nextPos.y > 1) || (prePos.y - nextPos.y < -1))
+    //        {
+    //            Debug.LogError("現在のマスと移動先のマスが隣接していません。pre:" + prePos + ",next:" + nextPos);
+    //            return;
+    //        }
+
+    //        SetDirection(nextPos - prePos);
+
+    //        if (CanMove(nextPos - prePos))
+    //        {
+    //            MoveForward();
+    //        }
+    //        return;
+    //    }
+
+    //}
+
+    public void MoveAlongWith()
+    {
+        Vector2Int nextPos, nextNextPos;
+
+        if (isMoving) return;
+
+        if (moveAlongWithCounter == routeList.Count -1)
+        {
+            Debug.Log("ルートの終点にいます");
+            Debug.Log("InBatteleに切り替えます");
+            state = State.InBattle;
             return;
         }
 
-        prePos = GetGridPos();
+        nextPos = routeList[moveAlongWithCounter + 1];
 
-        for(int i = 0; i < route.Length; i++)
+        if (moveAlongWithCounter < routeList.Count - 2)  //↓斜め移動できるときはそうする。
         {
-            if (prePos != route[i])
+            nextNextPos = routeList[moveAlongWithCounter + 2];
+            if (((nextPos-gridPos).x == 0 && (nextNextPos-nextPos).y == 0) || ((nextPos-gridPos).y == 0 && (nextNextPos-nextPos).x == 0)) //nextPosが角マスのときtrue
             {
-                if (i == route.Length - 1)
+                if (CanMove(nextNextPos - gridPos))
                 {
-                    Debug.Log("指定したルートに現在のgridPosが含まれていません。");
-                }
-                continue;
-            }
-            else if (i == route.Length - 1)
-            {
-                Debug.Log("指定したルートの終点にいます。");
-                return;
-            }
-
-            nextPos = route[i + 1];
-
-            if (i < route.Length - 2)  //↓斜め移動できるときはそうする。
-            {
-                nextNextPos = route[i + 2];
-                if(((prePos-nextPos).x ==0 && (nextPos - nextNextPos).y == 0) || ((prePos - nextPos).y == 0 && (nextPos - nextNextPos).x == 0)) //nextPosが角マスのときtrue
-                {
-                    if (CanMove(nextNextPos - prePos))
-                    {
-                        nextPos = nextNextPos;
-                    }
+                    Debug.Log($"斜め移動が可能なため、nextPos:{nextPos}をnextNextPos:{nextNextPos}で置き換えます gridPos:{gridPos}");
+                    nextPos = nextNextPos;
+                    moveAlongWithCounter++;
                 }
             }
-
-            if ((prePos.x - nextPos.x > 1)||(prePos.x - nextPos.x < -1)|| (prePos.y - nextPos.y > 1) || (prePos.y - nextPos.y < -1))
-            {
-                Debug.Log("現在のマスと移動先のマスが隣接していません。pre:" + prePos + ",next:" + nextPos);
-                return;
-            }
-
-            if (!isMoving)
-            {
-                SetDirection(nextPos - prePos);
-            }
-
-            if (CanMove(nextPos - prePos))
-            {
-                MoveForward();
-            }
-            return;
         }
+
+        SetDirection(nextPos - gridPos);
+        if (CanMove(nextPos - gridPos))
+        {
+            MoveForward();
+            moveAlongWithCounter++;
+        }
+        else
+        {
+            Debug.LogError($"CanMove({nextPos - gridPos})がfalseなので移動できません");
+        }
+
     }
 
     public void Battle()
     {
         Debug.LogWarning("Battleを実行します");
+        SetDirection(targetGridPos-gridPos);
     }
 }
 

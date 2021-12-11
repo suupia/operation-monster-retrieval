@@ -5,8 +5,8 @@ using System.Linq;
 
 public class PointerMGR : MonoBehaviour
 {
-    private float moveInterval = 0.15f;
-    private float lastMovingTime;
+    private float moveInterval = 0.3f;
+    private float lastMovementTime;
     [SerializeField] private GameObject pointerTailPrefab;
     private List<GameObject> pointerTails;
 
@@ -15,7 +15,7 @@ public class PointerMGR : MonoBehaviour
 
     private void Start()
     {
-        lastMovingTime = -moveInterval;
+        ResetLastMovementTime();
         playerRoute = new List<Vector2Int>();
         pointerTails = new List<GameObject>();
 
@@ -23,15 +23,15 @@ public class PointerMGR : MonoBehaviour
 
     public void MoveByArrowKey(Vector2Int directionVector) //矢印キーで移動
     {
-
         //positionをグリッドに合わせる
         Vector2Int gridPos = GameManager.instance.ToGridPosition(transform.position); //Updateで呼び出されるので毎回更新される
         transform.position = GameManager.instance.ToWorldPosition(gridPos);
 
+
         //arrowKeyFlagを変更する時に毎回ベクトルを割り当てているので、引数でもらったベクトルで入力の状況を判定できる。
         if (directionVector != Vector2Int.zero) //矢印キーを押したとき
         {
-            if (GameManager.instance.inputMGR.ArrowKeyTimer - lastMovingTime >= moveInterval)
+            if (GameManager.instance.inputMGR.ArrowKeyTimer - lastMovementTime >= moveInterval)
             {
                 if (!(playerRoute.Count(pos => pos == gridPos + directionVector) < 2) && playerRoute[playerRoute.Count - 2] != gridPos + directionVector) //進もうとしているマスを既に2回以上通っているかつ、来た道を戻らない場合はなにもしない
                 {
@@ -42,16 +42,16 @@ public class PointerMGR : MonoBehaviour
                 if (GameManager.instance.mapMGR.GetMapValue(gridPos + directionVector) % GameManager.instance.groundID == 0)
                 {
                     transform.position = transform.position + new Vector3(directionVector.x, directionVector.y, 0);
-                    lastMovingTime = GameManager.instance.inputMGR.ArrowKeyTimer;
+                    lastMovementTime = GameManager.instance.inputMGR.ArrowKeyTimer;
                 }
 
             }
         }
         else //矢印キーを離したとき
         {
-            GameManager.instance.inputMGR.ArrowKeyTimer = 0;
+            //GameManager.instance.inputMGR.ArrowKeyTimer = 0;
 
-            lastMovingTime = -moveInterval;
+            //ResetLastMovementTime();
 
         }
 
@@ -126,5 +126,14 @@ public class PointerMGR : MonoBehaviour
             sentece += i;
         }
         return sentece;
+    }
+
+    public void ResetLastMovementTime()
+    {
+        if(lastMovementTime != -moveInterval)
+            {
+                lastMovementTime = -moveInterval;
+            }
+            return;
     }
 }

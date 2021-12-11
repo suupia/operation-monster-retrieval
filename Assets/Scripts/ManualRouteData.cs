@@ -9,7 +9,7 @@ public class ManualRouteData
 
     //private float count = 0;
     //private float moveInterval = 0.15f;
-    //private float lastMovingTime;
+    //private float lastMovementTime;
     //private bool pressingArrowKey;
     //[SerializeField] private GameObject mouseTrailPrefab;
 
@@ -24,7 +24,7 @@ public class ManualRouteData
     ////コンストラクタ
     //public ManualRouteData()
     //{
-    //    lastMovingTime = -moveInterval;
+    //    lastMovementTime = -moveInterval;
     //    playerRoute = new List<Vector2Int>();
     //    mouseTrails = new List<GameObject>();
 
@@ -60,7 +60,7 @@ public class ManualRouteData
     //    transform.position = GameManager.instance.ToWorldPosition(gridPos);
 
     //    //1マスずつ移動
-    //    if (count - lastMovingTime >= moveInterval)
+    //    if (count - lastMovementTime >= moveInterval)
     //    {
     //        Vector2Int deltaVec = Vector2Int.zero;
     //        if (Input.GetKey(KeyCode.DownArrow) && GameManager.instance.mapMGR.GetMapValue(gridPos + Vector2Int.down) % GameManager.instance.groundID == 0)
@@ -91,7 +91,7 @@ public class ManualRouteData
     //        {
     //            transform.position = transform.position + new Vector3(deltaVec.x, deltaVec.y, 0);
     //            pressingArrowKey = true;
-    //            lastMovingTime = count;
+    //            lastMovementTime = count;
     //        }
 
     //    }
@@ -102,7 +102,7 @@ public class ManualRouteData
     //        count = 0;
 
 
-    //        lastMovingTime = -moveInterval;
+    //        lastMovementTime = -moveInterval;
 
     //        pressingArrowKey = false;
     //    }
