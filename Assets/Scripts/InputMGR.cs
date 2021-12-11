@@ -46,24 +46,24 @@ public class InputMGR : MonoBehaviour
         }
 
         //ñÓàÛÉLÅ[óp
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow))
         {
             arrowKeyInputFlag = true;
             arrowKeyVector = Vector2Int.right;
-        }else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        }else if (Input.GetKey(KeyCode.LeftArrow))
         {
             arrowKeyInputFlag = true;
             arrowKeyVector = Vector2Int.left;
-        }else if (Input.GetKeyDown(KeyCode.UpArrow))
+        }else if (Input.GetKey(KeyCode.UpArrow))
         {
             arrowKeyInputFlag = true;
             arrowKeyVector = Vector2Int.up;
-        }else if (Input.GetKeyDown(KeyCode.DownArrow))
+        }else if (Input.GetKey(KeyCode.DownArrow))
         {
             arrowKeyInputFlag = true;
             arrowKeyVector = Vector2Int.down;
         }
-        if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow))
+        if ((Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow)) && !(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow)))
         {
             arrowKeyInputFlag = false;
             arrowKeyVector = Vector2Int.zero;

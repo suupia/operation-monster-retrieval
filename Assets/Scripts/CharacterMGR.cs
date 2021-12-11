@@ -10,7 +10,8 @@ public class CharacterMGR : MonoBehaviour
 
     [SerializeField] Vector2Int gridPos;
 
-    [SerializeField] Vector2Int targetGridPos;
+    [SerializeField] Vector2Int targetCastlePos;
+    [SerializeField] Vector2Int targetTowerPos;
     [SerializeField] Vector2Int directionVectorToTarget;
 
     [SerializeField] int characterTypeID;
@@ -19,7 +20,7 @@ public class CharacterMGR : MonoBehaviour
     [SerializeField] int hp;
     [SerializeField] int atk;
     [SerializeField] float attackInterval;
-    [SerializeField] float attackRange;
+    [SerializeField] int attackRange;
     [SerializeField] float spd; //1秒間に進むマスの数 [マス/s]  とりあえず１にしておく
     float moveTime; // movetime = 1/spd [s]
     [SerializeField] int coolTime;
@@ -218,6 +219,8 @@ public class CharacterMGR : MonoBehaviour
         moveTime = 1 / spd;
         gridPos = GameManager.instance.ToGridPosition(transform.position);
         state = State.Marching;
+
+        targetCastlePos = new Vector2Int(GameManager.instance.mapMGR.GetMapWidth() - 2, GameManager.instance.mapMGR.GetMapHeight() - 2);
     }
 
     private void Update()
@@ -243,7 +246,7 @@ public class CharacterMGR : MonoBehaviour
             {
                 isFristMarch = false;
 
-                TargetNearestTower();
+                //TargetNearestTower();
                 SearchAutoRoute();
                 InitiMoveAlongWith();
             }
@@ -353,10 +356,8 @@ public class CharacterMGR : MonoBehaviour
 
     }
 
-    public void TargetNearestTower() //最も近いタワーの座標を取得する
+    public bool CanAttackTower() //最も近いタワーの座標を取得する
     {
-
-
         int lookingForValue = 1; //索敵範囲の値
         int notLookingForValue = 0; //索敵範囲外の値
         int centerValue = 0; //原点の値
@@ -365,7 +366,7 @@ public class CharacterMGR : MonoBehaviour
         List<Vector2Int> nearestTowerList = new List<Vector2Int>();
 
         int[,] searchRangeArray;
-        int maxRange = System.Math.Max(GameManager.instance.mapMGR.GetMapWidth(), GameManager.instance.mapMGR.GetMapHeight()); //探索する範囲はmapの縦横の最大値まで調べれば十分
+        int maxRange = attackRange;
 
 
         //Towerの位置をListに追加する
@@ -403,9 +404,19 @@ public class CharacterMGR : MonoBehaviour
         nearestTowerList.Sort((a, b) => b.y - a.y); //まずy座標に関して降順でソートする
         nearestTowerList.Sort((a, b) => b.x - a.x); //次にx座標に関して降順でソートする
 
-        targetGridPos = nearestTowerList[0];
+        //targetTowerPos = nearestTowerList[0];
 
-        Debug.Log($"targetGridPos:{targetGridPos}");
+        Debug.Log($"targetGridPos:{targetTowerPos}");
+
+        if (nearestTowerList.Count >0)
+        {
+            targetTowerPos = nearestTowerList[0];
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     public int[,] CalcSearchRangeArray(int advancingDistance, int lookingForValue, int notLookingForValue, int centerValue)
     {
@@ -444,8 +455,8 @@ public class CharacterMGR : MonoBehaviour
     public void SearchAutoRoute()
     {
         Debug.Log("SearchAutoRouteを実行します");
-        routeList = autoRoute.SearchShortestRoute(gridPos, targetGridPos); //参照渡し
-        Debug.Log(string.Join(",",routeList));
+        routeList = autoRoute.SearchShortestRoute(gridPos, targetCastlePos); //参照渡し
+        Debug.Log("routeList:"+string.Join(",",routeList));
     }
 
     public void InitiMoveAlongWith()
@@ -457,64 +468,7 @@ public class CharacterMGR : MonoBehaviour
             Debug.LogError($"routeListがgridPos:{gridPos}を含みません");
         }
 
-
-
-        //ルートがgridPosを含むかチェックし、斜め移動を作る
     }
-    //public void MoveAlongWith(Vector2Int[] route) //配列で指定したルートに沿っての移動
-    //{
-    //    Vector2Int prePos, nextPos,nextNextPos;
-
-    //    if (isMoving) return;
-
-    //    prePos = GetGridPos();
-
-    //    for(int i = 0; i < route.Length; i++)
-    //    {
-    //        if (prePos != route[i])
-    //        {
-    //            if (i == route.Length - 1)
-    //            {
-    //                Debug.Log("指定したルートに現在のgridPosが含まれていません。");
-    //            }
-    //            continue;
-    //        }
-    //        else if (i == route.Length - 1)
-    //        {
-    //            Debug.Log("指定したルートの終点にいます。");
-    //            return;
-    //        }
-
-    //        nextPos = route[i + 1];
-
-    //        if (i < route.Length - 2)  //↓斜め移動できるときはそうする。
-    //        {
-    //            nextNextPos = route[i + 2];
-    //            if(((prePos-nextPos).x ==0 && (nextPos - nextNextPos).y == 0) || ((prePos - nextPos).y == 0 && (nextPos - nextNextPos).x == 0)) //nextPosが角マスのときtrue
-    //            {
-    //                if (CanMove(nextNextPos - prePos))
-    //                {
-    //                    nextPos = nextNextPos;
-    //                }
-    //            }
-    //        }
-
-    //        if ((prePos.x - nextPos.x > 1)||(prePos.x - nextPos.x < -1)|| (prePos.y - nextPos.y > 1) || (prePos.y - nextPos.y < -1))
-    //        {
-    //            Debug.LogError("現在のマスと移動先のマスが隣接していません。pre:" + prePos + ",next:" + nextPos);
-    //            return;
-    //        }
-
-    //        SetDirection(nextPos - prePos);
-
-    //        if (CanMove(nextPos - prePos))
-    //        {
-    //            MoveForward();
-    //        }
-    //        return;
-    //    }
-
-    //}
 
     public void MoveAlongWith()
     {
@@ -522,10 +476,16 @@ public class CharacterMGR : MonoBehaviour
 
         if (isMoving) return;
 
-        if (moveAlongWithCounter == routeList.Count -1)
+        if (moveAlongWithCounter == routeList.Count -1) //ルートの終点にいるときの処理
         {
-            Debug.Log("ルートの終点にいます");
-            Debug.Log("InBatteleに切り替えます");
+            Debug.Log("ルートの終点にいますのでInBatteleに切り替えます");
+            state = State.InBattle;
+            return;
+        }
+
+        if (CanAttackTower()) //ルートに沿って移動しているときに、攻撃範囲内にタワーがあるとき
+        {
+            Debug.Log("攻撃範囲内にタワーがあるのでInBatteleに切り替えます");
             state = State.InBattle;
             return;
         }
@@ -561,8 +521,8 @@ public class CharacterMGR : MonoBehaviour
 
     public void Battle()
     {
-        Debug.LogWarning("Battleを実行します");
-        SetDirection(targetGridPos-gridPos);
+        Debug.LogWarning($"Battleを実行します targetTowerPos:{targetTowerPos}");
+        SetDirection(targetTowerPos-gridPos);
     }
 }
 
