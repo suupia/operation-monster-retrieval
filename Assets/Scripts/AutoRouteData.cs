@@ -197,51 +197,24 @@ public class AutoRouteData
         void StoreShortestRoute(Vector2Int centerPos, int distance)
         {
 
-            if (distance < 0)
-            {
-                return; //0までQueに入れれば十分
-            }
+            if (distance < 0) return; //0までQueに入れれば十分
 
-            Debug.Log($"dinstance:{distance}、maxDistance:{maxDistance}のため、distance == maxDistanceは{distance == maxDistance}");
-            if (distance == maxDistance) //最終地点の周りだけ周囲8マスに判定を行う(9マス)
-            {
-                Vector2Int inspectPos;
+            Debug.Log($"GetValue({centerPos})は{GetValue(centerPos)}、distance:{distance}");
 
-                for (int y = -1; y < 2; y++)
+            // 5 7 8
+            // 3 * 6
+            // 1 2 4 の優先順位で判定していく
+
+            Vector2Int[] orderInDirectionArray = new Vector2Int[] { Vector2Int.left + Vector2Int.down, Vector2Int.down, Vector2Int.left, Vector2Int.right + Vector2Int.down, Vector2Int.left + Vector2Int.up, Vector2Int.right, Vector2Int.up, Vector2Int.right + Vector2Int.up };
+
+            foreach (Vector2Int direction in orderInDirectionArray)
+            {
+                if (GetValue(centerPos + direction) == distance && CanMoveDiagonally(centerPos, centerPos + direction))
                 {
-                    for (int x = -1; x < 2; x++)
-                    {
-                        inspectPos = centerPos + new Vector2Int(x, y);
-                        if (GetValue(inspectPos) == distance)
-                        {
-                            Debug.Log($"distance:{distance} == maxDistance:{maxDistance}のときの、resultRouteArray[{distance}] = {inspectPos}を実行します");
-                            autoRouteList.Add(inspectPos);
-                            StoreShortestRoute(inspectPos, distance - 1);
-                        }
-                    }
+                    autoRouteList.Add(centerPos + direction);
+                    StoreShortestRoute(centerPos + direction, distance - 1);
+                    break;
                 }
-            }
-            else
-            {
-                Debug.Log($"GetValue({centerPos})は{GetValue(centerPos)}、distance:{distance}");
-
-                // 5 7 8
-                // 3 * 6
-                // 1 2 4 の優先順位で判定していく
-
-                Vector2Int[] orderInDirectionArray = new Vector2Int[] { Vector2Int.left + Vector2Int.down, Vector2Int.down, Vector2Int.left, Vector2Int.right + Vector2Int.down, Vector2Int.left + Vector2Int.up, Vector2Int.right, Vector2Int.up, Vector2Int.right + Vector2Int.up };
-
-                foreach (Vector2Int direction in orderInDirectionArray)
-                {
-                    if (GetValue(centerPos + direction) == distance && CanMoveDiagonally(centerPos, centerPos + direction))
-                    {
-                        Debug.Log($"distance:{distance} != maxDistance:{maxDistance}のときの、resultRouteArray[{distance}] = {centerPos + direction}を実行します");
-                        autoRouteList.Add(centerPos + direction);
-                        StoreShortestRoute(centerPos + direction, distance - 1);
-                        break;
-                    }
-                }
-
             }
         }
 
