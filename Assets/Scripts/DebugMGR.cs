@@ -51,6 +51,9 @@ public class DebugMGR : MonoBehaviour
             }
         }
 
+        if (isDebuggingMap) DebugMap();
+        if (isDebuggingAutoRoute) DebugAutoRoute();
+
     }
     public void DebugMap()
     {

@@ -101,14 +101,14 @@ public class GameManager : MonoBehaviour
     {
         isSpawnCharacter = true;
 
-        GameObject tempCharaGO; //スコープに注意　このメソッドの中でしか使えない
-        CharacterMGR tempCharaMGR;
+        GameObject characterGO; //スコープに注意　このメソッドの中でしか使えない
+        CharacterMGR characterMGR;
 
-        tempCharaGO = Instantiate(characterPrefabs[characterTypeNum], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0), Quaternion.identity);
-        tempCharaMGR = tempCharaGO.GetComponent<CharacterMGR>();
+        characterGO = Instantiate(characterPrefabs[characterTypeNum], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0), Quaternion.identity);
+        characterMGR = characterGO.GetComponent<CharacterMGR>();
 
         //キャラクターのデータをここで渡す
-        tempCharaMGR.SetCharacterData(0); //今はCharacterTypeIDとして0を渡しておく。AutoRouteDataも[0]を参照するようになる。
+        characterMGR.SetCharacterData(0); //今はCharacterTypeIDとして0を渡しておく。AutoRouteDataも[0]を参照するようになる。
         
 
         mapMGR.MultiplySetMapValue(vector, characterID);

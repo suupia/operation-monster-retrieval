@@ -119,17 +119,15 @@ MonoBehaviour:
   targetCastlePos: {x: 0, y: 0}
   targetTowerPos: {x: 0, y: 0}
   directionVectorToTarget: {x: 0, y: 0}
+  targetFacility: {fileID: 0}
   characterTypeID: 0
   level: 0
   maxHp: 0
   hp: 0
-  atk: 0
-  attackInterval: 0
-  attackRange: 2
-  spd: 2
+  atk: 1
+  attackInterval: 1
+  attackRange: 1
+  spd: 3
   coolTime: 0
-  isMarching: 0
-  isAttacking: 0
-  isMoving: 0
   damageText: {fileID: 0}
   drawDamageTime: 0

@@ -131,8 +131,10 @@ public class AutoRouteData
         bool isComplete = false;
         int maxDistance = 0;
 
+        //何よりもまず初期化
+        FillAll(_initiValue);
 
-        //まずmapをコピーして、動けない場所を-1にする。
+        //次にmapをコピーして、動けない場所を-1にする。
         for (int y = 0; y < Height; y++)
         {
             for (int x = 0; x < Width; x++)

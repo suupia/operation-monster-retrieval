@@ -14,6 +14,8 @@ public class CharacterMGR : MonoBehaviour
     [SerializeField] Vector2Int targetTowerPos;
     [SerializeField] Vector2Int directionVectorToTarget;
 
+    [SerializeField] Facility targetFacility;
+
     [SerializeField] int characterTypeID;
     [SerializeField] int level;
     [SerializeField] int maxHp;
@@ -25,9 +27,9 @@ public class CharacterMGR : MonoBehaviour
     float moveTime; // movetime = 1/spd [s]
     [SerializeField] int coolTime;
 
-    public bool isMarching = false;
-    public bool isAttacking = false;
-    public bool isMoving = false;
+    bool isMarching = false;
+    bool isAttacking = false;
+    bool isMoving = false;
 
     bool isFristMarch = true;
     bool isFristBattle = true;
@@ -39,12 +41,14 @@ public class CharacterMGR : MonoBehaviour
 
 
 
-    private GameObject damageTextGO;
+    GameObject damageTextGO;
     [SerializeField] private Text damageText;
     [SerializeField] private int drawDamageTime;
 
-    private Direction direction;
-    private State _state;
+    Direction direction;
+    State _state;
+
+    //プロパティ
     private State state
     {
         get { return _state; }
@@ -293,10 +297,7 @@ public class CharacterMGR : MonoBehaviour
     public void MoveForward()
     {
         Debug.Log("MoveForwardを実行します");
-        if (!isMoving)
-        {
-            StartCoroutine(MoveForwardCoroutine());
-        }
+        if (!isMoving) StartCoroutine(MoveForwardCoroutine());
     }
 
     IEnumerator MoveForwardCoroutine()  //Characterをゆっくり動かす関数
@@ -306,18 +307,15 @@ public class CharacterMGR : MonoBehaviour
         Vector2 endPos;
 
 
-        if (isAttacking)
-        {
-            yield return null;
-        }
-
         isMoving = true;
-
 
         MoveData(GetDirectionVector()); //先にMoveDateを行う
 
+
         startPos = transform.position;
         endPos = GetTransformPosFromGridPos();
+
+        Debug.Log($"MoveForwardCoroutineにおいてstartPos:{startPos},endPos{endPos}");
 
 
         float remainingDistance = (endPos - startPos).sqrMagnitude;
@@ -404,17 +402,16 @@ public class CharacterMGR : MonoBehaviour
         nearestTowerList.Sort((a, b) => b.y - a.y); //まずy座標に関して降順でソートする
         nearestTowerList.Sort((a, b) => b.x - a.x); //次にx座標に関して降順でソートする
 
-        //targetTowerPos = nearestTowerList[0];
-
-        Debug.Log($"targetGridPos:{targetTowerPos}");
-
         if (nearestTowerList.Count >0)
         {
             targetTowerPos = nearestTowerList[0];
+            Debug.Log("nearestTowerList:" + string.Join(",", nearestTowerList) + $"\ntargetGridPos:{targetTowerPos}");
             return true;
         }
         else
         {
+            targetTowerPos = Vector2Int.zero; //nullの代わり
+            Debug.Log("nearestTowerList:" + string.Join(",", nearestTowerList) + $"\ntargetGridPos:{targetTowerPos}");
             return false;
         }
     }
@@ -478,7 +475,8 @@ public class CharacterMGR : MonoBehaviour
 
         if (moveAlongWithCounter == routeList.Count -1) //ルートの終点にいるときの処理
         {
-            Debug.Log("ルートの終点にいますのでInBatteleに切り替えます");
+            Debug.Log("ルートの終点にいるのでInBatteleに切り替えます");
+            SetDirection(targetCastlePos - gridPos);
             state = State.InBattle;
             return;
         }
@@ -486,6 +484,7 @@ public class CharacterMGR : MonoBehaviour
         if (CanAttackTower()) //ルートに沿って移動しているときに、攻撃範囲内にタワーがあるとき
         {
             Debug.Log("攻撃範囲内にタワーがあるのでInBatteleに切り替えます");
+            SetDirection(targetTowerPos - gridPos);
             state = State.InBattle;
             return;
         }
@@ -507,6 +506,7 @@ public class CharacterMGR : MonoBehaviour
         }
 
         SetDirection(nextPos - gridPos);
+
         if (CanMove(nextPos - gridPos))
         {
             MoveForward();
@@ -521,9 +521,58 @@ public class CharacterMGR : MonoBehaviour
 
     public void Battle()
     {
-        Debug.LogWarning($"Battleを実行します targetTowerPos:{targetTowerPos}");
-        SetDirection(targetTowerPos-gridPos);
+        //Debug.LogWarning($"Battleを実行します targetTowerPos:{targetTowerPos}");
+
+        if (isFristBattle)
+        {
+            isFristBattle = false;
+
+            targetFacility = GameManager.instance.mapMGR.GetMap().GetFacility(targetTowerPos);
+        }
+
+        Attack();
     }
+
+    public void Attack()
+    {
+        Debug.LogWarning($"Attackを実行します");
+        //Debug.LogWarning($"GetFacility({targetTowerPos}):{GameManager.instance.mapMGR.GetMap().GetFacility(targetTowerPos)}");
+
+
+        if (GameManager.instance.mapMGR.GetMap().GetFacility(targetTowerPos) == null) { //towerMGRがないということはタワーを破壊したということなので、Marchingに切り替える
+            Debug.LogWarning("タワーを破壊したのでMarchingに切り替えます");
+            state = State.Marching;
+            return;
+        }
+
+        if (!isAttacking) StartCoroutine(AttackCoroutine());
+
+    }
+
+    IEnumerator AttackCoroutine()
+    {
+        float timer = 0;
+
+        Debug.LogWarning($"AttackCoroutineを実行します");
+         
+        isAttacking = true;
+
+        Debug.LogWarning($"Facility({targetTowerPos})に{atk}のダメージを与えた");
+        targetFacility.HP -= CalcDamage(atk);
+
+        while(timer < attackInterval){
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        isAttacking = false;
+    }
+
+    public int CalcDamage(int atk)
+    {
+        return atk; //とりあえず、今は何もしないで攻撃力をそのまま返す
+    }
+
 }
 
 

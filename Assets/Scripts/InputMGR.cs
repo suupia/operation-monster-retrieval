@@ -11,17 +11,14 @@ public class InputMGR : MonoBehaviour
     [SerializeField] bool rightTouchFlag;
     [SerializeField] bool arrowKeyInputFlag;
     Vector2Int arrowKeyVector;
-    float arrowKeyTimer = 0;
+
+    [SerializeField] int verticalInput;
+    [SerializeField] int horizontalInput;
 
     Vector2 mousePos;
     Vector2Int mouseGridPos;
 
     //プロパティ
-    public float ArrowKeyTimer
-    {
-        get { return arrowKeyTimer; }
-        set { arrowKeyTimer = value; }
-    }
 
     void Update()
     {
@@ -46,40 +43,33 @@ public class InputMGR : MonoBehaviour
         }
 
         //矢印キー用
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            arrowKeyInputFlag = true;
-            arrowKeyVector = Vector2Int.right;
-        }else if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            arrowKeyInputFlag = true;
-            arrowKeyVector = Vector2Int.left;
-        }else if (Input.GetKey(KeyCode.UpArrow))
-        {
-            arrowKeyInputFlag = true;
-            arrowKeyVector = Vector2Int.up;
-        }else if (Input.GetKey(KeyCode.DownArrow))
-        {
-            arrowKeyInputFlag = true;
-            arrowKeyVector = Vector2Int.down;
-        }
-        if ((Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow)) && !(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow)))
-        {
-            arrowKeyInputFlag = false;
-            arrowKeyVector = Vector2Int.zero;
-            arrowKeyTimer = 0;
-            GameManager.instance.pointerMGR.ResetLastMovementTime();
-        }
+        //if (Input.GetKey(KeyCode.RightArrow))
+        //{
+        //    arrowKeyInputFlag = true;
+        //    arrowKeyVector = Vector2Int.right;
+        //}else if (Input.GetKey(KeyCode.LeftArrow))
+        //{
+        //    arrowKeyInputFlag = true;
+        //    arrowKeyVector = Vector2Int.left;
+        //}else if (Input.GetKey(KeyCode.UpArrow))
+        //{
+        //    arrowKeyInputFlag = true;
+        //    arrowKeyVector = Vector2Int.up;
+        //}else if (Input.GetKey(KeyCode.DownArrow))
+        //{
+        //    arrowKeyInputFlag = true;
+        //    arrowKeyVector = Vector2Int.down;
+        //}
+        //if ((Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow)) && !(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow)))
+        //{
+        //    arrowKeyInputFlag = false;
+        //    arrowKeyVector = Vector2Int.zero;
+        //}
 
-        if (Input.GetKeyDown(KeyCode.P))
+
+        if (Input.GetKeyDown(KeyCode.P))          //Pointerの操作可、不可を変える
         {
             canMovePointer = !canMovePointer;
-
-            if (!canMovePointer)    //canMovePointerがfalseになったとき、lastMovementTimeとTimerをリセットする
-            {
-                GameManager.instance.pointerMGR.ResetLastMovementTime();
-                arrowKeyTimer = 0;
-            }
         }
 
         if (leftTouchFlag) //道を作る
@@ -92,22 +82,19 @@ public class InputMGR : MonoBehaviour
             GameManager.instance.mapMGR.MakeRoad(mouseGridPos.x,mouseGridPos.y);
         }
 
-        if (canMovePointer && rightTouchFlag) //Pointerを動かす
+
+        if (canMovePointer)   //Pointerを動かす
         {
-            mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            mouseGridPos = GameManager.instance.ToGridPosition(mousePos);
-            //Debug.Log($"mousePosは{mousePos}");
-            Debug.Log($"mouseGridPosは{mouseGridPos}");
+            if (rightTouchFlag) 
+            {
+                mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                mouseGridPos = GameManager.instance.ToGridPosition(mousePos);
+                //Debug.Log($"mousePosは{mousePos}");
+                Debug.Log($"mouseGridPosは{mouseGridPos}");
 
-            GameManager.instance.pointerMGR.MoveByMouse(mouseGridPos); //とりあえず、種類0番のキャラクターのルートを決定するようにする
+                GameManager.instance.pointerMGR.MoveByMouse(mouseGridPos); //とりあえず、種類0番のキャラクターのルートを決定するようにする
+            }
         }
-
-        if (canMovePointer && arrowKeyInputFlag)
-        {
-            arrowKeyTimer += Time.fixedDeltaTime;
-            GameManager.instance.pointerMGR.MoveByArrowKey(arrowKeyVector);
-        }
-
 
     }
 

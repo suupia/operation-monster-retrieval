@@ -300,6 +300,8 @@ MonoBehaviour:
   leftTouchFlag: 0
   rightTouchFlag: 0
   arrowKeyInputFlag: 0
+  verticalInput: 0
+  horizontalInput: 0
 --- !u!4 &414208364
 Transform:
   m_ObjectHideFlags: 0
@@ -914,10 +916,7 @@ MonoBehaviour:
   allysCastlePrefab: {fileID: 139007124859642035, guid: a65e05c2c6267a843aab67850a912cd0, type: 3}
   allysCastlePos: {x: 0, y: 0}
   characterSpawnPossFromCastle:
-  - {x: 2, y: 0}
-  - {x: 2, y: 1}
-  - {x: 1, y: 2}
-  - {x: 0, y: 2}
+  - {x: 1, y: 1}
   characterSpawnPoss: []
   enemysCastlePrefab: {fileID: 4573069688280726516, guid: 99166142ad6a57e4a82721286c976eaa, type: 3}
   enemysCastlePos: {x: 16, y: 7}

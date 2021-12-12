@@ -13,7 +13,7 @@ public class MapMGR : MonoBehaviour
 
     [SerializeField] int mapHeight;
     [SerializeField] int mapWidth;
-    [SerializeField] int outOfStageQ;
+    [SerializeField] int outOfStageQ; //マップの外にタイルを何枚はみ出して張るかを決める
 
     [SerializeField] GameObject allysCastlePrefab;
     [SerializeField] Vector2Int allysCastlePos;
@@ -116,9 +116,15 @@ public class MapMGR : MonoBehaviour
     {
         for (int i = 0; i < towerPrefabs.Length; i++)
         {
-            Instantiate(towerPrefabs[i], new Vector3(towerPoss[i].x + 0.5f, towerPoss[i].y + 0.75f, 0), Quaternion.identity);
+            GameObject towerGO;
+            TowerMGR towerMGR;
+
+            towerGO =  Instantiate(towerPrefabs[i], new Vector3(towerPoss[i].x + 0.5f, towerPoss[i].y + 0.75f, 0), Quaternion.identity);
+            towerMGR = towerGO.GetComponent<TowerMGR>();
 
             map.MultiplySetValue(towerPoss[i], GameManager.instance.towerID);
+            map.SetFacility(towerPoss[i],towerMGR);
+
         }
     }
 
@@ -443,8 +449,10 @@ public class MapData
     int _width;
     int _height;
     int[] _values = null;
+    CharacterMGR[] _characterMGRs = null;
+    Facility[] _facilities = null;
     int _edgeValue;
-    int _errorValue = -1;
+    int _outOfRangeValue = -1;
 
     //コンストラクタ
     public MapData(int width, int height)
@@ -457,6 +465,8 @@ public class MapData
         _width = width;
         _height = height;
         _values = new int[width * height];
+        _characterMGRs = new CharacterMGR[width * height];
+        _facilities = new Facility[width * height];
 
         FillAll(GameManager.instance.wallID); //mapの初期化はwallIDで行う
     }
@@ -474,8 +484,8 @@ public class MapData
     {
         if (IsOutOfRange(x, y))
         {
-            Debug.LogError($"領域外の値を取得しようとしました(x,y)=({x},{y})");
-            return _errorValue;
+            Debug.LogError($"IsOutOfRange({x},{y})がtrueです");
+            return _outOfRangeValue;
         }
         if (IsOnTheEdge(x,y))
         {
@@ -493,17 +503,43 @@ public class MapData
         if (index < 0 || index > _values.Length)
         {
             Debug.LogError("領域外の値を習得しようとしました");
-            return _errorValue;
+            return _outOfRangeValue;
         }
         return _values[index];
     }
 
+    public CharacterMGR GetCharacterMGR(int x,int y)
+    {
+        if (IsOutOfDataRange(x, y))
+        {
+            Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
+            return null; //例外用の数字を設定できないため、nullを返す。
+        }
+        return _characterMGRs[ToSubscript(x,y)];
+    }
+    public CharacterMGR GetCharacterMGR(Vector2Int vector)
+    {
+        return GetCharacterMGR(vector.x,vector.y);
+    }
+    public Facility GetFacility(int x,int y)
+    {
+        if (IsOutOfDataRange(x, y))
+        {
+            Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
+            return null; //例外用の数字を設定できないため、nullを返す。
+        }
+        return _facilities[ToSubscript(x, y)];
+    }
+    public Facility GetFacility(Vector2Int vector)
+    {
+        return GetFacility(vector.x,vector.y);
+    }
     //Setter
     public void SetValue(int x, int y, int value)
     {
         if (IsOutOfRange(x, y))
         {
-            Debug.LogError("領域外に値を設定しようとしました");
+            Debug.LogError($"IsOutOfRange({x},{y})がtrueです");
             return;
         }
         _values[ToSubscript(x, y)] = value;
@@ -512,6 +548,33 @@ public class MapData
     public void SetValue(Vector2Int vector, int value)
     {
         SetValue(vector.x, vector.y, value);
+    }
+
+    public void SetCharacterMGR(int x,int y, CharacterMGR characterMGR)
+    {
+        if (IsOutOfDataRange(x, y))
+        {
+            Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
+            return;
+        }
+        _characterMGRs[ToSubscript(x, y)] = characterMGR;
+    }
+    public void SetCharacterMGR(Vector2Int vector,CharacterMGR characterMGR)
+    {
+        SetCharacterMGR(vector.x,vector.y,characterMGR);
+    }
+    public void SetFacility(int x, int y ,Facility facility)
+    {
+        if (IsOutOfDataRange(x, y))
+        {
+            Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
+            return;
+        }
+        _facilities[ToSubscript(x, y)] = facility;
+    }
+    public void SetFacility(Vector2Int vector, Facility facility)
+    {
+        SetFacility(vector.x,vector.y,facility);
     }
 
     public void MultiplySetValue(Vector2Int vector, int value)
@@ -538,6 +601,11 @@ public class MapData
             Debug.LogError($"DivisionalSetValue({x},{y})で領域外に値{value}を設定しようとしました");
             return;
         }
+        if (GetValue(x,y)% value !=0)
+        {
+            Debug.LogError($"DivisionalSetValue({vector},{value})で余りが出たため実行できません");
+            return;
+        }
 
         _values[ToSubscript(x, y)] /= value;
     }
@@ -557,7 +625,7 @@ public class MapData
         return new Vector2Int(xSub, ySub);
     }
 
-    bool IsOutOfRange(int x, int y)
+    bool IsOutOfRange(int x, int y) //edgeの外側。つまり、データがedgeValueすらない
     {
         if (x < -1 || x > _width) { return true; }
         if (y < -1 || y > _height) { return true; }
@@ -573,6 +641,12 @@ public class MapData
         return false;
     }
 
+    bool IsOutOfDataRange(int x,int y) //座標(0,0)～(mapWidht-1,mapHeight-1)のデータが存在する領域の外側
+    {
+        if (x < 0 || x > _width - 1) { return true; }
+        if (y < 0 || y > _height - 1) { return true; }
+        return false;
+    }
 
     public void FillAll(int value)
     {
