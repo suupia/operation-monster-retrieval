@@ -537,7 +537,7 @@ public class CharacterMGR : MonoBehaviour
 
     public void Attack()
     {
-        Debug.LogWarning($"Attack‚ğÀs‚µ‚Ü‚·");
+        Debug.Log($"Attack‚ğÀs‚µ‚Ü‚·");
         //Debug.LogWarning($"GetFacility({targetTowerPos}):{GameManager.instance.mapMGR.GetMap().GetFacility(targetTowerPos)}");
 
 

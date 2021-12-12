@@ -9,6 +9,7 @@ public class PointerMGR : MonoBehaviour
     //private float lastMovementTime;
     [SerializeField] private GameObject pointerTailPrefab;
     private List<GameObject> pointerTails;
+    private List<PointerTailMGR> pointerTailMGRs;
 
     [SerializeField] List<Vector2Int> manualRoute;
     private bool isOnCastle;
@@ -73,7 +74,10 @@ public class PointerMGR : MonoBehaviour
         return manualRoute;
     }
 
-
+    public List<GameObject> GetPoinerTails()
+    {
+        return pointerTails;
+    }
     public void MoveByMouse(Vector2Int mouseGridPos) //マウスで移動
     {
         Vector2Int pointerGridPos = GameManager.instance.ToGridPosition(transform.position); //Updateで呼び出されるので毎回更新される
@@ -100,10 +104,10 @@ public class PointerMGR : MonoBehaviour
 
 
         IsOnCastle();
-        ManagePlayerRouteList();
-        ManageMouseTrails();
+        ManageManualRouteList();
+        ManageMPointerTails();
     }
-    private void ManagePlayerRouteList()
+    private void ManageManualRouteList()
     {
         Vector2Int pointerGridPos = GameManager.instance.ToGridPosition(transform.position);
 
@@ -111,7 +115,6 @@ public class PointerMGR : MonoBehaviour
         {
             manualRoute.RemoveAt(manualRoute.Count - 1);
             Debug.Log($"manualRoute:{string.Join(",", manualRoute)}");
-
         }
         else if (manualRoute.Count == 0 || (manualRoute[manualRoute.Count - 1] != pointerGridPos && manualRoute.Count(pos => pos == pointerGridPos) < 2))           //playerRouteに現在のgridPosが2つ以上入っていない場合、追加する
         {
@@ -121,17 +124,19 @@ public class PointerMGR : MonoBehaviour
     }
 
 
-    private void ManageMouseTrails()
+    private void ManageMPointerTails()
     {
-        while (manualRoute.Count > pointerTails.Count)
+        while (manualRoute.Count - 1 > pointerTails.Count)
         {
             pointerTails.Add(Instantiate(pointerTailPrefab, GameManager.instance.ToWorldPosition(manualRoute[pointerTails.Count]), pointerTailPrefab.transform.rotation));
+            //pointerTailMGRs.Add(pointerTails[pointerTails.Count - 1].GetComponent<PointerTailMGR>());
         }
 
-        while (manualRoute.Count < pointerTails.Count)
+        while (manualRoute.Count - 1 < pointerTails.Count)
         {
             Destroy(pointerTails[pointerTails.Count - 1]);
             pointerTails.RemoveAt(pointerTails.Count - 1);
+            //pointerTailMGRs.RemoveAt(pointerTails.Count - 1);
         }
     }
 

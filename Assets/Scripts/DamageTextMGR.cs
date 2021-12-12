@@ -13,6 +13,5 @@ public class DamageTextMGR : MonoBehaviour
         rd2D = GetComponent<Rigidbody2D>();
 
         rd2D.AddForce(Vector3.up * impalseValue);
-        Debug.LogWarning($"AddForce({Vector3.up}*{impalseValue})Çé¿çsÇµÇ‹ÇµÇΩ");
     }
 }

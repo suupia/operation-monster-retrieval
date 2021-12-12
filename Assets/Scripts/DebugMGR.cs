@@ -50,6 +50,10 @@ public class DebugMGR : MonoBehaviour
                 autoRouteTextParent.SetActive(false);
             }
         }
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            MakeEverythingTheWay();
+        }
 
         if (isDebuggingMap) DebugMap();
         if (isDebuggingAutoRoute) DebugAutoRoute();
@@ -125,6 +129,17 @@ public class DebugMGR : MonoBehaviour
                 autoRouteTextArray[i].text = GameManager.instance.autoRouteDatas[0].GetValue(i).ToString();
 
 
+            }
+        }
+    }
+
+    public void MakeEverythingTheWay()
+    {
+        for(int y = 0; y < GameManager.instance.mapMGR.GetMapHeight(); y++)
+        {
+            for(int x = 0; x < GameManager.instance.mapMGR.GetMapWidth(); x++)
+            {
+                GameManager.instance.mapMGR.MakeRoad(x, y);
             }
         }
     }
