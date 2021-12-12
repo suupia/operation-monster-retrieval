@@ -13,6 +13,10 @@ public class PointerTailMGR : MonoBehaviour
 
     private void Update()
     {
+        if(pointerTailIndex < GameManager.instance.pointerMGR.GetPoinerTails().Count - 3)
+        {
+            return;
+        }
         RotatePointerTail();
     }
     public void RotatePointerTail()

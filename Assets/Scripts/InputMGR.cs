@@ -6,7 +6,6 @@ public class InputMGR : MonoBehaviour
 {
     [SerializeField] Camera mainCamera;
 
-    [SerializeField] bool canMovePointer;
     [SerializeField] bool leftTouchFlag;
     [SerializeField] bool rightTouchFlag;
     [SerializeField] bool arrowKeyInputFlag;
@@ -37,9 +36,16 @@ public class InputMGR : MonoBehaviour
         {
             rightTouchFlag = true;
         }
-        if (Input.GetMouseButtonUp(1))
+        if (Input.GetMouseButtonUp(1))     //Pointerの初期化
         {
+
+            if (GameManager.instance.pointerMGR.GetIsOnCastle())      //Castleに到達していた場合、Routeを確定する。ここでManualRouteDataにリストを渡す
+            {
+                GameManager.instance.manualRouteDatas[0].manualRoute = GameManager.instance.pointerMGR.GetManualRoute();       //indexは仮に0としておく。要変更
+                Debug.LogWarning($"ルートを決定しました。 \nManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[0].GetManualRoute())}");
+            }
             rightTouchFlag = false;
+            GameManager.instance.pointerMGR.ResetPointer();
         }
 
         //矢印キー用
@@ -67,18 +73,7 @@ public class InputMGR : MonoBehaviour
         //}
 
 
-        if (Input.GetKeyDown(KeyCode.P))          //Pointerの操作可、不可を変える
-        {
-            canMovePointer = !canMovePointer;
-        }
 
-        if(GameManager.instance.pointerMGR.GetIsOnCastle() && Input.GetKeyDown(KeyCode.Space))      //Routeを確定する。ここでManualRouteDataにリストを渡す
-        {
-            GameManager.instance.manualRouteDatas[0].manualRoute = GameManager.instance.pointerMGR.GetManualRoute();       //indexは仮に0としておく。要変更
-            GameManager.instance.pointerMGR.ResetPointer();
-            canMovePointer = false;
-            Debug.LogWarning($"ルートを決定しました。RouteListをManualRouteDataに渡し、Pointerを操作不可にしました ManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[0].GetManualRoute())}");
-        }
 
         if (leftTouchFlag) //道を作る
         {
@@ -91,7 +86,7 @@ public class InputMGR : MonoBehaviour
         }
 
 
-        if (canMovePointer && rightTouchFlag)
+        if (rightTouchFlag)     //Pointerを動かす
         {
             mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             mouseGridPos = GameManager.instance.ToGridPosition(mousePos);

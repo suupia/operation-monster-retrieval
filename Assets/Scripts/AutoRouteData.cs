@@ -147,7 +147,7 @@ public class AutoRouteData
         }
 
         //動けるマスに数字を順番に振っていく
-        Debug.Log($"WaveletSearchを実行します");
+        Debug.Log($"WaveletSearchを実行します startPos:{startPos}");
         WaveletSearch();
 
         //先に配列をnewしておく
@@ -161,7 +161,7 @@ public class AutoRouteData
         Debug.Log($"StoreRouteAround({targetPos},{maxDistance})を実行します");
         StoreShortestRoute(targetPos, maxDistance);
 
-        Debug.Log($"resultRouteArrayは{autoRouteList}");
+        Debug.Log($"resultRouteList:{string.Join(",", autoRouteList)}");
 
         autoRouteList.Reverse(); //リストを反転させる
         return autoRouteList;
