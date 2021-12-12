@@ -16,6 +16,12 @@ public class CharacterMGR : MonoBehaviour
 
     [SerializeField] Facility targetFacility;
 
+    GameObject damageTextParent; //Findで取得する
+    [SerializeField] GameObject damageTextPrefab; //インスペクター上でセットする
+    [SerializeField] float heightToDisplayDamage; //ダメージテキストをどのくらい高く表示するかを決める
+    [SerializeField] float timeToDisplayDamage;
+
+
     [SerializeField] int characterTypeID;
     [SerializeField] int level;
     [SerializeField] int maxHp;
@@ -38,12 +44,6 @@ public class CharacterMGR : MonoBehaviour
     List<Vector2Int> routeList;
 
     int moveAlongWithCounter;
-
-
-
-    GameObject damageTextGO;
-    [SerializeField] private Text damageText;
-    [SerializeField] private int drawDamageTime;
 
     Direction direction;
     State _state;
@@ -219,6 +219,8 @@ public class CharacterMGR : MonoBehaviour
     private void Start()
     {
         animator = GetComponent<Animator>();
+
+        damageTextParent = GameObject.Find("DamageTextParent");
 
         moveTime = 1 / spd;
         gridPos = GameManager.instance.ToGridPosition(transform.position);
@@ -552,13 +554,17 @@ public class CharacterMGR : MonoBehaviour
     IEnumerator AttackCoroutine()
     {
         float timer = 0;
+        int damage;
 
         Debug.LogWarning($"AttackCoroutineを実行します");
          
         isAttacking = true;
 
-        Debug.LogWarning($"Facility({targetTowerPos})に{atk}のダメージを与えた");
-        targetFacility.HP -= CalcDamage(atk);
+        damage = CalcDamage(atk);
+
+        Debug.LogWarning($"Facility({targetTowerPos})に{damage}のダメージを与えた");
+        targetFacility.HP -= damage;
+        StartCoroutine(DrawDamage(damage));
 
         while(timer < attackInterval){
             timer += Time.deltaTime;
@@ -573,6 +579,26 @@ public class CharacterMGR : MonoBehaviour
         return atk; //とりあえず、今は何もしないで攻撃力をそのまま返す
     }
 
+    //public IEnumerator DrawDamage(int damage)
+    //{
+    //    Vector3 drawPos = this.transform.position + new Vector3(0, heightToDisplayDamage, 0);
+    //    Text textComponent = Instantiate(damageTextPrefab.GetComponent<Text>(), RectTransformUtility.WorldToScreenPoint(Camera.main, drawPos), Quaternion.identity, damageTextParent.transform);
+    //    textComponent.text = damage.ToString();
+    //    yield return new WaitForSeconds(timeToDisplayDamage);
+    //    Destroy(textComponent);
+    //}
+
+    public IEnumerator DrawDamage(int damage)
+    {
+        GameObject damageTextGO;
+        Text damageText;
+        Vector3 drawPos = this.transform.position + new Vector3(0, heightToDisplayDamage, 0);
+        damageTextGO = Instantiate(damageTextPrefab, RectTransformUtility.WorldToScreenPoint(Camera.main, drawPos), Quaternion.identity, damageTextParent.transform);
+        damageText = damageTextGO.GetComponent<Text>();
+        damageText.text = damage.ToString();
+        yield return new WaitForSeconds(timeToDisplayDamage);
+        Destroy(damageTextGO);
+    }
 }
 
 

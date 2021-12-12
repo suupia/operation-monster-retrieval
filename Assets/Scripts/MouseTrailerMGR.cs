@@ -140,13 +140,13 @@ public class MouseTrailerMGR : MonoBehaviour
         if (playerRoute.Count >= 2 && playerRoute[playerRoute.Count - 2] == trailerGridPos)     //MouseTrailer‚ªˆê‚Â–ß‚Á‚½‚çroute‚à‚»‚ê‚É‡‚í‚¹‚é
         {
             playerRoute.RemoveAt(playerRoute.Count - 1);
-            Debug.Log(ListToString(playerRoute, "playerRoute"));
+            Debug.Log(ListToString(playerRoute, "manualRoute"));
 
         }
         else if (playerRoute.Count == 0 ||(playerRoute[playerRoute.Count - 1] != trailerGridPos && playerRoute.Count(pos => pos == trailerGridPos) < 2))           //playerRoute‚ÉŒ»Ý‚ÌgridPos‚ª“ü‚Á‚Ä‚¢‚È‚¢ê‡A’Ç‰Á‚·‚é
         {
             playerRoute.Add(trailerGridPos);
-            Debug.Log(ListToString(playerRoute, "playerRoute"));
+            Debug.Log(ListToString(playerRoute, "manualRoute"));
         }
     }
 

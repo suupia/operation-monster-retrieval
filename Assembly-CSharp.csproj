@@ -67,6 +67,7 @@
     <Compile Include="Assets\Scripts\MapMGR.cs" />
     <Compile Include="Assets\Scripts\MouseTrailerMGR.cs" />
     <Compile Include="Assets\Scripts\Facility.cs" />
+    <Compile Include="Assets\Scripts\DamageTextMGR.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

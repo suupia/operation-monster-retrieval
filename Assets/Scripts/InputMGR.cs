@@ -72,6 +72,14 @@ public class InputMGR : MonoBehaviour
             canMovePointer = !canMovePointer;
         }
 
+        if(GameManager.instance.pointerMGR.GetIsOnCastle() && Input.GetKeyDown(KeyCode.Space))      //Routeを確定する。ここでManualRouteDataにリストを渡す
+        {
+            GameManager.instance.manualRouteDatas[0].manualRoute = GameManager.instance.pointerMGR.GetManualRoute();       //indexは仮に0としておく。要変更
+            GameManager.instance.pointerMGR.ResetPointer();
+            canMovePointer = false;
+            Debug.LogWarning($"ルートを決定しました。RouteListをManualRouteDataに渡し、Pointerを操作不可にしました ManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[0].GetManualRoute())}");
+        }
+
         if (leftTouchFlag) //道を作る
         {
             mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -83,19 +91,15 @@ public class InputMGR : MonoBehaviour
         }
 
 
-        if (canMovePointer)   //Pointerを動かす
+        if (canMovePointer && rightTouchFlag)
         {
-            if (rightTouchFlag) 
-            {
-                mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-                mouseGridPos = GameManager.instance.ToGridPosition(mousePos);
-                //Debug.Log($"mousePosは{mousePos}");
-                Debug.Log($"mouseGridPosは{mouseGridPos}");
+            mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            mouseGridPos = GameManager.instance.ToGridPosition(mousePos);
+            //Debug.Log($"mousePosは{mousePos}");
+            Debug.Log($"mouseGridPosは{mouseGridPos}");
 
-                GameManager.instance.pointerMGR.MoveByMouse(mouseGridPos); //とりあえず、種類0番のキャラクターのルートを決定するようにする
-            }
+            GameManager.instance.pointerMGR.MoveByMouse(mouseGridPos); //とりあえず、種類0番のキャラクターのルートを決定するようにする
         }
-
     }
 
 }

@@ -14,10 +14,10 @@ public class DebugMGR : MonoBehaviour
     Text[] mapValueTextArray;
     Text[] autoRouteTextArray;
 
-    [SerializeField] public GameObject mapValueTextParent; //インスペクター上でTextの親を決めておく
-    [SerializeField] public GameObject autoRouteTextParent; //インスペクター上でTextの親を決めておく
-    [SerializeField] private Text mapValueText;
-    [SerializeField] private Text autoRouteText;
+    [SerializeField] GameObject mapValueTextParent; //インスペクター上でTextの親を決めておく
+    [SerializeField] GameObject autoRouteTextParent; //インスペクター上でTextの親を決めておく
+    [SerializeField] Text mapValueText;
+    [SerializeField] Text autoRouteText;
 
     private void Update()
     {
