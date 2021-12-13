@@ -41,7 +41,7 @@ public class InputMGR : MonoBehaviour
 
             if (GameManager.instance.pointerMGR.GetIsOnCastle())      //Castleに到達していた場合、Routeを確定する。ここでManualRouteDataにリストを渡す
             {
-                GameManager.instance.manualRouteDatas[0].manualRoute = GameManager.instance.pointerMGR.GetManualRoute();       //indexは仮に0としておく。要変更
+                GameManager.instance.manualRouteDatas[0].SetManualRoute(GameManager.instance.pointerMGR.GetManualRoute()); //indexは仮に0としておく。要変更
                 Debug.LogWarning($"ルートを決定しました。 \nManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[0].GetManualRoute())}");
             }
             rightTouchFlag = false;

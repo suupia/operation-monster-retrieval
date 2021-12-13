@@ -37,16 +37,17 @@ public class CharacterMGR : MonoBehaviour
     bool isAttacking = false;
     bool isMoving = false;
 
-    bool isFristMarch = true;
     bool isFristBattle = true;
 
     AutoRouteData autoRoute;
+    ManualRouteData manualRoute;
     List<Vector2Int> routeList;
 
-    int moveAlongWithCounter;
+    int moveAlongWithCounter=0;
 
     Direction direction;
-    State _state;
+    State _state; //プロパティを定義してある
+    Mode _mode; //プロパティを定義してある
 
     //プロパティ
     private State state
@@ -57,7 +58,6 @@ public class CharacterMGR : MonoBehaviour
             switch (value)
             {
                 case State.Marching:
-                    isFristMarch = true;
                     break;
                 case State.InBattle:
                     isFristBattle = true;
@@ -66,6 +66,15 @@ public class CharacterMGR : MonoBehaviour
             _state = value;
         }
     }
+    private Mode mode
+    {
+        get { return _mode; }
+        set
+        {
+            _mode = value;
+        }
+    }
+
 
     private enum Direction
     {
@@ -82,6 +91,11 @@ public class CharacterMGR : MonoBehaviour
     {
         Marching,
         InBattle
+    }
+    private enum Mode
+    {
+        Auto,
+        Manual
     }
 
 
@@ -142,6 +156,7 @@ public class CharacterMGR : MonoBehaviour
     public void SetCharacterData(int characterTypeID)  //hpやatkなどの情報もここでセットする。
     {
         autoRoute = GameManager.instance.autoRouteDatas[characterTypeID];
+        manualRoute = GameManager.instance.manualRouteDatas[characterTypeID];
     }
     public void SetDirection(Vector2 directionVector)
     {
@@ -227,6 +242,19 @@ public class CharacterMGR : MonoBehaviour
         state = State.Marching;
 
         targetCastlePos = new Vector2Int(GameManager.instance.mapMGR.GetMapWidth() - 2, GameManager.instance.mapMGR.GetMapHeight() - 2);
+
+        //routeに関する処理
+        mode = Mode.Auto;
+        switch (mode)
+        {
+            case Mode.Auto:
+                SetAutoRoute();
+                break;
+            case Mode.Manual:
+                SetManualRoute();
+                break;
+        }
+        InitiMoveAlongWith();
     }
 
     private void Update()
@@ -244,26 +272,6 @@ public class CharacterMGR : MonoBehaviour
 
     public void March() //Update()で呼ばれることに注意
     {
-
-        if (true) //キャラクターの進行するモードによって行動が変わる
-        {
-            //オートモード
-            if (isFristMarch)
-            {
-                isFristMarch = false;
-
-                //TargetNearestTower();
-                SearchAutoRoute();
-                InitiMoveAlongWith();
-            }
-        }
-        else
-        {
-            //プレイヤーが進路を選択する
-            //↓はテスト用の配列
-            Vector2Int[] route = { new Vector2Int(1, 0), new Vector2Int(1, 1), new Vector2Int(1, 2), new Vector2Int(1, 3), new Vector2Int(1, 4), new Vector2Int(2, 4), new Vector2Int(3, 4) };
-        }
-
         MoveAlongWith();
     }
 
@@ -451,16 +459,23 @@ public class CharacterMGR : MonoBehaviour
         return resultArray;
     }
 
-    public void SearchAutoRoute()
+    public void SetAutoRoute()
     {
-        Debug.Log("SearchAutoRouteを実行します");
+        Debug.Log("SetAutoRouteを実行します");
         routeList = autoRoute.SearchShortestRoute(gridPos, targetCastlePos); //参照渡し
         Debug.Log("routeList:"+string.Join(",",routeList));
     }
 
+    public void SetManualRoute()
+    {
+        Debug.Log("SetManualRouteを実行します");
+        routeList = manualRoute.GetManualRoute();
+        Debug.Log("routeList:" + string.Join(",", routeList));
+    }
+
     public void InitiMoveAlongWith()
     {
-        moveAlongWithCounter = 0; //カウンターの初期化
+        //moveAlongWithCounter = 0; //カウンターの初期化
 
         if (!routeList.Contains(gridPos)) //キャラクターの位置を含むかどうか確認する
         {

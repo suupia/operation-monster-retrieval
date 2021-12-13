@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class ManualRouteData
 {
-    [System.NonSerialized] public List<Vector2Int> manualRoute;
-
+    List<Vector2Int> manualRoute;
 
 
     //コンストラクタ
@@ -14,8 +13,15 @@ public class ManualRouteData
         manualRoute = new List<Vector2Int>();
     }
 
+    //Getter
     public List<Vector2Int> GetManualRoute()
     {
         return manualRoute;
+    }
+
+    //Setter
+    public void SetManualRoute(List<Vector2Int> route)
+    {
+        manualRoute = route;
     }
 }
