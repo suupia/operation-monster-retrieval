@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     [System.NonSerialized] public DebugMGR debugMGR;
     [System.NonSerialized] public PointerMGR pointerMGR;
 
-    [SerializeField] int numOfCharacterTypes = 5; //とりあえず5としておく
+    [SerializeField] int numOfCharacterTypes = 4; //戦闘に参加するモンスターの種類は4種類
     [SerializeField] AutoRouteData autoRouteData; //インスペクター上でセットする
     [SerializeField] ManualRouteData manualRouteData; //インスペクター上でセットする
     public AutoRouteData[] autoRouteDatas;
@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
     public readonly int towerID = 5;
     public readonly int characterID = 11;
 
-    public GameObject[] characterPrefabs;
+    public GameObject[] characterPrefabs; //配列にしているのは仮。実際にはデータベースから情報を読み取ってインスタンス化するからプレハブは一つでよい
 
     bool isSpawnCharacter = false;
 
@@ -77,12 +77,7 @@ public class GameManager : MonoBehaviour
 
     }
 
-    private void Update()
-    {
-        SpawnCharacter();
-    }
-
-    private void SpawnCharacter()
+    public void SpawnCharacter(int CharacterTypeNum)
     {
         if (isSpawnCharacter)
         {
@@ -93,7 +88,7 @@ public class GameManager : MonoBehaviour
             if (mapMGR.GetMapValue(mapMGR.characterSpawnPoss[i]) % GameManager.instance.groundID == 0)
             {
                 Debug.Log("SpawnCharacterCoroutineを実行します");
-                StartCoroutine(SpawnCharacterCoroutine(mapMGR.characterSpawnPoss[i], 0)); //とりあえずcharacterIDの引数は0にしておく
+                StartCoroutine(SpawnCharacterCoroutine(mapMGR.characterSpawnPoss[i], CharacterTypeNum)); //とりあえずcharacterIDの引数は0にしておく
             }
 
         }
@@ -114,7 +109,7 @@ public class GameManager : MonoBehaviour
         
 
         mapMGR.MultiplySetMapValue(vector, characterID);
-        yield return new WaitForSeconds(200f); //とりあえずデバッグしやすいように長くしておく
+        yield return new WaitForSeconds(1f); //クールタイムは適当
 
         isSpawnCharacter = false;
     }
