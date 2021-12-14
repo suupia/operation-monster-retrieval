@@ -10,6 +10,7 @@ public class PointerMGR : MonoBehaviour
     [SerializeField] private GameObject pointerTailPrefab;
     private List<GameObject> pointerTails;
     private List<PointerTailMGR> pointerTailMGRs;
+    private List<Vector2Int> nonDiagonalPoints;
 
     [SerializeField] List<Vector2Int> manualRoute;
     private bool isOnCastle;
@@ -20,6 +21,7 @@ public class PointerMGR : MonoBehaviour
     {
         manualRoute = new List<Vector2Int>();
         pointerTails = new List<GameObject>();
+        nonDiagonalPoints = new List<Vector2Int>();
         startPos = new Vector3(1.5f, 1.5f, 0);
 
         manualRoute.Add(new Vector2Int(1, 1));
@@ -78,6 +80,11 @@ public class PointerMGR : MonoBehaviour
     {
         return pointerTails;
     }
+    public List<Vector2Int> GetNonDiagonalPoints()
+    {
+        return nonDiagonalPoints;
+    }
+
     public void MoveByMouse(Vector2Int mouseGridPos) //マウスで移動
     {
         Vector2Int pointerGridPos = GameManager.instance.ToGridPosition(transform.position); //Updateで呼び出されるので毎回更新される
@@ -166,5 +173,25 @@ public class PointerMGR : MonoBehaviour
         }
         manualRoute.Add(new Vector2Int(1, 1));
         Debug.Log($"Pointerを初期化:manualRoute={string.Join(",", manualRoute)}, isOnCastle={isOnCastle}, pointerTails={string.Join(",", pointerTails)}");
+    }
+
+
+    //以下、ルートが完成し、ManualRouteDataクラスにその情報を渡すときに使う関数
+
+    public void SetFinalManualRoute()
+    {
+        for (int i = 0; i < pointerTails.Count; i++)
+        {
+            if (!pointerTails[i].activeSelf)
+            {
+                pointerTails.RemoveAt(i);
+                manualRoute.RemoveAt(i);
+                i--;
+            }
+            else if (pointerTails[i].GetComponent<PointerTailMGR>().NonDiagonal)
+            {
+                nonDiagonalPoints.Add(manualRoute[i]);
+            }
+        }
     }
 }

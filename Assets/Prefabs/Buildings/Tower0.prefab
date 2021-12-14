@@ -97,9 +97,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridPos: {x: 0, y: 0}
   targetCharacterPos: {x: 0, y: 0}
+  targetCharacter: {fileID: 0}
+  damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
+  heightToDisplayDamage: 0.6
+  timeToDisplayDamage: 0.37
   level: 0
-  maxHp: 0
+  maxHp: 5
   hp: 5
-  atk: 0
-  attackInterval: 0
-  attackRange: 0
+  atk: 1
+  attackInterval: 1
+  attackRange: 2

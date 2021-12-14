@@ -5,9 +5,9 @@ using UnityEngine;
 public class TowerMGR : Facility
 {
 
-    public override void Destroy()
+    public override void Die()
     {
-        Debug.LogWarning($"HPが0以下になったので、タワーを破壊します gridPos:{gridPos}");
+        Debug.Log($"HPが0以下になったので、タワーを破壊します gridPos:{gridPos}のタワー");
         
         GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos,GameManager.instance.towerID); //先にデータを消去する
 

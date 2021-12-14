@@ -41,8 +41,12 @@ public class InputMGR : MonoBehaviour
 
             if (GameManager.instance.pointerMGR.GetIsOnCastle())      //Castleに到達していた場合、Routeを確定する。ここでManualRouteDataにリストを渡す
             {
+                GameManager.instance.pointerMGR.SetFinalManualRoute();
                 GameManager.instance.manualRouteDatas[0].SetManualRoute(GameManager.instance.pointerMGR.GetManualRoute()); //indexは仮に0としておく。要変更
-                Debug.LogWarning($"ルートを決定しました。 \nManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[0].GetManualRoute())}");
+                GameManager.instance.manualRouteDatas[0].SetNonDiaonalPoints(GameManager.instance.pointerMGR.GetNonDiagonalPoints()); //同上
+                Debug.LogWarning($"ルートを決定しました。 \n" +
+                    $"ManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[0].GetManualRoute())} \n" +
+                    $"NonDiagonalPoints:{string.Join(",", GameManager.instance.manualRouteDatas[0].GetNonDiagonalPoints())}");
             }
             rightTouchFlag = false;
             GameManager.instance.pointerMGR.ResetPointer();

@@ -122,8 +122,8 @@ public class MapMGR : MonoBehaviour
             towerGO =  Instantiate(towerPrefabs[i], new Vector3(towerPoss[i].x + 0.5f, towerPoss[i].y + 0.75f, 0), Quaternion.identity);
             towerMGR = towerGO.GetComponent<TowerMGR>();
 
-            map.MultiplySetValue(towerPoss[i], GameManager.instance.towerID);
-            map.SetFacility(towerPoss[i],towerMGR);
+            map.MultiplySetValue(towerPoss[i], GameManager.instance.towerID); //数値データをセット
+            map.SetFacility(towerPoss[i],towerMGR); //スクリプトをセット
 
         }
     }

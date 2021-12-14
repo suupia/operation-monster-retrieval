@@ -131,3 +131,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   impalseValue: 25000
+  timeToDisplay: 0.37

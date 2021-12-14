@@ -125,8 +125,7 @@ MonoBehaviour:
   timeToDisplayDamage: 0.37
   characterTypeID: 0
   level: 0
-  maxHp: 0
-  hp: 0
+  maxHp: 5
   atk: 1
   attackInterval: 1
   attackRange: 1
