@@ -13,6 +13,7 @@ public class PointerMGR : MonoBehaviour
     private List<Vector2Int> nonDiagonalPoints;
 
     [SerializeField] List<Vector2Int> manualRoute;
+    [SerializeField] List<Vector2Int> finalManualRoute;
     private bool isOnCastle;
 
     private Vector3 startPos;
@@ -20,6 +21,7 @@ public class PointerMGR : MonoBehaviour
     private void Start()
     {
         manualRoute = new List<Vector2Int>();
+        finalManualRoute = new List<Vector2Int>();
         pointerTails = new List<GameObject>();
         nonDiagonalPoints = new List<Vector2Int>();
         startPos = new Vector3(1.5f, 1.5f, 0);
@@ -85,10 +87,40 @@ public class PointerMGR : MonoBehaviour
         return nonDiagonalPoints;
     }
 
+    public List<Vector2Int> GetFinalManualRoute()
+    {
+        return finalManualRoute;
+    }
+    public void SetFinalManualRoute()
+    {
+        finalManualRoute.Clear();
+        nonDiagonalPoints.Clear();
+        for (int i = 0; i < manualRoute.Count; i++)
+        {
+            if (i + 1 != manualRoute.Count)
+            {
+                if (pointerTails[i].activeSelf)
+                {
+                    finalManualRoute.Add(manualRoute[i]);
+
+                    if (pointerTails[i].GetComponent<PointerTailMGR>().NonDiagonal)
+                    {
+                        nonDiagonalPoints.Add(manualRoute[i]);
+                    }
+                }
+            }
+            else
+            {
+                finalManualRoute.Add(manualRoute[i]);
+            }
+        }
+    }
+
     public void MoveByMouse(Vector2Int mouseGridPos) //マウスで移動
     {
         Vector2Int pointerGridPos = GameManager.instance.ToGridPosition(transform.position); //Updateで呼び出されるので毎回更新される
 
+        SetFinalManualRoute();
 
         if ((mouseGridPos - pointerGridPos).magnitude > 1)       //mouseとpointerが隣接していない場合はなにもしない
         {
@@ -96,9 +128,15 @@ public class PointerMGR : MonoBehaviour
             return;
         }
 
-        if (manualRoute.Count(pos => pos == mouseGridPos) >= 2 && manualRoute[manualRoute.Count - 2] != mouseGridPos)           //進もうとしているマスを既に2回以上通っていて、来た道を戻らない場合はなにもしない
+        if (finalManualRoute.Count(pos => pos == mouseGridPos) >= 2 && manualRoute[manualRoute.Count - 2] != mouseGridPos)           //進もうとしているマスを既に2回以上通っていて、来た道を戻らない場合はreturn
         {
             Debug.Log("同じマスを通れるのは2回までです");
+            return;
+        }
+                                                                                                
+        if (finalManualRoute.Count(pos => pos == pointerGridPos) >= 2 && finalManualRoute[0] != pointerGridPos && finalManualRoute[finalManualRoute.IndexOf(pointerGridPos) - 1] == mouseGridPos && manualRoute[manualRoute.Count - 2] != mouseGridPos)    //前に通った道を逆向きに進もうとしていて、来た道を戻らない場合はreturn
+        {
+            Debug.LogWarning("既にPointerTailが表示されているマスを逆向きに進むことはできません");
             return;
         }
 
@@ -123,7 +161,7 @@ public class PointerMGR : MonoBehaviour
             manualRoute.RemoveAt(manualRoute.Count - 1);
             Debug.Log($"manualRoute:{string.Join(",", manualRoute)}");
         }
-        else if (manualRoute.Count == 0 || (manualRoute[manualRoute.Count - 1] != pointerGridPos && manualRoute.Count(pos => pos == pointerGridPos) < 2))           //playerRouteに現在のgridPosが2つ以上入っていない場合、追加する
+        else if (manualRoute.Count == 0 || (manualRoute[manualRoute.Count - 1] != pointerGridPos && finalManualRoute.Count(pos => pos == pointerGridPos) < 2))           //finalManualRouteに現在のgridPosが2つ以上入っていない場合、manualRouteに追加する
         {
             manualRoute.Add(pointerGridPos);
             Debug.Log($"manualRoute:{string.Join(",", manualRoute)}");
@@ -175,23 +213,4 @@ public class PointerMGR : MonoBehaviour
         Debug.Log($"Pointerを初期化:manualRoute={string.Join(",", manualRoute)}, isOnCastle={isOnCastle}, pointerTails={string.Join(",", pointerTails)}");
     }
 
-
-    //以下、ルートが完成し、ManualRouteDataクラスにその情報を渡すときに使う関数
-
-    public void SetFinalManualRoute()
-    {
-        for (int i = 0; i < pointerTails.Count; i++)
-        {
-            if (!pointerTails[i].activeSelf)
-            {
-                pointerTails.RemoveAt(i);
-                manualRoute.RemoveAt(i);
-                i--;
-            }
-            else if (pointerTails[i].GetComponent<PointerTailMGR>().NonDiagonal)
-            {
-                nonDiagonalPoints.Add(manualRoute[i]);
-            }
-        }
-    }
 }

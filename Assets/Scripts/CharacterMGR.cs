@@ -528,10 +528,13 @@ public class CharacterMGR : MonoBehaviour
     {
         Debug.Log($"HPが0以下になったので、キャラクターを消去します gridPos:{gridPos}のキャラクター");
 
+        Debug.LogWarning($"this:{this},gameObject.GetComponent<CharacterMGR>(){gameObject.GetComponent<CharacterMGR>()}");
+
         GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos, GameManager.instance.characterID); //数値データをを消去する
-        GameManager.instance.mapMGR.GetMap().SetCharacterMGR(gridPos,null); //スクリプトをを消去する
+        GameManager.instance.mapMGR.GetMap().RemoveCharacterMGR(gridPos,this);
+        //GameManager.instance.mapMGR.GetMap().SetCharacterMGR(gridPos,null); //スクリプトをを消去する
 
-
+        
         Destroy(this.gameObject);
     }
 }

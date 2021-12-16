@@ -204,13 +204,13 @@ public class GameManager : MonoBehaviour
         if (nearestTargetList.Count > 0)
         {
             targetPos = nearestTargetList[0];
-            Debug.Log("nearestTargetList:" + string.Join(",", nearestTargetList) + $"\ntargetPos:{targetPos}");
+            //Debug.Log("nearestTargetList:" + string.Join(",", nearestTargetList) + $"\ntargetPos:{targetPos}");
             return true;
         }
         else
         {
             targetPos = Vector2Int.zero; //null‚Ì‘ã‚í‚è
-            Debug.Log("nearestTargetList:" + string.Join(",", nearestTargetList) + $"\ntargetPos:{targetPos}");
+            //Debug.Log("nearestTargetList:" + string.Join(",", nearestTargetList) + $"\ntargetPos:{targetPos}");
             return false;
         }
     }

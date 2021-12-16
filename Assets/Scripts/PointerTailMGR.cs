@@ -38,35 +38,7 @@ public class PointerTailMGR : MonoBehaviour
     {
         int angle = 0;
 
-        if (pointerTailIndex >= 2 && manualRoute.Count >= pointerTailIndex + 3)           //最初の回転を含むときの処理　このPointerTailが回転に含まれる5点のうち3点目のときに処理を行う
-        {
-            if (manualRoute[pointerTailIndex + 2] == manualRoute[pointerTailIndex - 2])
-            {
-                for (int i = 0; i < 3; i++)
-                {
-                    pointerTails[pointerTailIndex - i].SetActive(true);              //斜めになっているPointerTailの次のPointerTailは非アクティブにしてあるので、アクティブにする
-                    pointerTails[pointerTailIndex - i].GetComponent<PointerTailMGR>().NonDiagonal = true;
-                }
-            }
-        }
-        else if (manualRoute.Count == pointerTailIndex + 2 &&
-                 pointerTails[pointerTailIndex].GetComponent<PointerTailMGR>().NonDiagonal &&
-                 pointerTails[pointerTailIndex - 1].GetComponent<PointerTailMGR>().NonDiagonal &&
-                 pointerTails[pointerTailIndex - 2].GetComponent<PointerTailMGR>().NonDiagonal)        //このPointerTailが最小の回転に含まれる3点目かつ、PointerがこのPointerTailの次のマスにあるとき(回転になっていないとき)
-        {
-            for (int i = 2; i >= 0; i--)
-            {
-                pointerTails[pointerTailIndex - i].GetComponent<PointerTailMGR>().NonDiagonal = false;      //回転になっていないので、斜めを向けるようにする(一応PointerTailが置かれた順に処理を行う)
-                if (i == 1)
-                {
-                    pointerTails[pointerTailIndex - i].SetActive(false);              //斜め表示に戻す際、このPointerTailの一つ前のPointerTailは非アクティブにする
-                                                                                      //別のところで行われる処理だが、他の処理との順番がかみ合わないかったのでここに書いておく
-                                                                                      //多分大丈夫だけど、応急処置的にも見えるので後々問題が起こるかも
-                }
-            }
-        }
-
-
+        ManageNonDiagonal();
 
         if (manualRoute.Count >= pointerTailIndex + 2 && GameManager.instance.pointerMGR.GetPoinerTails().Count > pointerTailIndex + 1)       //pointerTailがこれ自身の後ろに存在する場合の処理
         {
@@ -140,6 +112,43 @@ public class PointerTailMGR : MonoBehaviour
         transform.localScale = new Vector3(1, 1, 1);        //斜めを向かないときはscaleは長さを1に
 
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+    }
+
+    private void ManageNonDiagonal()
+    {
+
+        if (pointerTailIndex >= 2 && manualRoute.Count >= pointerTailIndex + 3)           //最小の回転を含むときの処理　このPointerTailが回転に含まれる5点のうち3点目のときに処理を行う
+        {
+            if (manualRoute[pointerTailIndex + 2] == manualRoute[pointerTailIndex - 2])
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    pointerTails[pointerTailIndex - i].SetActive(true);              //斜めになっているPointerTailの次のPointerTailは非アクティブにしてあるので、アクティブにする
+                    pointerTails[pointerTailIndex - i].GetComponent<PointerTailMGR>().NonDiagonal = true;
+                }
+            }
+        }
+        else if (pointerTailIndex >= 2 && manualRoute.Count == pointerTailIndex + 2 && NonDiagonal &&
+                 pointerTails[pointerTailIndex - 1].GetComponent<PointerTailMGR>().NonDiagonal &&
+                 pointerTails[pointerTailIndex - 2].GetComponent<PointerTailMGR>().NonDiagonal)        //このPointerTailが最小の回転に含まれる3点目かつ、PointerがこのPointerTailの次のマスにあるとき(回転になっていないとき)
+        {
+            if (pointerTailIndex >= 3 && pointerTails[pointerTailIndex - 3].GetComponent<PointerTailMGR>().NonDiagonal)
+            {
+                NonDiagonal = false;
+                return;
+            }
+            for (int i = 2; i >= 0; i--)
+            {
+                pointerTails[pointerTailIndex - i].GetComponent<PointerTailMGR>().NonDiagonal = false;      //回転になっていないので、斜めを向けるようにする(一応PointerTailが置かれた順に処理を行う)
+                if (i == 1)
+                {
+                    pointerTails[pointerTailIndex - i].SetActive(false);              //斜め表示に戻す際、このPointerTailの一つ前のPointerTailは非アクティブにする
+                                                                                      //別のところで行われる処理だが、他の処理との順番がかみ合わないかったのでここに書いておく
+                                                                                      //多分大丈夫だけど、応急処置的にも見えるので後々問題が起こるかも
+                }
+            }
+        }
 
     }
 }

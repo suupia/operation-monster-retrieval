@@ -6,7 +6,7 @@ public class ManualRouteData
 {
     List<Vector2Int> manualRoute;
     List<Vector2Int> nonDiagonalPoints;
-
+     
 
     //コンストラクタ
     public ManualRouteData()

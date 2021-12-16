@@ -94,25 +94,32 @@ public abstract class Facility : MonoBehaviour
 
     protected void Idle() //Update()で呼ばれることに注意
     {
-        Debug.LogWarning("FacilityのBattleを実行します");
+        Debug.Log("FacilityのIdleを実行します");
 
         if (GameManager.instance.CanAttackTarget(gridPos,attackRange,GameManager.instance.characterID,out targetCharacterPos))
         {
             Debug.Log("攻撃範囲内にキャラクターがいるのでInBatteleに切り替えます");
+            targetCharacter = GameManager.instance.mapMGR.GetMap().GetCharacterMGR(targetCharacterPos)[0]; //とりあえず単体攻撃
             state = State.InBattle;
             return;
         }
     }
     protected void Battle()
     {
-        Debug.LogWarning($"FacilityのBattleを実行します");
+        Debug.Log($"FacilityのBattleを実行します");
 
         if (isFristBattle)
         {
             isFristBattle = false;
 
-            targetCharacter = GameManager.instance.mapMGR.GetMap().GetCharacterMGR(targetCharacterPos);
+        }
 
+
+        if (targetCharacter == null)
+        { 
+            Debug.Log($"キャラクターを倒したのでIdleに切り替えます targetCharacterPos:{targetCharacterPos}");
+            state = State.Idle;
+            return;
         }
 
         FacilityAttack();
@@ -120,13 +127,6 @@ public abstract class Facility : MonoBehaviour
     protected void FacilityAttack()
     {
         Debug.Log($"FacilityAttackを実行します");
-
-        if (GameManager.instance.mapMGR.GetMapValue(targetCharacterPos) % GameManager.instance.characterID != 0)
-        { //chracterIDが含まれないということはキャラクターを倒したということなので、Idleに切り替える
-            Debug.Log("キャラクターを倒したのでIdleに切り替えます");
-            state = State.Idle;
-            return;
-        }
 
         if (!isAttacking) StartCoroutine(FacilityAttackCoroutine());
     }

@@ -449,7 +449,7 @@ public class MapData
     int _width;
     int _height;
     int[] _values = null;
-    CharacterMGR[] _characterMGRs = null;
+    List<CharacterMGR>[] _characterMGRs = null;
     Facility[] _facilities = null;
     int _edgeValue;
     int _outOfRangeValue = -1;
@@ -465,7 +465,11 @@ public class MapData
         _width = width;
         _height = height;
         _values = new int[width * height];
-        _characterMGRs = new CharacterMGR[width * height];
+        _characterMGRs = new List<CharacterMGR>[width * height];
+        for(int i= 0; i < width * height; i++)
+        {
+            _characterMGRs[i] = new List<CharacterMGR>();
+        }
         _facilities = new Facility[width * height];
 
         FillAll(GameManager.instance.wallID); //mapの初期化はwallIDで行う
@@ -508,7 +512,7 @@ public class MapData
         return _values[index];
     }
 
-    public CharacterMGR GetCharacterMGR(int x,int y)
+    public List<CharacterMGR> GetCharacterMGRList(int x,int y)
     {
         if (IsOutOfDataRange(x, y))
         {
@@ -517,9 +521,9 @@ public class MapData
         }
         return _characterMGRs[ToSubscript(x,y)];
     }
-    public CharacterMGR GetCharacterMGR(Vector2Int vector)
+    public List<CharacterMGR> GetCharacterMGR(Vector2Int vector)
     {
-        return GetCharacterMGR(vector.x,vector.y);
+        return GetCharacterMGRList(vector.x,vector.y);
     }
     public Facility GetFacility(int x,int y)
     {
@@ -557,11 +561,24 @@ public class MapData
             Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
             return;
         }
-        _characterMGRs[ToSubscript(x, y)] = characterMGR;
+        _characterMGRs[ToSubscript(x, y)].Add(characterMGR);
     }
     public void SetCharacterMGR(Vector2Int vector,CharacterMGR characterMGR)
     {
         SetCharacterMGR(vector.x,vector.y,characterMGR);
+    }
+    public void RemoveCharacterMGR(int x,int y ,CharacterMGR characterMGR)
+    {
+        if (IsOutOfDataRange(x, y))
+        {
+            Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
+            return;
+        }
+        _characterMGRs[ToSubscript(x, y)].Remove(characterMGR);
+    }
+    public void RemoveCharacterMGR(Vector2Int vector,CharacterMGR characterMGR)
+    {
+        RemoveCharacterMGR(vector.x, vector.y, characterMGR);
     }
     public void SetFacility(int x, int y ,Facility facility)
     {
@@ -576,7 +593,6 @@ public class MapData
     {
         SetFacility(vector.x,vector.y,facility);
     }
-
     public void MultiplySetValue(Vector2Int vector, int value)
     {
         int x = vector.x;
@@ -603,7 +619,7 @@ public class MapData
         }
         if (GetValue(x,y)% value !=0)
         {
-            Debug.LogError($"DivisionalSetValue({vector},{value})で余りが出たため実行できません");
+            Debug.LogError($"DivisionalSetValue(vector:{vector},value:{value})で余りが出たため実行できません");
             return;
         }
 
