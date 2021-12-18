@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour
 
     public GameObject[] characterPrefabs; //配列にしているのは仮。実際にはデータベースから情報を読み取ってインスタンス化するからプレハブは一つでよい
 
+    public CharacterMGR.Mode[] characterMode; //キャラクターの種類ごとの操作モードを格納する
+
     bool isSpawnCharacter = false;
 
     //座標変換
@@ -44,6 +46,16 @@ public class GameManager : MonoBehaviour
         return ToWorldPosition(gridPosition.x, gridPosition.y);
     }
 
+    //Setter
+    public void SetCharacterMode(int characterTypeNum,CharacterMGR.Mode mode)
+    {
+        if(characterTypeNum<0 || this.numOfCharacterTypes < characterTypeNum)
+        {
+            Debug.LogError($"SetCharacterModeの引数characterTypeNumが{characterTypeNum}になっています");
+            return;
+        }
+        characterMode[characterTypeNum] = mode;
+    }
     private void Awake()
     {
         if (instance == null)
@@ -64,8 +76,14 @@ public class GameManager : MonoBehaviour
         pointerMGR = GameObject.Find("Pointer").GetComponent<PointerMGR>();
         Debug.LogWarning($"pointerMGRを初期化しました。pointerMGR.transform.position:{pointerMGR.transform.position}");
 
-        autoRouteDatas = new AutoRouteData[numOfCharacterTypes];  //とりあえず5体分のルートを用意しておく
+        autoRouteDatas = new AutoRouteData[numOfCharacterTypes];
         manualRouteDatas = new ManualRouteData[numOfCharacterTypes];
+
+        characterMode = new CharacterMGR.Mode[numOfCharacterTypes];
+        for(int i = 0; i<characterMode.Length; i++)
+        {
+            characterMode[i] = CharacterMGR.Mode.Auto; //デフォルトはAutoMode
+        }
 
         for (int i=0;i<numOfCharacterTypes;i++)
         {
@@ -98,18 +116,17 @@ public class GameManager : MonoBehaviour
     {
         isSpawnCharacter = true;
 
-        GameObject characterGO; //スコープに注意　このメソッドの中でしか使えない
-        CharacterMGR characterMGR;
-
-        characterGO = Instantiate(characterPrefabs[characterTypeNum], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0), Quaternion.identity);
-        characterMGR = characterGO.GetComponent<CharacterMGR>();
+        GameObject characterGO = Instantiate(characterPrefabs[characterTypeNum], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0), Quaternion.identity);
+        CharacterMGR characterMGR = characterGO.GetComponent<CharacterMGR>();
 
         //キャラクターのデータをここで渡す
         characterMGR.SetCharacterData(0); //今はCharacterTypeIDとして0を渡しておく。AutoRouteDataも[0]を参照するようになる。
-        
 
         mapMGR.MultiplySetMapValue(vector, characterID);
         mapMGR.GetMap().AddCharacterMGR(vector,characterMGR);
+
+        //キャラクターのモードを決める
+        characterMGR.SetMode(characterMode[characterTypeNum]);
 
         yield return new WaitForSeconds(1f); //クールタイムは適当
 

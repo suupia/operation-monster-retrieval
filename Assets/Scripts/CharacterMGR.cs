@@ -82,7 +82,7 @@ public class CharacterMGR : MonoBehaviour
     }
 
     Mode _mode;
-    private Mode mode
+    public Mode mode
     {
         get { return _mode; }
         set
@@ -90,7 +90,7 @@ public class CharacterMGR : MonoBehaviour
             _mode = value;
         }
     } //プロパティ
-    private enum Mode
+    public enum Mode
     {
         Auto,
         Manual
@@ -242,6 +242,19 @@ public class CharacterMGR : MonoBehaviour
         }
     }
 
+    public void SetMode(Mode mode)
+    {
+        switch (mode)
+        {
+            case Mode.Auto:
+                this.mode = Mode.Auto;
+                break;
+            case Mode.Manual:
+                this.mode = Mode.Manual;
+                break;
+        }
+
+    }
     private void Start()
     {
         animator = GetComponent<Animator>();
@@ -256,7 +269,7 @@ public class CharacterMGR : MonoBehaviour
         targetCastlePos = new Vector2Int(GameManager.instance.mapMGR.GetMapWidth() - 2, GameManager.instance.mapMGR.GetMapHeight() - 2);
 
         //routeに関する処理
-        mode = Mode.Manual;
+        //mode = Mode.Manual;
         switch (mode)
         {
             case Mode.Auto:
