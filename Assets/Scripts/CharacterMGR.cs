@@ -54,6 +54,7 @@ public class CharacterMGR : MonoBehaviour
     AutoRouteData autoRoute;
     ManualRouteData manualRoute;
     List<Vector2Int> routeList;
+    List<int> nonDiagonalPoints;
 
     int moveAlongWithCounter=0;
 
@@ -255,7 +256,7 @@ public class CharacterMGR : MonoBehaviour
         targetCastlePos = new Vector2Int(GameManager.instance.mapMGR.GetMapWidth() - 2, GameManager.instance.mapMGR.GetMapHeight() - 2);
 
         //routeに関する処理
-        mode = Mode.Auto;
+        mode = Mode.Manual;
         switch (mode)
         {
             case Mode.Auto:
@@ -371,8 +372,8 @@ public class CharacterMGR : MonoBehaviour
         GameManager.instance.mapMGR.MultiplySetMapValue(gridPos + directionVector, GameManager.instance.characterID);
 
         //スクリプトの移動
-        GameManager.instance.mapMGR.GetMap().SetCharacterMGR(gridPos, null);
-        GameManager.instance.mapMGR.GetMap().SetCharacterMGR(gridPos+directionVector, this.gameObject.GetComponent<CharacterMGR>());
+        GameManager.instance.mapMGR.GetMap().RemoveCharacterMGR(gridPos, this);
+        GameManager.instance.mapMGR.GetMap().AddCharacterMGR(gridPos+directionVector, this.gameObject.GetComponent<CharacterMGR>());
 
 
 
@@ -384,6 +385,7 @@ public class CharacterMGR : MonoBehaviour
     {
         Debug.Log("SetAutoRouteを実行します");
         routeList = autoRoute.SearchShortestRoute(gridPos, targetCastlePos); //参照渡し
+        nonDiagonalPoints = new List<int>(); //Autoのときは使わないと思うが、Manualと揃えるためにnewしておく
         Debug.Log("routeList:"+string.Join(",",routeList));
     }
 
@@ -391,6 +393,7 @@ public class CharacterMGR : MonoBehaviour
     {
         Debug.Log("SetManualRouteを実行します");
         routeList = manualRoute.GetManualRoute();
+        nonDiagonalPoints = manualRoute.GetNonDiagonalPoints();
         Debug.Log("routeList:" + string.Join(",", routeList));
     }
 
@@ -429,7 +432,7 @@ public class CharacterMGR : MonoBehaviour
 
         nextPos = routeList[moveAlongWithCounter + 1];
 
-        if (moveAlongWithCounter < routeList.Count - 2)  //↓斜め移動できるときはそうする。
+        if (moveAlongWithCounter < routeList.Count - 2 && !nonDiagonalPoints.Contains(moveAlongWithCounter))  //↓斜め移動できるときはそうする。
         {
             nextNextPos = routeList[moveAlongWithCounter + 2];
             if (((nextPos-gridPos).x == 0 && (nextNextPos-nextPos).y == 0) || ((nextPos-gridPos).y == 0 && (nextNextPos-nextPos).x == 0)) //nextPosが角マスのときtrue

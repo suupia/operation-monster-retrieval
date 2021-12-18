@@ -99,7 +99,8 @@ public abstract class Facility : MonoBehaviour
         if (GameManager.instance.CanAttackTarget(gridPos,attackRange,GameManager.instance.characterID,out targetCharacterPos))
         {
             Debug.Log("攻撃範囲内にキャラクターがいるのでInBatteleに切り替えます");
-            targetCharacter = GameManager.instance.mapMGR.GetMap().GetCharacterMGR(targetCharacterPos)[0]; //とりあえず単体攻撃
+            targetCharacter = GameManager.instance.mapMGR.GetMap().GetCharacterMGRList(targetCharacterPos)[0]; //とりあえず単体攻撃
+            Debug.Log($"targetCharacter:{targetCharacter}");
             state = State.InBattle;
             return;
         }
@@ -112,6 +113,13 @@ public abstract class Facility : MonoBehaviour
         {
             isFristBattle = false;
 
+        }
+
+        if (!GameManager.instance.CanAttackTarget(gridPos, attackRange, GameManager.instance.characterID, out targetCharacterPos))
+        {
+            Debug.Log($"キャラクターが攻撃範囲外に出たのでIdleに切り替えます");
+            state = State.Idle;
+            return;
         }
 
 

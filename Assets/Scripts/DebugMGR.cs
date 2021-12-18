@@ -11,13 +11,20 @@ public class DebugMGR : MonoBehaviour
     bool isFirstDebugAutoRoute=true;
     bool isDebuggingAutoRoute = false;
 
+    bool isFirstDebugCharacterMGR = true;
+    bool isDebuggingCharacterMGR = false;
+
     Text[] mapValueTextArray;
     Text[] autoRouteTextArray;
+    Text[] characterMGRTextArray;
 
     [SerializeField] GameObject mapValueTextParent; //インスペクター上でTextの親を決めておく
     [SerializeField] GameObject autoRouteTextParent; //インスペクター上でTextの親を決めておく
+    [SerializeField] GameObject characterMGRTextParent; //インスペクター上でTextの親を決めておく
+
     [SerializeField] Text mapValueText;
     [SerializeField] Text autoRouteText;
+    [SerializeField] Text characterMGRText;
 
     private void Update()
     {
@@ -50,6 +57,20 @@ public class DebugMGR : MonoBehaviour
                 autoRouteTextParent.SetActive(false);
             }
         }
+        if (Input.GetKeyDown(KeyCode.F4))
+        {
+            if (!isDebuggingCharacterMGR)
+            {
+                isDebuggingCharacterMGR = true;
+                characterMGRTextParent.SetActive(true);
+                DebugCharacterMGR();
+            }
+            else
+            {
+                isDebuggingCharacterMGR = false;
+                characterMGRTextParent.SetActive(false);
+            }
+        }
         if (Input.GetKeyDown(KeyCode.F1))
         {
             MakeEverythingTheWay();
@@ -57,6 +78,7 @@ public class DebugMGR : MonoBehaviour
 
         if (isDebuggingMap) DebugMap();
         if (isDebuggingAutoRoute) DebugAutoRoute();
+        if (isDebuggingCharacterMGR) DebugCharacterMGR();
 
     }
     public void DebugMap()
@@ -95,7 +117,6 @@ public class DebugMGR : MonoBehaviour
             }
         }
     }
-
     public void DebugAutoRoute()
     {
         int x, y;
@@ -127,6 +148,42 @@ public class DebugMGR : MonoBehaviour
             {
 
                 autoRouteTextArray[i].text = GameManager.instance.autoRouteDatas[0].GetValue(i).ToString();
+
+
+            }
+        }
+    }
+    public void DebugCharacterMGR()
+    {
+        int x, y;
+
+        if (isFirstDebugCharacterMGR)
+        {
+            Vector3 textPosition;
+
+            characterMGRTextArray = new Text[GameManager.instance.mapMGR.GetMapSize()];
+
+            for (int i = 0; i < GameManager.instance.mapMGR.GetMapSize(); i++)
+            {
+
+                x = i % GameManager.instance.mapMGR.GetMapWidth();
+                y = (i - x) / GameManager.instance.mapMGR.GetMapWidth();
+
+                textPosition = new Vector3(x + 0.5f, y + 0.5f, 0);
+                characterMGRTextArray[i] = Instantiate(characterMGRText, textPosition, Quaternion.identity, characterMGRTextParent.transform);
+                characterMGRTextArray[i].text = GameManager.instance.mapMGR.GetMap().GetCharacterMGRList(i).Count.ToString(); //そのマスに存在するcharacterMGRの個数を返す
+
+            }
+
+            isFirstDebugCharacterMGR = false;
+
+        }
+        else
+        {
+            for (int i = 0; i < GameManager.instance.mapMGR.GetMapSize(); i++)
+            {
+
+                characterMGRTextArray[i].text = GameManager.instance.mapMGR.GetMap().GetCharacterMGRList(i).Count.ToString(); //そのマスに存在するcharacterMGRの個数を返す
 
 
             }

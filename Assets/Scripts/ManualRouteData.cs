@@ -5,14 +5,14 @@ using UnityEngine;
 public class ManualRouteData
 {
     List<Vector2Int> manualRoute;
-    List<Vector2Int> nonDiagonalPoints;
+    List<int> nonDiagonalPoints;
      
 
     //コンストラクタ
     public ManualRouteData()
     {
         manualRoute = new List<Vector2Int>();
-        nonDiagonalPoints = new List<Vector2Int>();
+        nonDiagonalPoints = new List<int>();
     }
 
     //Getter
@@ -21,7 +21,7 @@ public class ManualRouteData
         return manualRoute;
     }
 
-    public List<Vector2Int> GetNonDiagonalPoints()
+    public List<int> GetNonDiagonalPoints()
     {
         return nonDiagonalPoints;
     }
@@ -31,7 +31,7 @@ public class ManualRouteData
         manualRoute = route;
     }
 
-    public void SetNonDiaonalPoints(List<Vector2Int> list)
+    public void SetNonDiaonalPoints(List<int> list)
     {
         nonDiagonalPoints = list;
     }

@@ -109,7 +109,7 @@ public class GameManager : MonoBehaviour
         
 
         mapMGR.MultiplySetMapValue(vector, characterID);
-        mapMGR.GetMap().SetCharacterMGR(vector,characterMGR);
+        mapMGR.GetMap().AddCharacterMGR(vector,characterMGR);
 
         yield return new WaitForSeconds(1f); //クールタイムは適当
 

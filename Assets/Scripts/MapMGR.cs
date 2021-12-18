@@ -517,13 +517,22 @@ public class MapData
         if (IsOutOfDataRange(x, y))
         {
             Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
-            return null; //例外用の数字を設定できないため、nullを返す。
+            return null; //例外用の数字を設定できないため、nullを返す
         }
         return _characterMGRs[ToSubscript(x,y)];
     }
-    public List<CharacterMGR> GetCharacterMGR(Vector2Int vector)
+    public List<CharacterMGR> GetCharacterMGRList(Vector2Int vector)
     {
         return GetCharacterMGRList(vector.x,vector.y);
+    }
+    public List<CharacterMGR> GetCharacterMGRList(int index)
+    {
+        if(index < 0 || index > _values.Length)
+        {
+            Debug.LogError("領域外の値を習得しようとしました");
+            return null; //例外用の数字を設定できないため、nullを返す
+        }
+        return _characterMGRs[index];
     }
     public Facility GetFacility(int x,int y)
     {
@@ -554,7 +563,7 @@ public class MapData
         SetValue(vector.x, vector.y, value);
     }
 
-    public void SetCharacterMGR(int x,int y, CharacterMGR characterMGR)
+    public void AddCharacterMGR(int x,int y, CharacterMGR characterMGR)
     {
         if (IsOutOfDataRange(x, y))
         {
@@ -563,9 +572,9 @@ public class MapData
         }
         _characterMGRs[ToSubscript(x, y)].Add(characterMGR);
     }
-    public void SetCharacterMGR(Vector2Int vector,CharacterMGR characterMGR)
+    public void AddCharacterMGR(Vector2Int vector,CharacterMGR characterMGR)
     {
-        SetCharacterMGR(vector.x,vector.y,characterMGR);
+        AddCharacterMGR(vector.x,vector.y,characterMGR);
     }
     public void RemoveCharacterMGR(int x,int y ,CharacterMGR characterMGR)
     {

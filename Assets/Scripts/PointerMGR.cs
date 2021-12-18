@@ -10,7 +10,7 @@ public class PointerMGR : MonoBehaviour
     [SerializeField] private GameObject pointerTailPrefab;
     private List<GameObject> pointerTails;
     private List<PointerTailMGR> pointerTailMGRs;
-    private List<Vector2Int> nonDiagonalPoints;
+    private List<int> nonDiagonalPoints;
 
     [SerializeField] List<Vector2Int> manualRoute;
     [SerializeField] List<Vector2Int> finalManualRoute;
@@ -23,7 +23,7 @@ public class PointerMGR : MonoBehaviour
         manualRoute = new List<Vector2Int>();
         finalManualRoute = new List<Vector2Int>();
         pointerTails = new List<GameObject>();
-        nonDiagonalPoints = new List<Vector2Int>();
+        nonDiagonalPoints = new List<int>();
         startPos = new Vector3(1.5f, 1.5f, 0);
 
         manualRoute.Add(new Vector2Int(1, 1));
@@ -82,7 +82,7 @@ public class PointerMGR : MonoBehaviour
     {
         return pointerTails;
     }
-    public List<Vector2Int> GetNonDiagonalPoints()
+    public List<int> GetNonDiagonalPoints()
     {
         return nonDiagonalPoints;
     }
@@ -105,7 +105,7 @@ public class PointerMGR : MonoBehaviour
 
                     if (pointerTails[i].GetComponent<PointerTailMGR>().NonDiagonal)
                     {
-                        nonDiagonalPoints.Add(manualRoute[i]);
+                        nonDiagonalPoints.Add(i);
                     }
                 }
             }
@@ -201,7 +201,9 @@ public class PointerMGR : MonoBehaviour
 
     public void ResetPointer()
     {
-        manualRoute = new List<Vector2Int>();
+        manualRoute.Clear();
+        finalManualRoute = new List<Vector2Int>(); //ManualRouteに参照を渡しているので、次に使うためにnewする必要がある
+        nonDiagonalPoints = new List<int>(); //同上
         isOnCastle = false;
         transform.position = startPos;
         while(pointerTails.Count != 0)
