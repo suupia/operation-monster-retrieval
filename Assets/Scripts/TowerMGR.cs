@@ -9,7 +9,7 @@ public class TowerMGR : Facility
     {
         Debug.Log($"HPが0以下になったので、タワーを破壊します gridPos:{gridPos}のタワー");
         
-        GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos,GameManager.instance.towerID); //先にデータを消去する
+        GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos,GameManager.instance.facilityID); //先にデータを消去する
 
         Destroy(this.gameObject);
     }

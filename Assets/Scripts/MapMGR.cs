@@ -101,7 +101,11 @@ public class MapMGR : MonoBehaviour
     private void PlaceCastle()
     {
         Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x + 1, allysCastlePos.y + 1, 0), Quaternion.identity); //画像の中心が格子点にくるように、+1していることに注意
-        Instantiate(enemysCastlePrefab, new Vector3(enemysCastlePos.x + 1, enemysCastlePos.y + 1, 0), Quaternion.identity);
+        GameObject enemyCastleGO = Instantiate(enemysCastlePrefab, new Vector3(enemysCastlePos.x + 1, enemysCastlePos.y + 1, 0), Quaternion.identity);
+        CastleMGR enemyCastleMGR = enemyCastleGO.GetComponent<CastleMGR>();
+
+        map.MultiplySetValue(enemysCastlePos, GameManager.instance.facilityID); //数値データをセット
+        map.SetFacility(enemysCastlePos, enemyCastleMGR); //スクリプトをセット
 
         characterSpawnPoss = new Vector2Int[characterSpawnPossFromCastle.Length];
         Debug.Log($"characterSpawnPossFromCastle.Length={characterSpawnPossFromCastle.Length}");
@@ -116,13 +120,10 @@ public class MapMGR : MonoBehaviour
     {
         for (int i = 0; i < towerPrefabs.Length; i++)
         {
-            GameObject towerGO;
-            TowerMGR towerMGR;
+            GameObject towerGO =  Instantiate(towerPrefabs[i], new Vector3(towerPoss[i].x + 0.5f, towerPoss[i].y + 0.75f, 0), Quaternion.identity);
+            TowerMGR towerMGR = towerGO.GetComponent<TowerMGR>();
 
-            towerGO =  Instantiate(towerPrefabs[i], new Vector3(towerPoss[i].x + 0.5f, towerPoss[i].y + 0.75f, 0), Quaternion.identity);
-            towerMGR = towerGO.GetComponent<TowerMGR>();
-
-            map.MultiplySetValue(towerPoss[i], GameManager.instance.towerID); //数値データをセット
+            map.MultiplySetValue(towerPoss[i], GameManager.instance.facilityID); //数値データをセット
             map.SetFacility(towerPoss[i],towerMGR); //スクリプトをセット
 
         }
@@ -493,7 +494,7 @@ public class MapData
         }
         if (IsOnTheEdge(x,y))
         {
-            Debug.Log($"IsOnTheEdge({x},{y})がtrueです");
+            //Debug.Log($"IsOnTheEdge({x},{y})がtrueです");
             return _edgeValue;
         }
         return _values[ToSubscript(x, y)];
@@ -546,6 +547,15 @@ public class MapData
     public Facility GetFacility(Vector2Int vector)
     {
         return GetFacility(vector.x,vector.y);
+    }
+    public Facility GetFacility(int index)
+    {
+        if (index < 0 || index > _values.Length)
+        {
+            Debug.LogError("領域外の値を習得しようとしました");
+            return null; //例外用の数字を設定できないため、nullを返す
+        }
+        return _facilities[index];
     }
     //Setter
     public void SetValue(int x, int y, int value)

@@ -11,7 +11,7 @@ public class CharacterMGR : MonoBehaviour
     [SerializeField] Vector2Int gridPos;
 
     [SerializeField] Vector2Int targetCastlePos;
-    [SerializeField] Vector2Int targetTowerPos;
+    [SerializeField] Vector2Int targetFacilityPos;
     [SerializeField] Vector2Int directionVectorToTarget;
 
     [SerializeField] Facility targetFacility;
@@ -24,7 +24,7 @@ public class CharacterMGR : MonoBehaviour
     [SerializeField] int characterTypeID;
     [SerializeField] int level;
     [SerializeField] int maxHp;
-    int hp;
+    [SerializeField] int hp;
     public int HP
     {
         get { return hp; }
@@ -427,18 +427,18 @@ public class CharacterMGR : MonoBehaviour
 
         if (isMoving) return;
 
-        if (moveAlongWithCounter == routeList.Count -1) //ルートの終点にいるときの処理
-        {
-            Debug.Log("ルートの終点にいるのでInBatteleに切り替えます");
-            SetDirection(targetCastlePos - gridPos);
-            state = State.InBattle;
-            return;
-        }
+        //if (moveAlongWithCounter == routeList.Count -1) //ルートの終点にいるときの処理
+        //{
+        //    Debug.Log("ルートの終点にいるのでInBatteleに切り替えます");
+        //    SetDirection(targetCastlePos - gridPos);
+        //    state = State.InBattle;
+        //    return;
+        //}
 
-        if (GameManager.instance. CanAttackTarget(gridPos,attackRange,GameManager.instance.towerID,out targetTowerPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワーがあるとき
+        if (GameManager.instance. CanAttackTarget(gridPos,attackRange,GameManager.instance.facilityID,out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワーがあるとき
         {
-            Debug.Log("攻撃範囲内にタワーがあるのでInBatteleに切り替えます");
-            SetDirection(targetTowerPos - gridPos);
+            Debug.LogWarning($"攻撃範囲内にタワーがあるのでInBatteleに切り替えます targetFacilityPos:{targetFacilityPos}");
+            SetDirection(targetFacilityPos - gridPos);
             state = State.InBattle;
             return;
         }
@@ -481,7 +481,7 @@ public class CharacterMGR : MonoBehaviour
         {
             isFristBattle = false;
 
-            targetFacility = GameManager.instance.mapMGR.GetMap().GetFacility(targetTowerPos);
+            targetFacility = GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos);
         }
 
         Attack();
@@ -491,8 +491,8 @@ public class CharacterMGR : MonoBehaviour
     {
         Debug.Log($"Attackを実行します");
 
-        if (GameManager.instance.mapMGR.GetMap().GetFacility(targetTowerPos) == null) { //towerMGRがないということはタワーを破壊したということなので、Marchingに切り替える
-            Debug.Log("タワーを破壊したのでMarchingに切り替えます");
+        if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) == null) { //towerMGRがないということはタワーを破壊したということなので、Marchingに切り替える
+            Debug.LogWarning($"タワーを破壊したのでMarchingに切り替えます targetFacilityPos:{targetFacilityPos}");
             state = State.Marching;
             return;
         }
@@ -512,7 +512,7 @@ public class CharacterMGR : MonoBehaviour
 
         damage = CalcDamage(atk);
 
-        Debug.Log($"Facility({targetTowerPos})に{damage}のダメージを与えた");
+        Debug.Log($"Facility({targetFacilityPos})に{damage}のダメージを与えた");
         targetFacility.HP -= damage;
         DrawDamage(damage);
 
@@ -543,8 +543,6 @@ public class CharacterMGR : MonoBehaviour
     public void Die()
     {
         Debug.Log($"HPが0以下になったので、キャラクターを消去します gridPos:{gridPos}のキャラクター");
-
-        Debug.LogWarning($"this:{this},gameObject.GetComponent<CharacterMGR>(){gameObject.GetComponent<CharacterMGR>()}");
 
         GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos, GameManager.instance.characterID); //数値データをを消去する
         GameManager.instance.mapMGR.GetMap().RemoveCharacterMGR(gridPos,this);

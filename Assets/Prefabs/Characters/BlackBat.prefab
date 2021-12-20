@@ -117,17 +117,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridPos: {x: 0, y: 0}
   targetCastlePos: {x: 0, y: 0}
-  targetTowerPos: {x: 0, y: 0}
+  targetFacilityPos: {x: 0, y: 0}
   directionVectorToTarget: {x: 0, y: 0}
   targetFacility: {fileID: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
   heightToDisplayDamage: 0.6
-  timeToDisplayDamage: 0.37
   characterTypeID: 0
   level: 0
-  maxHp: 5
-  atk: 1
-  attackInterval: 1
+  maxHp: 6
+  atk: 3
+  attackInterval: 1.5
   attackRange: 1
-  spd: 3.5
+  spd: 8
   coolTime: 0

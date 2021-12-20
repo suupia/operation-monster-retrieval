@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4769263052605452336}
   - component: {fileID: 4862625592789355574}
+  - component: {fileID: -3945826711492582406}
   m_Layer: 0
   m_Name: Enemy'sCastle
   m_TagString: Untagged
@@ -82,3 +83,25 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &-3945826711492582406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4573069688280726516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6daa323ed81ad934783e80a43ac9df79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridPos: {x: 0, y: 0}
+  targetCharacterPos: {x: 0, y: 0}
+  targetCharacter: {fileID: 0}
+  damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
+  heightToDisplayDamage: 0
+  level: 0
+  maxHp: 100
+  atk: 1
+  attackInterval: 1.5
+  attackRange: 3

@@ -14,17 +14,24 @@ public class DebugMGR : MonoBehaviour
     bool isFirstDebugCharacterMGR = true;
     bool isDebuggingCharacterMGR = false;
 
+    bool isFirstDebugFacility = true;
+    bool isDebuggingFacility = false;
+
     Text[] mapValueTextArray;
     Text[] autoRouteTextArray;
     Text[] characterMGRTextArray;
+    Text[] facilityTextArray;
 
     [SerializeField] GameObject mapValueTextParent; //インスペクター上でTextの親を決めておく
     [SerializeField] GameObject autoRouteTextParent; //インスペクター上でTextの親を決めておく
     [SerializeField] GameObject characterMGRTextParent; //インスペクター上でTextの親を決めておく
+    [SerializeField] GameObject facilityTextParent; //インスペクター上でTextの親を決めておく
+
 
     [SerializeField] Text mapValueText;
     [SerializeField] Text autoRouteText;
     [SerializeField] Text characterMGRText;
+    [SerializeField] Text facilityText;
 
     private void Update()
     {
@@ -71,6 +78,20 @@ public class DebugMGR : MonoBehaviour
                 characterMGRTextParent.SetActive(false);
             }
         }
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            if (!isDebuggingFacility)
+            {
+                isDebuggingFacility = true;
+                facilityTextParent.SetActive(true);
+                DebugFacility();
+            }
+            else
+            {
+                isDebuggingFacility = false;
+                facilityTextParent.SetActive(false);
+            }
+        }
         if (Input.GetKeyDown(KeyCode.F1))
         {
             MakeEverythingTheWay();
@@ -79,6 +100,7 @@ public class DebugMGR : MonoBehaviour
         if (isDebuggingMap) DebugMap();
         if (isDebuggingAutoRoute) DebugAutoRoute();
         if (isDebuggingCharacterMGR) DebugCharacterMGR();
+        if (isDebuggingFacility) DebugFacility();
 
     }
     public void DebugMap()
@@ -189,6 +211,55 @@ public class DebugMGR : MonoBehaviour
             }
         }
     }
+    public void DebugFacility()
+    {
+        int x, y;
+
+        if (isFirstDebugFacility)
+        {
+            Vector3 textPosition;
+
+            facilityTextArray = new Text[GameManager.instance.mapMGR.GetMapSize()];
+
+            for (int i = 0; i < GameManager.instance.mapMGR.GetMapSize(); i++)
+            {
+
+                x = i % GameManager.instance.mapMGR.GetMapWidth();
+                y = (i - x) / GameManager.instance.mapMGR.GetMapWidth();
+
+                textPosition = new Vector3(x + 0.5f, y + 0.5f, 0);
+                facilityTextArray[i] = Instantiate(facilityText, textPosition, Quaternion.identity, facilityTextParent.transform);
+                if (GameManager.instance.mapMGR.GetMap().GetFacility(i) != null)
+                {
+                    facilityTextArray[i].text = GameManager.instance.mapMGR.GetMap().GetFacility(i).ToString(); //そのマスに存在するfacilityを返す
+                }
+                else
+                {
+                    facilityTextArray[i].text = ""; //nullの代わり
+                }
+               
+
+            }
+
+            isFirstDebugFacility = false;
+
+        }
+        else
+        {
+            for (int i = 0; i < GameManager.instance.mapMGR.GetMapSize(); i++)
+            {
+                if (GameManager.instance.mapMGR.GetMap().GetFacility(i) != null)
+                {
+                    facilityTextArray[i].text = GameManager.instance.mapMGR.GetMap().GetFacility(i).ToString(); //そのマスに存在するfacilityを返す
+                }
+                else
+                {
+                    facilityTextArray[i].text = ""; //nullの代わり
+                }
+            }
+        }
+    }
+
 
     public void MakeEverythingTheWay()
     {

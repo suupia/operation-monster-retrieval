@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
 
     public readonly int wallID = 3;
     public readonly int groundID = 2;
-    public readonly int towerID = 5;
+    public readonly int facilityID = 5;
     public readonly int characterID = 11;
 
     public GameObject[] characterPrefabs; //配列にしているのは仮。実際にはデータベースから情報を読み取ってインスタンス化するからプレハブは一つでよい

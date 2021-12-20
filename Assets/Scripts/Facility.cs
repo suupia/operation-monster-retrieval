@@ -19,7 +19,7 @@ public abstract class Facility : MonoBehaviour
 
     [SerializeField] protected int level;
     [SerializeField] protected int maxHp;
-    protected int hp;
+    [SerializeField] protected int hp;
     [SerializeField] protected int atk;
     [SerializeField] protected float attackInterval;
     [SerializeField] protected int attackRange;
