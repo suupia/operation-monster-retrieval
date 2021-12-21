@@ -128,7 +128,7 @@ public class PointerMGR : MonoBehaviour
             return;
         }
 
-        if (finalManualRoute.Count(pos => pos == mouseGridPos) >= 2 && manualRoute[manualRoute.Count - 2] != mouseGridPos)           //進もうとしているマスを既に2回以上通っていて、来た道を戻らない場合はreturn
+        if (finalManualRoute.Count(pos => pos == mouseGridPos) >= 2 && manualRoute[manualRoute.Count - 2] != mouseGridPos) //進もうとしているマスを既に2回以上通っていて、来た道を戻らない場合はreturn
         {
             Debug.Log("同じマスを通れるのは2回までです");
             return;

@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     [System.NonSerialized] public DebugMGR debugMGR;
     [System.NonSerialized] public PointerMGR pointerMGR;
 
-    [SerializeField] int numOfCharacterTypes = 4; //戦闘に参加するモンスターの種類は4種類
+    int numOfCharacterTypes = 4; //戦闘に参加するモンスターの種類は4種類
     [SerializeField] AutoRouteData autoRouteData; //インスペクター上でセットする
     [SerializeField] ManualRouteData manualRouteData; //インスペクター上でセットする
     public AutoRouteData[] autoRouteDatas;
@@ -26,6 +26,9 @@ public class GameManager : MonoBehaviour
     public readonly int characterID = 11;
 
     public GameObject[] characterPrefabs; //配列にしているのは仮。実際にはデータベースから情報を読み取ってインスタンス化するからプレハブは一つでよい
+
+    int characterCounter =0; //キャラクターが何体スポーンしたかを数える
+    float characterDisplacement= 0.03f; //キャラクターがスポーンしたときにどれくらいズレるかを決める(10回で一周するようにする)
 
     public CharacterMGR.Mode[] characterMode; //キャラクターの種類ごとの操作モードを格納する
 
@@ -116,14 +119,19 @@ public class GameManager : MonoBehaviour
     {
         isSpawnCharacter = true;
 
-        GameObject characterGO = Instantiate(characterPrefabs[characterTypeNum], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0), Quaternion.identity);
+        Vector3 displacement = new Vector3(characterDisplacement * (characterCounter%10)-3*characterDisplacement, characterDisplacement * (characterCounter % 10) - 3 * characterDisplacement, 0); //キャラクターを少しずらす
+        Debug.LogWarning($"displacement:{displacement}");
+
+        GameObject characterGO = Instantiate(characterPrefabs[characterTypeNum], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0) + displacement, Quaternion.identity);
         CharacterMGR characterMGR = characterGO.GetComponent<CharacterMGR>();
 
         //キャラクターのデータをここで渡す
-        characterMGR.SetCharacterData(0); //今はCharacterTypeIDとして0を渡しておく。AutoRouteDataも[0]を参照するようになる。
+        characterMGR.SetCharacterData(characterTypeNum); //今はCharacterTypeIDとして0を渡しておく。AutoRouteDataも[0]を参照するようになる。
 
         mapMGR.MultiplySetMapValue(vector, characterID);
         mapMGR.GetMap().AddCharacterMGR(vector,characterMGR);
+
+        characterCounter++;
 
         //キャラクターのモードを決める
         characterMGR.SetMode(characterMode[characterTypeNum]);

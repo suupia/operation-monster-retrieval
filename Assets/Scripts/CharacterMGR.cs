@@ -348,7 +348,7 @@ public class CharacterMGR : MonoBehaviour
 
 
         startPos = transform.position;
-        endPos = GetTransformPosFromGridPos();
+        endPos = startPos + GetDirectionVector();
 
         Debug.Log($"MoveForwardCoroutine‚É‚¨‚¢‚ÄstartPos:{startPos},endPos{endPos}");
 
