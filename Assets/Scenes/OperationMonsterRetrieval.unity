@@ -813,6 +813,7 @@ MonoBehaviour:
   characterPrefabs:
   - {fileID: 6960445815220418439, guid: b8224d8f969ca5a41b9853d79e1a5a05, type: 3}
   - {fileID: 6960445815220418439, guid: 1051f466cc565d34981d033e983c2fc2, type: 3}
+  - {fileID: 6960445815220418439, guid: 132e80cd9adc78641ade1d1adef1572b, type: 3}
   characterMode: 
 --- !u!4 &753949605
 Transform:
