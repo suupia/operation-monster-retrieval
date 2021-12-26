@@ -185,7 +185,7 @@ public class CharacterMGR : MonoBehaviour
         {
             transform.localScale = new Vector3(-1, 1, 1); //Œ³‚Ì‰æ‘œ‚ª¶Œü‚«‚Ì‚½‚ß
         }
-        else if (directionVector.x < 0)
+        else if (directionVector.x <= 0)
         {
             transform.localScale = new Vector3(1, 1, 1);
         }
@@ -266,7 +266,7 @@ public class CharacterMGR : MonoBehaviour
         gridPos = GameManager.instance.ToGridPosition(transform.position);
         state = State.Marching;
 
-        targetCastlePos = new Vector2Int(GameManager.instance.mapMGR.GetMapWidth() - 2, GameManager.instance.mapMGR.GetMapHeight() - 2);
+        targetCastlePos = GameManager.instance.mapMGR.GetEnemysCastlePos();
 
         //route‚ÉŠÖ‚·‚éˆ—
         //mode = Mode.Manual;

@@ -24,9 +24,9 @@ public class PointerMGR : MonoBehaviour
         finalManualRoute = new List<Vector2Int>();
         pointerTails = new List<GameObject>();
         nonDiagonalPoints = new List<int>();
-        startPos = new Vector3(1.5f, 1.5f, 0);
+        startPos = GameManager.instance.ToWorldPosition(GameManager.instance.mapMGR.GetAllysCastlePos());
 
-        manualRoute.Add(new Vector2Int(1, 1));
+        manualRoute.Add(GameManager.instance.mapMGR.GetAllysCastlePos());
 
     }
 
@@ -187,7 +187,7 @@ public class PointerMGR : MonoBehaviour
 
     private void IsOnCastle()
     {
-        if(transform.position.x >= GameManager.instance.mapMGR.GetMapWidth()-3 && transform.position.y >= GameManager.instance.mapMGR.GetMapHeight()-3)
+        if((int)transform.position.x >= GameManager.instance.mapMGR.GetEnemysCastlePos().x-1 && (int)transform.position.y <= GameManager.instance.mapMGR.GetEnemysCastlePos().y+1)
         {
             Debug.LogWarning("Pointer‚ªCastle‚É“ž’B‚µ‚Ü‚µ‚½");
             isOnCastle = true;
@@ -211,7 +211,7 @@ public class PointerMGR : MonoBehaviour
             Destroy(pointerTails[pointerTails.Count -1]);
             pointerTails.RemoveAt(pointerTails.Count - 1);
         }
-        manualRoute.Add(new Vector2Int(1, 1));
+        manualRoute.Add(GameManager.instance.mapMGR.GetAllysCastlePos());
         Debug.Log($"Pointer‚ð‰Šú‰»:manualRoute={string.Join(",", manualRoute)}, isOnCastle={isOnCastle}, pointerTails={string.Join(",", pointerTails)}");
     }
 

@@ -8,10 +8,15 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    [System.NonSerialized] public MapMGR mapMGR;
-    [System.NonSerialized] public InputMGR inputMGR;
-    [System.NonSerialized] public DebugMGR debugMGR;
-    [System.NonSerialized] public PointerMGR pointerMGR;
+    [SerializeField] public MapMGR mapMGR; //インスペクター上でセットする
+    [SerializeField] public InputMGR inputMGR;
+    [SerializeField] public DebugMGR debugMGR;
+    [SerializeField] public PointerMGR pointerMGR;
+    [SerializeField] public TimerMGR timerMGR;
+
+    [SerializeField] GameObject outcomeTextGO; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある
+    Text outcomeText;
+
 
     int numOfCharacterTypes = 4; //戦闘に参加するモンスターの種類は4種類
     [SerializeField] AutoRouteData autoRouteData; //インスペクター上でセットする
@@ -33,6 +38,9 @@ public class GameManager : MonoBehaviour
     public CharacterMGR.Mode[] characterMode; //キャラクターの種類ごとの操作モードを格納する
 
     bool isSpawnCharacter = false;
+
+
+
 
     //座標変換
     public Vector2Int ToGridPosition(Vector3 worldPosition)
@@ -73,11 +81,13 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        mapMGR = GameObject.Find("Tilemap").GetComponent<MapMGR>();
-        inputMGR = GameObject.Find("InputMGR").GetComponent<InputMGR>();
-        debugMGR = GameObject.Find("DebugMGR").GetComponent<DebugMGR>();
-        pointerMGR = GameObject.Find("Pointer").GetComponent<PointerMGR>();
-        Debug.LogWarning($"pointerMGRを初期化しました。pointerMGR.transform.position:{pointerMGR.transform.position}");
+        //mapMGR = GameObject.Find("Tilemap").GetComponent<MapMGR>();
+        //inputMGR = GameObject.Find("InputMGR").GetComponent<InputMGR>();
+        //debugMGR = GameObject.Find("DebugMGR").GetComponent<DebugMGR>();
+        //pointerMGR = GameObject.Find("Pointer").GetComponent<PointerMGR>();
+        //Debug.LogWarning($"pointerMGRを初期化しました。pointerMGR.transform.position:{pointerMGR.transform.position}");
+
+        outcomeText = outcomeTextGO.GetComponent<Text>();
 
         autoRouteDatas = new AutoRouteData[numOfCharacterTypes];
         manualRouteDatas = new ManualRouteData[numOfCharacterTypes];
@@ -97,7 +107,6 @@ public class GameManager : MonoBehaviour
         mapMGR.SetupMap();
 
     }
-
     public void SpawnCharacter(int CharacterTypeNum)
     {
         if (isSpawnCharacter)
@@ -119,14 +128,14 @@ public class GameManager : MonoBehaviour
     {
         isSpawnCharacter = true;
 
-        Vector3 displacement = new Vector3(characterDisplacement * (characterCounter%10)-3*characterDisplacement, characterDisplacement * (characterCounter % 10) - 3 * characterDisplacement, 0); //キャラクターを少しずらす
+        Vector3 displacement = new Vector3(characterDisplacement * (characterCounter%7)-3*characterDisplacement, 0.5f*(characterDisplacement * (characterCounter % 7) - 3 * characterDisplacement), 0); //キャラクターを少しずらす y方向のズレはx方向のズレの0.5倍
         Debug.LogWarning($"displacement:{displacement}");
 
         GameObject characterGO = Instantiate(characterPrefabs[characterTypeNum], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0) + displacement, Quaternion.identity);
         CharacterMGR characterMGR = characterGO.GetComponent<CharacterMGR>();
 
         //キャラクターのデータをここで渡す
-        characterMGR.SetCharacterData(characterTypeNum); //今はCharacterTypeIDとして0を渡しておく。AutoRouteDataも[0]を参照するようになる。
+        characterMGR.SetCharacterData(characterTypeNum);
 
         mapMGR.MultiplySetMapValue(vector, characterID);
         mapMGR.GetMap().AddCharacterMGR(vector,characterMGR);
@@ -245,6 +254,18 @@ public class GameManager : MonoBehaviour
         return atk; //とりあえず今は攻撃力をそのまま返すだけ
     }
 
+    public void WinTheGame()
+    {
+        timerMGR.StopTimer();
+        outcomeTextGO.SetActive(true);
+        outcomeText.text = "勝利";
+    }
 
+    public void LoseTheGame()
+    {
+        timerMGR.StopTimer();
+        outcomeTextGO.SetActive(true);
+        outcomeText.text = "敗北";
+    }
 
 }

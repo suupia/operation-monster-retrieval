@@ -18,7 +18,7 @@ public class MapMGR : MonoBehaviour
     [SerializeField] GameObject allysCastlePrefab;
     [SerializeField] Vector2Int allysCastlePos;
     [SerializeField] Vector2Int[] characterSpawnPossFromCastle;
-    [SerializeField] public Vector2Int[] characterSpawnPoss;
+    [System.NonSerialized] public Vector2Int[] characterSpawnPoss;
     [SerializeField] GameObject enemysCastlePrefab;
     [SerializeField] Vector2Int enemysCastlePos;
 
@@ -53,6 +53,14 @@ public class MapMGR : MonoBehaviour
     public int GetMapValue(int index)
     {
         return map.GetValue(index);
+    }
+    public Vector2Int GetAllysCastlePos()
+    {
+        return allysCastlePos;
+    }
+    public Vector2Int GetEnemysCastlePos()
+    {
+        return enemysCastlePos;
     }
     public void MultiplySetMapValue(Vector2Int vector, int value)
     {
@@ -100,8 +108,8 @@ public class MapMGR : MonoBehaviour
 
     private void PlaceCastle()
     {
-        Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x + 1, allysCastlePos.y + 1, 0), Quaternion.identity); //画像の中心が格子点にくるように、+1していることに注意
-        GameObject enemyCastleGO = Instantiate(enemysCastlePrefab, new Vector3(enemysCastlePos.x + 1, enemysCastlePos.y + 1, 0), Quaternion.identity);
+        Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x, allysCastlePos.y+1, 0), Quaternion.identity); //画像の中心が格子点にくるように、+1していることに注意
+        GameObject enemyCastleGO = Instantiate(enemysCastlePrefab, new Vector3(enemysCastlePos.x + 1, enemysCastlePos.y, 0), Quaternion.identity);
         CastleMGR enemyCastleMGR = enemyCastleGO.GetComponent<CastleMGR>();
 
         map.MultiplySetValue(enemysCastlePos, GameManager.instance.facilityID); //数値データをセット

@@ -83,7 +83,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!95 &9213731899227868462
 Animator:
   serializedVersion: 3
@@ -125,6 +125,7 @@ MonoBehaviour:
   characterTypeID: 0
   level: 0
   maxHp: 6
+  hp: 0
   atk: 3
   attackInterval: 1.5
   attackRange: 1
