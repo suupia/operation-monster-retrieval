@@ -6,8 +6,15 @@ using UnityEngine.UI;
 
 public class MapMGR : MonoBehaviour
 {
+[System.Serializable]
+    class StageTileArray //インスペクター上でセットできるようにするためにクラスを作る
+    {
+        [SerializeField] public TileBase[] stageTileArray;
+    }
     [SerializeField] Tilemap tilemap;
-    [SerializeField] TileBase[] tileArray;
+    [SerializeField] StageTileArray[]  tileArray;
+    [SerializeField] int stageNum; //ステージの番号によって使うタイルマップを決める（0からスタート）
+
 
     MapData map;
 
@@ -24,6 +31,7 @@ public class MapMGR : MonoBehaviour
 
     [SerializeField] GameObject[] towerPrefabs;
     [SerializeField] Vector2Int[] towerPoss;
+
 
     //Getter
     public MapData GetMap()
@@ -148,23 +156,23 @@ public class MapMGR : MonoBehaviour
             {
                 if (CalculateTileType(x, y) < 47) //周りがすべて壁のタイルは3種類ある
                 {
-                    tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[CalculateTileType(x, y)]);
+                    tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[stageNum].stageTileArray[CalculateTileType(x, y)]);
                 }
                 else
                 {
-                    tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[UnityEngine.Random.Range(47, 49 + 1)]);
+                    tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[stageNum].stageTileArray[UnityEngine.Random.Range(47, 49 + 1)]);
                 }
                 //Debug.Log($"タイルを{x},{y}に敷き詰めました");
             }
             else if (map.GetValue(x, y) % GameManager.instance.groundID == 0)
             {
-                tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[UnityEngine.Random.Range(50, 52 + 1)]);
+                tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[stageNum].stageTileArray[UnityEngine.Random.Range(50, 52 + 1)]);
             }
 
         }
         else //mapの領域外
         {
-            tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[UnityEngine.Random.Range(47, 49 + 1)]); //全方向が壁のタイルを張る(3枚)
+            tilemap.SetTile(new Vector3Int(x, y, 0), tileArray[stageNum].stageTileArray[UnityEngine.Random.Range(47, 49 + 1)]); //全方向が壁のタイルを張る(3枚)
         }
     }
     private int CalculateTileType(int x, int y)
