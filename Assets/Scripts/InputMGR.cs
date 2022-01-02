@@ -17,7 +17,8 @@ public class InputMGR : MonoBehaviour
     Vector2Int mouseGridPos;
 
     private int manualRouteNumber = -1; //何も選択していないときは-1にしておく
-    private ButtonMGR selectedButtonMGR; //Buttonが選択されたときにそのButtonのスクリプトのインスタンスを受け取る
+    private SelectCharacterButtonMGR selectedButtonMGR; //Buttonが選択されたときにそのButtonのスクリプトのインスタンスを受け取る
+
 
     //プロパティ
     public int GetManualRouteNumber()
@@ -30,85 +31,90 @@ public class InputMGR : MonoBehaviour
         manualRouteNumber = number;
     }
 
-    public void SetSelectedButtonMGR(ButtonMGR buttonMGR)
+    public void SetSelectedButtonMGR(SelectCharacterButtonMGR buttonMGR)
     {
         selectedButtonMGR = buttonMGR;
     }
 
-    public ButtonMGR GetSelectedButtonMGR()
+    public SelectCharacterButtonMGR GetSelectedButtonMGR()
     {
         return selectedButtonMGR;
     }
     void Update()
     {
+        if (GameManager.instance.state != GameManager.State.PlayingGame) return; //以下の処理はGameManagerがPlayingGameの時のみ実行される
+
         if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            foreach(ManualRouteData m in GameManager.instance.manualRouteDatas)
             {
-                Debug.LogWarning(string.Join(",", m.GetManualRoute()));
+                foreach (ManualRouteData m in GameManager.instance.manualRouteDatas)
+                {
+                    Debug.LogWarning(string.Join(",", m.GetManualRoute()));
+                }
             }
-        }
-        //左クリック用
-        if (Input.GetMouseButtonDown(0))
-        {
-            leftTouchFlag = true;
-        }
-        if (Input.GetMouseButtonUp(0))
-        {
+            //左クリック用
+            if (Input.GetMouseButtonDown(0))
+            {
+                leftTouchFlag = true;
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+
             leftTouchFlag = false;
-        }
-
-        //右クリック用
-        if (Input.GetMouseButtonDown(1))
-        {
-            rightTouchFlag = true;
-        }
-        if (Input.GetMouseButtonUp(1))     //Pointerの初期化
-        {
-
-            if (GameManager.instance.pointerMGR.GetIsOnCastle())      //Castleに到達していた場合、Routeを確定する。ここでManualRouteDataにリストを渡す
-            {
-                GameManager.instance.pointerMGR.SetFinalManualRoute();
-                GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetManualRoute(GameManager.instance.pointerMGR.GetFinalManualRoute()); 
-                GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetNonDiaonalPoints(GameManager.instance.pointerMGR.GetNonDiagonalPoints()); 
-                Debug.LogWarning($"ルートを決定しました。 \n" +
-                    $"ManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[GetManualRouteNumber()].GetManualRoute())} \n" +
-                    $"NonDiagonalPoints:{string.Join(",", GameManager.instance.manualRouteDatas[GetManualRouteNumber()].GetNonDiagonalPoints())}");
-                manualRouteNumber = -1; //Reset
-                selectedButtonMGR.ResetToNormalColor(); //ButtonのRest
             }
-            rightTouchFlag = false;
-            GameManager.instance.pointerMGR.ResetPointer();
-        }
 
-
-        if (leftTouchFlag) //道を作る
-        {
-            mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            mouseGridPos = GameManager.instance.ToGridPosition(mousePos);
-            //Debug.Log($"mousePosは{mousePos}");
-            //Debug.Log($"mouseGridPosは{mouseGridPos}");
-
-            GameManager.instance.mapMGR.MakeRoad(mouseGridPos.x,mouseGridPos.y);
-        }
-
-
-        if (rightTouchFlag)     //Pointerを動かす
-        {
-            if (manualRouteNumber == -1)
+            //右クリック用
+            if (Input.GetMouseButtonDown(1))
             {
-                Debug.LogWarning($"Characterを選択してください manualRouteNumber={manualRouteNumber}");
+                rightTouchFlag = true;
             }
-            else
+            if (Input.GetMouseButtonUp(1))     //Pointerの初期化
+            {
+
+                if (GameManager.instance.pointerMGR.GetIsOnCastle())      //Castleに到達していた場合、Routeを確定する。ここでManualRouteDataにリストを渡す
+                {
+                    GameManager.instance.pointerMGR.SetFinalManualRoute();
+                    GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetManualRoute(GameManager.instance.pointerMGR.GetFinalManualRoute());
+                    GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetNonDiaonalPoints(GameManager.instance.pointerMGR.GetNonDiagonalPoints());
+                    Debug.LogWarning($"ルートを決定しました。 \n" +
+                        $"ManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[GetManualRouteNumber()].GetManualRoute())} \n" +
+                        $"NonDiagonalPoints:{string.Join(",", GameManager.instance.manualRouteDatas[GetManualRouteNumber()].GetNonDiagonalPoints())}");
+                    manualRouteNumber = -1; //Reset
+                    selectedButtonMGR.ResetToNormalColor(); //ButtonのRest
+                }
+                rightTouchFlag = false;
+                GameManager.instance.pointerMGR.ResetPointer();
+            }
+
+
+            if (leftTouchFlag) //道を作る
             {
                 mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
                 mouseGridPos = GameManager.instance.ToGridPosition(mousePos);
                 //Debug.Log($"mousePosは{mousePos}");
-                Debug.Log($"mouseGridPosは{mouseGridPos}");
+                //Debug.Log($"mouseGridPosは{mouseGridPos}");
 
-                GameManager.instance.pointerMGR.MoveByMouse(mouseGridPos); 
+                GameManager.instance.mapMGR.MakeRoad(mouseGridPos.x, mouseGridPos.y);
             }
-        }
+
+
+            if (rightTouchFlag)     //Pointerを動かす
+            {
+                if (manualRouteNumber == -1)
+                {
+                    Debug.LogWarning($"Characterを選択してください manualRouteNumber={manualRouteNumber}");
+                }
+                else
+                {
+                    mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                    mouseGridPos = GameManager.instance.ToGridPosition(mousePos);
+                    //Debug.Log($"mousePosは{mousePos}");
+                    Debug.Log($"mouseGridPosは{mouseGridPos}");
+
+                    GameManager.instance.pointerMGR.MoveByMouse(mouseGridPos);
+                }
+            }
+        
+
     }
 
 }

@@ -14,8 +14,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] public PointerMGR pointerMGR;
     [SerializeField] public TimerMGR timerMGR;
 
-    [SerializeField] GameObject outcomeTextGO; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある
-    Text outcomeText;
+    [SerializeField] GameObject selectStageCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
+
+    [SerializeField] GameObject resultTextGO; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
+    Text resultText;
 
 
     int numOfCharacterTypes = 4; //戦闘に参加するモンスターの種類は4種類
@@ -39,7 +41,22 @@ public class GameManager : MonoBehaviour
 
     bool isSpawnCharacter = false;
 
+    [SerializeField] State _state; //デバッグしやすいようにSerializeFieldにしておく
+    public State state
+    {
+        get { return _state; }
+        set
+        {
 
+            _state = value;
+        }
+    } //プロパティ
+    public enum State
+    {
+        SelectingStage,
+        PlayingGame,
+        ShowingResults
+    }
 
 
     //座標変換
@@ -81,13 +98,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        //mapMGR = GameObject.Find("Tilemap").GetComponent<MapMGR>();
-        //inputMGR = GameObject.Find("InputMGR").GetComponent<InputMGR>();
-        //debugMGR = GameObject.Find("DebugMGR").GetComponent<DebugMGR>();
-        //pointerMGR = GameObject.Find("Pointer").GetComponent<PointerMGR>();
-        //Debug.LogWarning($"pointerMGRを初期化しました。pointerMGR.transform.position:{pointerMGR.transform.position}");
-
-        outcomeText = outcomeTextGO.GetComponent<Text>();
+        resultText = resultTextGO.GetComponent<Text>();
 
         autoRouteDatas = new AutoRouteData[numOfCharacterTypes];
         manualRouteDatas = new ManualRouteData[numOfCharacterTypes];
@@ -104,7 +115,29 @@ public class GameManager : MonoBehaviour
             manualRouteDatas[i] = new ManualRouteData(); //今はmanualRouteDataがない
         }
 
+        StartSelectingStage();
+
+
+    }
+    
+
+    public void StartSelectingStage()
+    {
+        state = State.SelectingStage;
+        selectStageCanvas.SetActive(true);
+        //次のPlayingGameに備えて前の戦闘のデータをここでリセットする（今は特に書くことはない）
+    }
+    public  void StartPlayingGame()
+    {
+        state = State.PlayingGame;
+        selectStageCanvas.SetActive(false);
+
         mapMGR.SetupMap();
+
+    }
+    public void StartShowingResults()
+    {
+        state = State.ShowingResults;
 
     }
     public void SpawnCharacter(int CharacterTypeNum)
@@ -257,15 +290,15 @@ public class GameManager : MonoBehaviour
     public void WinTheGame()
     {
         timerMGR.StopTimer();
-        outcomeTextGO.SetActive(true);
-        outcomeText.text = "勝利";
+        resultTextGO.SetActive(true);
+        resultText.text = "勝利";
     }
 
     public void LoseTheGame()
     {
         timerMGR.StopTimer();
-        outcomeTextGO.SetActive(true);
-        outcomeText.text = "敗北";
+        resultTextGO.SetActive(true);
+        resultText.text = "敗北";
     }
 
 }

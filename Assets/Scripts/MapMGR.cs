@@ -70,6 +70,8 @@ public class MapMGR : MonoBehaviour
     {
         return enemysCastlePos;
     }
+
+    //Setter
     public void MultiplySetMapValue(Vector2Int vector, int value)
     {
         map.MultiplySetValue(vector, value);
@@ -85,6 +87,10 @@ public class MapMGR : MonoBehaviour
         {
             map.DivisionalSetValue(vector, value);
         }
+    }
+    public void SetStageNum(int stageNum)
+    {
+        this.stageNum = stageNum;
     }
 
     public void SetupMap() //‚±‚ê‚ðGameManager‚©‚çŒÄ‚Ô

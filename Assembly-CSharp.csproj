@@ -63,15 +63,16 @@
     <Compile Include="Assets\Scripts\ManualRouteData.cs" />
     <Compile Include="Assets\Scripts\DebugMGR.cs" />
     <Compile Include="Assets\Scripts\CharacterMGR.cs" />
-    <Compile Include="Assets\Scripts\ButtonMGR.cs" />
+    <Compile Include="Assets\Scripts\SelectCharacterButtonMGR.cs" />
     <Compile Include="Assets\Scripts\AutoRouteData.cs" />
     <Compile Include="Assets\Scripts\TowerMGR.cs" />
     <Compile Include="Assets\Scripts\CastleMGR.cs" />
+    <Compile Include="Assets\Scripts\TimerMGR.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\MapMGR.cs" />
     <Compile Include="Assets\Scripts\MouseTrailerMGR.cs" />
     <Compile Include="Assets\Scripts\PointerTailMGR.cs" />
-    <Compile Include="Assets\Scripts\TimerMGR.cs" />
+    <Compile Include="Assets\Scripts\SelectStageButtonMGR.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
