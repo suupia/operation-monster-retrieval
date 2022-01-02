@@ -20,7 +20,8 @@ public class GameManager : MonoBehaviour
     Text resultText;
 
 
-    int numOfCharacterTypes = 4; //戦闘に参加するモンスターの種類は4種類
+    int numOfCharacterInCombat = 4; //戦闘に参加するモンスターの種類は4種類
+    int[] IDsOfCharactersInCombat; //戦闘に酸化しているモンスターのID (numOfCharacterTypesの分だけ要素を用意する)
     [SerializeField] AutoRouteData autoRouteData; //インスペクター上でセットする
     [SerializeField] ManualRouteData manualRouteData; //インスペクター上でセットする
     public AutoRouteData[] autoRouteDatas;
@@ -77,7 +78,7 @@ public class GameManager : MonoBehaviour
     //Setter
     public void SetCharacterMode(int characterTypeNum,CharacterMGR.Mode mode)
     {
-        if(characterTypeNum<0 || this.numOfCharacterTypes < characterTypeNum)
+        if(characterTypeNum<0 || this.numOfCharacterInCombat < characterTypeNum)
         {
             Debug.LogError($"SetCharacterModeの引数characterTypeNumが{characterTypeNum}になっています");
             return;
@@ -100,16 +101,18 @@ public class GameManager : MonoBehaviour
     {
         resultText = resultTextGO.GetComponent<Text>();
 
-        autoRouteDatas = new AutoRouteData[numOfCharacterTypes];
-        manualRouteDatas = new ManualRouteData[numOfCharacterTypes];
+        IDsOfCharactersInCombat = new int[numOfCharacterInCombat];
 
-        characterMode = new CharacterMGR.Mode[numOfCharacterTypes];
+        autoRouteDatas = new AutoRouteData[numOfCharacterInCombat];
+        manualRouteDatas = new ManualRouteData[numOfCharacterInCombat];
+
+        characterMode = new CharacterMGR.Mode[numOfCharacterInCombat];
         for(int i = 0; i<characterMode.Length; i++)
         {
             characterMode[i] = CharacterMGR.Mode.Auto; //デフォルトはAutoMode
         }
 
-        for (int i=0;i<numOfCharacterTypes;i++)
+        for (int i=0;i<numOfCharacterInCombat;i++)
         {
             autoRouteDatas[i] = new AutoRouteData(mapMGR.GetMapWidth(),mapMGR.GetMapHeight());
             manualRouteDatas[i] = new ManualRouteData(); //今はmanualRouteDataがない
@@ -132,6 +135,8 @@ public class GameManager : MonoBehaviour
         state = State.PlayingGame;
         selectStageCanvas.SetActive(false);
 
+        SetCharacterTypeIDInCombat();
+
         mapMGR.SetupMap();
 
     }
@@ -140,7 +145,7 @@ public class GameManager : MonoBehaviour
         state = State.ShowingResults;
 
     }
-    public void SpawnCharacter(int CharacterTypeNum)
+    public void SpawnCharacter(int buttonNum)
     {
         if (isSpawnCharacter)
         {
@@ -151,24 +156,26 @@ public class GameManager : MonoBehaviour
             if (mapMGR.GetMapValue(mapMGR.characterSpawnPoss[i]) % GameManager.instance.groundID == 0)
             {
                 Debug.Log("SpawnCharacterCoroutineを実行します");
-                StartCoroutine(SpawnCharacterCoroutine(mapMGR.characterSpawnPoss[i], CharacterTypeNum)); //とりあえずcharacterIDの引数は0にしておく
+                StartCoroutine(SpawnCharacterCoroutine(mapMGR.characterSpawnPoss[i], buttonNum));
             }
 
         }
     }
 
-    private IEnumerator SpawnCharacterCoroutine(Vector2Int vector, int characterTypeNum)
+    private IEnumerator SpawnCharacterCoroutine(Vector2Int vector, int buttonNum)
     {
         isSpawnCharacter = true;
+
+        int characterTypeID = IDsOfCharactersInCombat[buttonNum];
 
         Vector3 displacement = new Vector3(characterDisplacement * (characterCounter%7)-3*characterDisplacement, 0.5f*(characterDisplacement * (characterCounter % 7) - 3 * characterDisplacement), 0); //キャラクターを少しずらす y方向のズレはx方向のズレの0.5倍
         Debug.LogWarning($"displacement:{displacement}");
 
-        GameObject characterGO = Instantiate(characterPrefabs[characterTypeNum], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0) + displacement, Quaternion.identity);
+        GameObject characterGO = Instantiate(characterPrefabs[characterTypeID], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0) + displacement, Quaternion.identity);
         CharacterMGR characterMGR = characterGO.GetComponent<CharacterMGR>();
 
         //キャラクターのデータをここで渡す
-        characterMGR.SetCharacterData(characterTypeNum);
+        characterMGR.SetCharacterData(buttonNum,characterTypeID);
 
         mapMGR.MultiplySetMapValue(vector, characterID);
         mapMGR.GetMap().AddCharacterMGR(vector,characterMGR);
@@ -176,13 +183,26 @@ public class GameManager : MonoBehaviour
         characterCounter++;
 
         //キャラクターのモードを決める
-        characterMGR.SetMode(characterMode[characterTypeNum]);
+        characterMGR.SetMode(characterMode[buttonNum]);
 
         yield return new WaitForSeconds(1f); //クールタイムは適当
 
         isSpawnCharacter = false;
     }
+    int ToCharacterTypeID(int buttonNum)
+    {
+        return buttonNum; //今のところはそのまま返す
+    }
 
+    void SetCharacterTypeIDInCombat()
+    {
+        //とりあえず適当に出撃するモンスターを決めておく
+        for(int i = 0;i<numOfCharacterInCombat; i++)
+        {
+            IDsOfCharactersInCombat[i] = i;
+
+        }
+    }
     public int[,] CalcSearchRangeArray(int advancingDistance, int lookingForValue, int notLookingForValue, int centerValue) //マス目に置ける円形の索敵範囲を計算して、2次元配列で返す
     {
         int t = lookingForValue; //索敵範囲

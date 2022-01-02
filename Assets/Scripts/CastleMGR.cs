@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class CastleMGR : Facility
 {
+    public override void SetDirection(Vector2 directionVector)
+    {
+        //Castle‚ÍŒü‚«‚ð•Ï‚¦‚é‚±‚Æ‚Í‚È‚¢
+    }
     public override void Die()
     {
 

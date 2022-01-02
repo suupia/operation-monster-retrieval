@@ -66,8 +66,10 @@ public abstract class Facility : MonoBehaviour
 
         }
     }
+    public abstract void SetDirection(Vector2 directionVector); //TowerMGRでのみ処理が必要
 
-    private void Start()
+
+    protected void Start()
     {
         animator = GetComponent<Animator>();
 
@@ -150,6 +152,9 @@ public abstract class Facility : MonoBehaviour
 
         damage = GameManager.instance.CalcDamage(atk);
 
+        //キャラクターの方を向く
+        SetDirection(targetCharacter.GetGridPos() - gridPos);
+
         Debug.Log($"Character({targetCharacterPos})に{damage}のダメージを与えた");
         targetCharacter.HP -= damage;
         DrawDamage(damage);
@@ -171,6 +176,7 @@ public abstract class Facility : MonoBehaviour
         damageText = damageTextGO.GetComponent<Text>();
         damageText.text = damage.ToString();
     }
+
 
     public abstract void Die(); //抽象メソッド
 

@@ -43,7 +43,7 @@ public class CharacterMGR : MonoBehaviour
     [SerializeField] int attackRange;
     [SerializeField] float spd; //1秒間に進むマスの数 [マス/s]  とりあえず１にしておく
     float moveTime; // movetime = 1/spd [s]
-    [SerializeField] int coolTime;
+    [SerializeField] float coolTime;
 
     bool isMarching = false;
     bool isAttacking = false;
@@ -164,10 +164,18 @@ public class CharacterMGR : MonoBehaviour
     }
 
     //Setter
-    public void SetCharacterData(int characterTypeID)  //hpやatkなどの情報もここでセットする。
+    public void SetCharacterData(int buttonNum,int characterTypeID)  //hpやatkなどの情報もここでセットする。
     {
-        autoRoute = GameManager.instance.autoRouteDatas[characterTypeID];
-        manualRoute = GameManager.instance.manualRouteDatas[characterTypeID];
+        autoRoute = GameManager.instance.autoRouteDatas[buttonNum];
+        manualRoute = GameManager.instance.manualRouteDatas[buttonNum];
+
+        maxHp = CSVLoader.monsterDataList[characterTypeID].HP;
+        atk = CSVLoader.monsterDataList[characterTypeID].ATK;
+        attackInterval = CSVLoader.monsterDataList[characterTypeID].AttackInterval;
+        attackRange = CSVLoader.monsterDataList[characterTypeID].AttackRange;
+        spd = CSVLoader.monsterDataList[characterTypeID].SPD;
+        coolTime = CSVLoader.monsterDataList[characterTypeID].CoolTime;
+
     }
     public void SetDirection(Vector2 directionVector)
     {
