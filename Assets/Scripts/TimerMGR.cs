@@ -12,7 +12,10 @@ public class TimerMGR : MonoBehaviour
     [SerializeField] float timeLimit; //秒で指定する
     [SerializeField] float timer; //デバッグしやすいようにSerializeFieldにしておく
 
-
+    public void InitiTimer() //GameManagerがState.PlayingGameになったときに呼ぶ
+    {
+        timer = 0;
+    }
     void Update()
     {
         if (!isActive) return;
@@ -30,10 +33,7 @@ public class TimerMGR : MonoBehaviour
         }
     }
 
-    public void InitiTimer() //GameManagerがState.PlayingGameになったときに呼ぶ
-    {
-        timer = 0;
-    }
+
     public void StopTimer()
     {
         isActive = false;

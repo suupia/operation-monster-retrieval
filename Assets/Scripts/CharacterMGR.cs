@@ -169,8 +169,6 @@ public class CharacterMGR : MonoBehaviour
         autoRoute = GameManager.instance.autoRouteDatas[buttonNum];
         manualRoute = GameManager.instance.manualRouteDatas[buttonNum];
 
-        Debug.LogWarning($"CSVLoader.monsterDataList.Count:{CSVLoader.monsterDataList.Count}");
-
         maxHp = CSVLoader.monsterDataList[characterTypeID].HP;
         atk = CSVLoader.monsterDataList[characterTypeID].ATK;
         attackInterval = CSVLoader.monsterDataList[characterTypeID].AttackInterval;

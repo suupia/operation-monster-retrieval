@@ -119,7 +119,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 320, y: 200}
+  m_SizeDelta: {x: 200, y: 190}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1421535067278608580
 CanvasRenderer:
@@ -184,7 +184,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.6666667, g: 0.6666667, b: 0.6666667, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -216,14 +216,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonNum: 0
-  colorBlock:
-    m_NormalColor: {r: 0.48584908, g: 0.9753483, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.44001427, g: 0.8834866, b: 0.9056604, a: 1}
-    m_PressedColor: {r: 0.4862745, g: 0.9764706, b: 1, a: 1}
-    m_SelectedColor: {r: 0.4862745, g: 0.9764706, b: 1, a: 1}
-    m_DisabledColor: {r: 0.4862745, g: 0.9764706, b: 1, a: 1}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+  buttonImage: {fileID: 1421535067278608581}
+  modeSwitchButtonImage: {fileID: 6462996495602166589}
+  modeSwitchButtonText: {fileID: 3707469013689063769}
 --- !u!114 &7517407415526071365
 MonoBehaviour:
   m_ObjectHideFlags: 0

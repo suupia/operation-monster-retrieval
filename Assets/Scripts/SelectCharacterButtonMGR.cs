@@ -7,23 +7,39 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 {
     [SerializeField] int buttonNum; //インスペクター上でセットする
 
-    Text modeSwitchButtonText;
+    [SerializeField] Image buttonImage; //インスペクター上でセットする
+    [SerializeField] Image modeSwitchButtonImage;
+    [SerializeField] Text modeSwitchButtonText;
 
-    //以下modeSwitchButtonの変数
+    Color canSpawnCharacterColor = Color.white;
+    Color canNotSpawnCharacterColor = Color.gray;
+
+    //以下、modeSwitchButtonの変数
     CharacterMGR.Mode mode = CharacterMGR.Mode.Auto; //デフォルトはAutoMode
 
     //以下、ManualRoute用の変数
-    private Button button;
-    [SerializeField] ColorBlock colorBlock;
+    Color selectedColor = Color.cyan;
+    Color notSelectedColor = Color.white;
 
-    private void Start()
+    public void InitiSelectCharacterButton() //GameManagerがState.PlayingGameになったときに呼ぶ
     {
-        modeSwitchButtonText = transform.Find("ModeSwitchButton/Text").gameObject.GetComponent<Text>(); //孫オブジェクトからTextコンポーネントを取得する
         modeSwitchButtonText.text = "Auto Mode"; //デフォルトはAutoMode
-        button = gameObject.GetComponent<Button>();
-    }
 
-    public void PointerDown()
+    }
+    void Update()
+    {
+        if(GameManager.instance.energyMGR.CurrentEnergy >= CSVLoader.monsterDataList[GameManager.instance.IDsOfCharactersInCombat[buttonNum]].Cost)
+        {
+            buttonImage.color = canSpawnCharacterColor;
+            modeSwitchButtonImage.color = canSpawnCharacterColor;
+        }
+        else
+        {
+            buttonImage.color = canNotSpawnCharacterColor;
+            modeSwitchButtonImage.color = canNotSpawnCharacterColor;
+        }
+    }
+    public void PointerDown() //EventTriggerで呼ぶ
     {
         if (GameManager.instance.state != GameManager.State.PlayingGame) return;
 
@@ -35,7 +51,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         }
         else if (Input.GetMouseButton(1))
         {
-            if (button.colors != colorBlock) //このbuttonが選択されていない状態で、このbuttonがクリックされたとき
+            if (buttonImage.color != selectedColor) //このbuttonが選択されていない状態で、このbuttonがクリックされたとき
             {
                 SetToSelectedColor();
             }
@@ -72,7 +88,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         {
             GameManager.instance.inputMGR.GetSelectedButtonMGR().ResetToNormalColor(); //そのbuttonの色を戻す
         }
-        button.colors = colorBlock;
+        buttonImage.color = selectedColor;
         GameManager.instance.inputMGR.SetManualRouteNumber(buttonNum);
         GameManager.instance.inputMGR.SetSelectedButtonMGR(this);
         Debug.LogWarning($"ManualRouteを選択するキャラクターを決定しました number={GameManager.instance.inputMGR.GetManualRouteNumber()}");
@@ -80,7 +96,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 
     public void ResetToNormalColor()
     {
-        button.colors = ColorBlock.defaultColorBlock;
+        buttonImage.color = notSelectedColor;
         Debug.LogWarning($"ManualRouteのキャラクタ―選択を解除しました number={GameManager.instance.inputMGR.GetManualRouteNumber()}");
     }
 }

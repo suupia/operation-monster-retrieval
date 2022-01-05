@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] public InputMGR inputMGR;
     [SerializeField] public DebugMGR debugMGR;
     [SerializeField] public PointerMGR pointerMGR;
+    [SerializeField] public SelectCharacterButtonMGR[] selectCharacterButtonMGR; //4つセットする
     [SerializeField] public TimerMGR timerMGR;
     [SerializeField] public EnergyMGR energyMGR;
 
@@ -22,7 +23,11 @@ public class GameManager : MonoBehaviour
 
 
     int numOfCharacterInCombat = 4; //戦闘に参加するモンスターの種類は4種類
-    int[] IDsOfCharactersInCombat; //戦闘に酸化しているモンスターのID (numOfCharacterTypesの分だけ要素を用意する)
+    int[] idsOfCharactersInCombat; //戦闘に酸化しているモンスターのID (numOfCharacterTypesの分だけ要素を用意する)
+    public int[] IDsOfCharactersInCombat
+    {
+        get { return idsOfCharactersInCombat; }
+    } //getterのみ
     [SerializeField] AutoRouteData autoRouteData; //インスペクター上でセットする
     [SerializeField] ManualRouteData manualRouteData; //インスペクター上でセットする
     public AutoRouteData[] autoRouteDatas;
@@ -102,7 +107,7 @@ public class GameManager : MonoBehaviour
     {
         resultText = resultTextGO.GetComponent<Text>();
 
-        IDsOfCharactersInCombat = new int[numOfCharacterInCombat];
+        idsOfCharactersInCombat = new int[numOfCharacterInCombat];
 
         autoRouteDatas = new AutoRouteData[numOfCharacterInCombat];
         manualRouteDatas = new ManualRouteData[numOfCharacterInCombat];
@@ -136,7 +141,12 @@ public class GameManager : MonoBehaviour
         state = State.PlayingGame;
         selectStageCanvas.SetActive(false);
 
+        foreach(SelectCharacterButtonMGR MGR in selectCharacterButtonMGR)
+        {
+            MGR.InitiSelectCharacterButton();
+        }
         timerMGR.InitiTimer();
+        energyMGR.InitiEnergy();
 
         SetCharacterTypeIDInCombat();
 
@@ -191,7 +201,7 @@ public class GameManager : MonoBehaviour
         int characterTypeID = IDsOfCharactersInCombat[buttonNum];
 
         Vector3 displacement = new Vector3(characterDisplacement * (characterCounter%7)-3*characterDisplacement, 0.5f*(characterDisplacement * (characterCounter % 7) - 3 * characterDisplacement), 0); //キャラクターを少しずらす y方向のズレはx方向のズレの0.5倍
-        Debug.LogWarning($"displacement:{displacement}");
+        Debug.Log($"displacement:{displacement}");
 
         GameObject characterGO = Instantiate(characterPrefabs[characterTypeID], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0) + displacement, Quaternion.identity);
         CharacterMGR characterMGR = characterGO.GetComponent<CharacterMGR>();
