@@ -13,7 +13,7 @@ public class CastleMGR : Facility
 
         Debug.Log($"HP‚ª0ˆÈ‰º‚É‚È‚Á‚½‚Ì‚ÅAé‚ğ”j‰ó‚µ‚Ü‚· gridPos:{gridPos}‚Ìé");
 
-        GameManager.instance.WinTheGame();
+        GameManager.instance.StartShowingResults(true);
 
         Destroy(this.gameObject);
     }

@@ -25,6 +25,8 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 
     public void PointerDown()
     {
+        if (GameManager.instance.state != GameManager.State.PlayingGame) return;
+
         Debug.Log($"SelectCharacterButton{buttonNum}‚ª‰Ÿ‚³‚ê‚Ü‚µ‚½");
 
         if (Input.GetMouseButton(0))

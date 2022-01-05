@@ -56,6 +56,7 @@
      <Compile Include="Assets\Scripts\CharacterMGR.cs" />
      <Compile Include="Assets\Scripts\SelectCharacterButtonMGR.cs" />
      <Compile Include="Assets\Scripts\AutoRouteData.cs" />
+     <Compile Include="Assets\Scripts\CSVLoader.cs" />
      <Compile Include="Assets\Scripts\TowerMGR.cs" />
      <Compile Include="Assets\Scripts\CastleMGR.cs" />
      <Compile Include="Assets\Scripts\TimerMGR.cs" />
@@ -64,7 +65,7 @@
      <Compile Include="Assets\Scripts\MouseTrailerMGR.cs" />
      <Compile Include="Assets\Scripts\PointerTailMGR.cs" />
      <Compile Include="Assets\Scripts\SelectStageButtonMGR.cs" />
-     <Compile Include="Assets\Scripts\CSVLoader.cs" />
+     <Compile Include="Assets\Scripts\EnergyMGR.cs" />
  <Reference Include="UnityEngine">
  <HintPath>D:/Program Files/Unity/Hub/Editor/2020.3.2f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
  </Reference>

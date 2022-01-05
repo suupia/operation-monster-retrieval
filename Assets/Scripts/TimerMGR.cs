@@ -12,14 +12,13 @@ public class TimerMGR : MonoBehaviour
     [SerializeField] float timeLimit; //秒で指定する
     [SerializeField] float timer; //デバッグしやすいようにSerializeFieldにしておく
 
-    void Start()
-    {
-        InitiTimer();
-    }
 
     void Update()
     {
         if (!isActive) return;
+
+        if (GameManager.instance.state != GameManager.State.PlayingGame) return; //以下の処理はGameManagerがPlayingGameの時のみ実行される
+
 
         timer += Time.deltaTime;
         timerText.text = ConvertStringTime(timeLimit - timer);
@@ -27,11 +26,11 @@ public class TimerMGR : MonoBehaviour
         if (timer > timeLimit)
         {
             Debug.LogWarning("戦闘に負けました");
-            GameManager.instance.LoseTheGame();
+            GameManager.instance.StartShowingResults(false);
         }
     }
 
-    public void InitiTimer()
+    public void InitiTimer() //GameManagerがState.PlayingGameになったときに呼ぶ
     {
         timer = 0;
     }

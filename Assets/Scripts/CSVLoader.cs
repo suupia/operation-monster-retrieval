@@ -9,6 +9,7 @@ public class CSVLoader : MonoBehaviour
 
     List<string[]> csvDataList = new List<string[]>(); //csvをstringでそのまま読み込んだもの
 
+    //↓staticであることに注意
     public static readonly List<MonsterData> monsterDataList = new List<MonsterData>(); //csvDataListのstring型を扱いやすいようにintやfloat型にし、必要ない要素(名前とか項目名とか)を削除したもの
 
     int numOfRows; //csvの行の数
@@ -38,7 +39,7 @@ public class CSVLoader : MonoBehaviour
             //monsterDataList[i][0] = 3;
             Debug.Log($"monsterDataList[i] : {monsterDataList[i-1]}");
 
-            Debug.Log($"ID,HP,ATK,AttackInterval,AttackRange,SPD,CoolTime : {monsterDataList[i - 1].ID},{monsterDataList[i - 1].HP},{monsterDataList[i - 1].ATK},{monsterDataList[i - 1].AttackInterval},{monsterDataList[i - 1].AttackRange},{monsterDataList[i - 1].SPD},{monsterDataList[i - 1].CoolTime}");
+            Debug.Log($"ID,HP,ATK,AttackInterval,AttackRange,SPD,CoolTime,Cost : {monsterDataList[i - 1].ID},{monsterDataList[i - 1].HP},{monsterDataList[i - 1].ATK},{monsterDataList[i - 1].AttackInterval},{monsterDataList[i - 1].AttackRange},{monsterDataList[i - 1].SPD},{monsterDataList[i - 1].CoolTime},{monsterDataList[i - 1].Cost}");
 
         }
 
@@ -52,6 +53,7 @@ public class CSVLoader : MonoBehaviour
     public readonly int AttackRange;
     public readonly float SPD;
     public readonly float CoolTime;
+    public readonly int Cost;
 
    public MonsterData(string[] strings){
         ID = int.Parse(strings[1]);
@@ -61,6 +63,7 @@ public class CSVLoader : MonoBehaviour
         AttackRange = int.Parse(strings[5]);
         SPD = float.Parse(strings[6]);
         CoolTime = float.Parse(strings[7]);
+        Cost = int.Parse(strings[8]);
     }
 
 }

@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] public DebugMGR debugMGR;
     [SerializeField] public PointerMGR pointerMGR;
     [SerializeField] public TimerMGR timerMGR;
+    [SerializeField] public EnergyMGR energyMGR;
 
     [SerializeField] GameObject selectStageCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
 
@@ -135,15 +136,27 @@ public class GameManager : MonoBehaviour
         state = State.PlayingGame;
         selectStageCanvas.SetActive(false);
 
+        timerMGR.InitiTimer();
+
         SetCharacterTypeIDInCombat();
 
         mapMGR.SetupMap();
 
     }
-    public void StartShowingResults()
+    public void StartShowingResults( bool isWin)
     {
         state = State.ShowingResults;
 
+        resultTextGO.SetActive(true);
+
+        if (isWin)
+        {
+            resultText.text = "勝利";
+        }
+        else
+        {
+            resultText.text = "敗北";
+        }
     }
     public void SpawnCharacter(int buttonNum)
     {
@@ -151,13 +164,22 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
-        for (int i = 0; i < mapMGR.characterSpawnPoss.Length; i++)
+        for (int i = 0; i < mapMGR.characterSpawnPoss.Length; i++) //characterSpawnPossが1つしかないので、forループに意味はない
         {
-            if (mapMGR.GetMapValue(mapMGR.characterSpawnPoss[i]) % GameManager.instance.groundID == 0)
+
+            if (mapMGR.GetMapValue(mapMGR.characterSpawnPoss[i]) % GameManager.instance.groundID != 0)
             {
-                Debug.Log("SpawnCharacterCoroutineを実行します");
-                StartCoroutine(SpawnCharacterCoroutine(mapMGR.characterSpawnPoss[i], buttonNum));
+                Debug.Log($"{mapMGR.characterSpawnPoss[i]}のmapValueにgroundIDが含まれないため、モンスターをスポーンできません。");
+                return;
             }
+            if (energyMGR.CurrentEnergy < CSVLoader.monsterDataList[IDsOfCharactersInCombat[buttonNum]].Cost)
+            {
+                Debug.Log($"Energyが足りないためモンスターをスポーンできません。（energyMGR.CurrentEnergy :{energyMGR.CurrentEnergy},Cost:{CSVLoader.monsterDataList[IDsOfCharactersInCombat[buttonNum]].Cost}）");
+                return;
+            }
+
+            Debug.Log("SpawnCharacterCoroutineを実行します");
+            StartCoroutine(SpawnCharacterCoroutine(mapMGR.characterSpawnPoss[i], buttonNum));
 
         }
     }
@@ -173,6 +195,9 @@ public class GameManager : MonoBehaviour
 
         GameObject characterGO = Instantiate(characterPrefabs[characterTypeID], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0) + displacement, Quaternion.identity);
         CharacterMGR characterMGR = characterGO.GetComponent<CharacterMGR>();
+
+        //スポーンでCostを消費する
+        energyMGR.CurrentEnergy -= CSVLoader.monsterDataList[characterTypeID].Cost;
 
         //キャラクターのデータをここで渡す
         characterMGR.SetCharacterData(buttonNum,characterTypeID);
@@ -307,18 +332,6 @@ public class GameManager : MonoBehaviour
         return atk; //とりあえず今は攻撃力をそのまま返すだけ
     }
 
-    public void WinTheGame()
-    {
-        timerMGR.StopTimer();
-        resultTextGO.SetActive(true);
-        resultText.text = "勝利";
-    }
 
-    public void LoseTheGame()
-    {
-        timerMGR.StopTimer();
-        resultTextGO.SetActive(true);
-        resultText.text = "敗北";
-    }
 
 }
