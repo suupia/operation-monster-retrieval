@@ -10,6 +10,8 @@ public class EnergyMGR : MonoBehaviour
     [SerializeField] Image energyLevelUpImage;
     [SerializeField] Text energyLevelUpText;
 
+    [SerializeField] Image ImageToChangeColor;
+
     bool isActive = true;
 
     float energyGain; //1秒あたりのエネルギー獲得量
@@ -22,8 +24,9 @@ public class EnergyMGR : MonoBehaviour
     [SerializeField] int level; //デバッグしやすいようにSerializeFieldにしておく
     [SerializeField] float[] energyRequiredArray;
 
-    Color canLevelUpColor = Color.white;
-    Color canNotLevelUpColor = Color.gray;
+    Color canLevelUpColor = Color.clear;//透明
+    Color canNotLevelUpColor = new Color(0, 0, 0, 0.3f); //不当明度がある灰色
+
 
     //プロパティ
     public float CurrentEnergy
@@ -69,11 +72,11 @@ public class EnergyMGR : MonoBehaviour
 
         if (GameManager.instance.energyMGR.CurrentEnergy >= energyRequiredArray[LEVEL])
         {
-            energyLevelUpImage.color = canLevelUpColor;
+            ImageToChangeColor.color = canLevelUpColor;
         }
         else
         {
-            energyLevelUpImage.color = canNotLevelUpColor;
+            ImageToChangeColor.color = canNotLevelUpColor;
         }
 
         CurrentEnergy += energyGain * Time.deltaTime;

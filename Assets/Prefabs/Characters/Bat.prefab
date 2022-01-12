@@ -130,4 +130,5 @@ MonoBehaviour:
   attackInterval: 1
   attackRange: 1
   spd: 3.5
-  coolTime: 0
+  coolTime: 1
+  cost: 100

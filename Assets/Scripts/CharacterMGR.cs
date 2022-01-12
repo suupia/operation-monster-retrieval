@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class CharacterMGR : MonoBehaviour
 {
     Animator animator;
@@ -44,6 +43,7 @@ public class CharacterMGR : MonoBehaviour
     [SerializeField] float spd; //1秒間に進むマスの数 [マス/s]  とりあえず１にしておく
     float moveTime; // movetime = 1/spd [s]
     [SerializeField] float coolTime;
+    [SerializeField] int cost;
 
     bool isMarching = false;
     bool isAttacking = false;
@@ -56,7 +56,7 @@ public class CharacterMGR : MonoBehaviour
     List<Vector2Int> routeList;
     List<int> nonDiagonalPoints;
 
-    int moveAlongWithCounter=0;
+    int moveAlongWithCounter = 0;
 
     State _state;
     private State state
@@ -162,19 +162,27 @@ public class CharacterMGR : MonoBehaviour
     {
         return GameManager.instance.ToWorldPosition(gridPos);
     }
-
+    //Getter
+    public float GetCoolTime()
+    {
+        return coolTime;
+    }
+    public int GetCost()
+    {
+        return cost;
+    }
     //Setter
-    public void SetCharacterData(int buttonNum,int characterTypeID)  //hpやatkなどの情報もここでセットする。
+    public void SetCharacterData(int buttonNum, int characterTypeID)  //hpやatkなどの情報もここでセットする。
     {
         autoRoute = GameManager.instance.autoRouteDatas[buttonNum];
         manualRoute = GameManager.instance.manualRouteDatas[buttonNum];
 
-        maxHp = CSVLoader.monsterDataList[characterTypeID].HP;
-        atk = CSVLoader.monsterDataList[characterTypeID].ATK;
-        attackInterval = CSVLoader.monsterDataList[characterTypeID].AttackInterval;
-        attackRange = CSVLoader.monsterDataList[characterTypeID].AttackRange;
-        spd = CSVLoader.monsterDataList[characterTypeID].SPD;
-        coolTime = CSVLoader.monsterDataList[characterTypeID].CoolTime;
+        //maxHp = CSVLoader.monsterDataList[characterTypeID].HP;
+        //atk = CSVLoader.monsterDataList[characterTypeID].ATK;
+        //attackInterval = CSVLoader.monsterDataList[characterTypeID].AttackInterval;
+        //attackRange = CSVLoader.monsterDataList[characterTypeID].AttackRange;
+        //spd = CSVLoader.monsterDataList[characterTypeID].SPD;
+        //coolTime = CSVLoader.monsterDataList[characterTypeID].CoolTime;
 
     }
     public void SetDirection(Vector2 directionVector)
@@ -394,7 +402,7 @@ public class CharacterMGR : MonoBehaviour
 
         //スクリプトの移動
         GameManager.instance.mapMGR.GetMap().RemoveCharacterMGR(gridPos, this);
-        GameManager.instance.mapMGR.GetMap().AddCharacterMGR(gridPos+directionVector, this.gameObject.GetComponent<CharacterMGR>());
+        GameManager.instance.mapMGR.GetMap().AddCharacterMGR(gridPos + directionVector, this.gameObject.GetComponent<CharacterMGR>());
 
 
 
@@ -407,7 +415,7 @@ public class CharacterMGR : MonoBehaviour
         Debug.Log("SetAutoRouteを実行します");
         routeList = autoRoute.SearchShortestRoute(gridPos, targetCastlePos); //参照渡し
         nonDiagonalPoints = new List<int>(); //Autoのときは使わないと思うが、Manualと揃えるためにnewしておく
-        Debug.Log("routeList:"+string.Join(",",routeList));
+        Debug.Log("routeList:" + string.Join(",", routeList));
     }
 
     public void SetManualRoute()
@@ -443,7 +451,7 @@ public class CharacterMGR : MonoBehaviour
         //    return;
         //}
 
-        if (GameManager.instance. CanAttackTarget(gridPos,attackRange,GameManager.instance.facilityID,out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワーがあるとき
+        if (GameManager.instance.CanAttackTarget(gridPos, attackRange, GameManager.instance.facilityID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワーがあるとき
         {
             Debug.LogWarning($"攻撃範囲内にタワーがあるのでInBatteleに切り替えます targetFacilityPos:{targetFacilityPos}");
             SetDirection(targetFacilityPos - gridPos);
@@ -456,7 +464,7 @@ public class CharacterMGR : MonoBehaviour
         if (moveAlongWithCounter < routeList.Count - 2 && !nonDiagonalPoints.Contains(moveAlongWithCounter))  //↓斜め移動できるときはそうする。
         {
             nextNextPos = routeList[moveAlongWithCounter + 2];
-            if (((nextPos-gridPos).x == 0 && (nextNextPos-nextPos).y == 0) || ((nextPos-gridPos).y == 0 && (nextNextPos-nextPos).x == 0)) //nextPosが角マスのときtrue
+            if (((nextPos - gridPos).x == 0 && (nextNextPos - nextPos).y == 0) || ((nextPos - gridPos).y == 0 && (nextNextPos - nextPos).x == 0)) //nextPosが角マスのときtrue
             {
                 if (CanMove(nextNextPos - gridPos))
                 {
@@ -499,7 +507,8 @@ public class CharacterMGR : MonoBehaviour
     {
         Debug.Log($"Attackを実行します");
 
-        if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) == null) { //towerMGRがないということはタワーを破壊したということなので、Marchingに切り替える
+        if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) == null)
+        { //towerMGRがないということはタワーを破壊したということなので、Marchingに切り替える
             Debug.LogWarning($"タワーを破壊したのでMarchingに切り替えます targetFacilityPos:{targetFacilityPos}");
             state = State.Marching;
             return;
@@ -515,7 +524,7 @@ public class CharacterMGR : MonoBehaviour
         int damage;
 
         Debug.Log($"AttackCoroutineを実行します");
-         
+
         isAttacking = true;
 
         damage = CalcDamage(atk);
@@ -524,7 +533,8 @@ public class CharacterMGR : MonoBehaviour
         targetFacility.HP -= damage;
         DrawDamage(damage);
 
-        while(timer < attackInterval){
+        while (timer < attackInterval)
+        {
             timer += Time.deltaTime;
             yield return null;
         }
@@ -553,12 +563,11 @@ public class CharacterMGR : MonoBehaviour
         Debug.Log($"HPが0以下になったので、キャラクターを消去します gridPos:{gridPos}のキャラクター");
 
         GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos, GameManager.instance.characterID); //数値データをを消去する
-        GameManager.instance.mapMGR.GetMap().RemoveCharacterMGR(gridPos,this);
+        GameManager.instance.mapMGR.GetMap().RemoveCharacterMGR(gridPos, this);
         //GameManager.instance.mapMGR.GetMap().SetCharacterMGR(gridPos,null); //スクリプトをを消去する
 
-        
+
         Destroy(this.gameObject);
     }
 }
-
 

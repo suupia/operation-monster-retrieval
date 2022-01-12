@@ -122,7 +122,7 @@ MonoBehaviour:
   targetFacility: {fileID: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
   heightToDisplayDamage: 0.6
-  characterTypeID: 0
+  characterTypeID: 1
   level: 0
   maxHp: 6
   hp: 0
@@ -130,4 +130,5 @@ MonoBehaviour:
   attackInterval: 1.5
   attackRange: 1
   spd: 8
-  coolTime: 0
+  coolTime: 1.5
+  cost: 200

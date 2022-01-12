@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
 
 
     int numOfCharacterInCombat = 4; //戦闘に参加するモンスターの種類は4種類
-    int[] idsOfCharactersInCombat; //戦闘に酸化しているモンスターのID (numOfCharacterTypesの分だけ要素を用意する)
+    int[] idsOfCharactersInCombat; //戦闘に参加しているモンスターのID (numOfCharacterTypesの分だけ要素を用意する)
     public int[] IDsOfCharactersInCombat
     {
         get { return idsOfCharactersInCombat; }
@@ -39,14 +39,15 @@ public class GameManager : MonoBehaviour
     public readonly int facilityID = 5;
     public readonly int characterID = 11;
 
-    public GameObject[] characterPrefabs; //配列にしているのは仮。実際にはデータベースから情報を読み取ってインスタンス化するからプレハブは一つでよい
+    public GameObject[] characterPrefabs; //配列にしているのは仮。実際にはデータベースから情報を読み取ってインスタンス化するからプレハブは一つでよい と思ったがこれがデータベースになる
+    CharacterMGR[] characterDatabase; //上のchraracterPrefabsをCharacter型に直したもの。データベースとして使う。
 
     int characterCounter =0; //キャラクターが何体スポーンしたかを数える
     float characterDisplacement= 0.03f; //キャラクターがスポーンしたときにどれくらいズレるかを決める(10回で一周するようにする)
 
     public CharacterMGR.Mode[] characterMode; //キャラクターの種類ごとの操作モードを格納する
 
-    bool isSpawnCharacter = false;
+    bool[] isSpawnCharacterArray; //コルーチン用
 
     [SerializeField] State _state; //デバッグしやすいようにSerializeFieldにしておく
     public State state
@@ -80,7 +81,11 @@ public class GameManager : MonoBehaviour
     {
         return ToWorldPosition(gridPosition.x, gridPosition.y);
     }
-
+    //Getter
+    public CharacterMGR GetCharacterMGRFromButtonNum(int buttonNum)
+    {
+        return characterDatabase[IDsOfCharactersInCombat[buttonNum]];
+    }
     //Setter
     public void SetCharacterMode(int characterTypeNum,CharacterMGR.Mode mode)
     {
@@ -109,8 +114,20 @@ public class GameManager : MonoBehaviour
 
         idsOfCharactersInCombat = new int[numOfCharacterInCombat];
 
+        isSpawnCharacterArray = new bool[numOfCharacterInCombat];
+        for (int i =0;i< isSpawnCharacterArray.Length;i++)
+        {
+            isSpawnCharacterArray[i] = false;
+        }
+
         autoRouteDatas = new AutoRouteData[numOfCharacterInCombat];
         manualRouteDatas = new ManualRouteData[numOfCharacterInCombat];
+
+        characterDatabase = new CharacterMGR[characterPrefabs.Length];
+        for(int i=0; i < characterPrefabs.Length; i++)
+        {
+            characterDatabase[i] = characterPrefabs[i].GetComponent<CharacterMGR>();
+        }
 
         characterMode = new CharacterMGR.Mode[numOfCharacterInCombat];
         for(int i = 0; i<characterMode.Length; i++)
@@ -170,7 +187,7 @@ public class GameManager : MonoBehaviour
     }
     public void SpawnCharacter(int buttonNum)
     {
-        if (isSpawnCharacter)
+        if (isSpawnCharacterArray[buttonNum])
         {
             return;
         }
@@ -182,9 +199,9 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"{mapMGR.characterSpawnPoss[i]}のmapValueにgroundIDが含まれないため、モンスターをスポーンできません。");
                 return;
             }
-            if (energyMGR.CurrentEnergy < CSVLoader.monsterDataList[IDsOfCharactersInCombat[buttonNum]].Cost)
+            if (energyMGR.CurrentEnergy < characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCost())
             {
-                Debug.Log($"Energyが足りないためモンスターをスポーンできません。（energyMGR.CurrentEnergy :{energyMGR.CurrentEnergy},Cost:{CSVLoader.monsterDataList[IDsOfCharactersInCombat[buttonNum]].Cost}）");
+                Debug.Log($"Energyが足りないためモンスターをスポーンできません。（energyMGR.CurrentEnergy :{energyMGR.CurrentEnergy},Cost:{characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCost()}）");
                 return;
             }
 
@@ -196,7 +213,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator SpawnCharacterCoroutine(Vector2Int vector, int buttonNum)
     {
-        isSpawnCharacter = true;
+        isSpawnCharacterArray[buttonNum] = true;
 
         int characterTypeID = IDsOfCharactersInCombat[buttonNum];
 
@@ -207,7 +224,7 @@ public class GameManager : MonoBehaviour
         CharacterMGR characterMGR = characterGO.GetComponent<CharacterMGR>();
 
         //スポーンでCostを消費する
-        energyMGR.CurrentEnergy -= CSVLoader.monsterDataList[characterTypeID].Cost;
+        energyMGR.CurrentEnergy -= characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCost();
 
         //キャラクターのデータをここで渡す
         characterMGR.SetCharacterData(buttonNum,characterTypeID);
@@ -220,9 +237,17 @@ public class GameManager : MonoBehaviour
         //キャラクターのモードを決める
         characterMGR.SetMode(characterMode[buttonNum]);
 
-        yield return new WaitForSeconds(1f); //クールタイムは適当
+        //yield return new WaitForSeconds(1f); //クールタイムは適当
 
-        isSpawnCharacter = false;
+        float time = 0;
+        while(time < characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCoolTime())
+        {
+            time += Time.deltaTime;
+            selectCharacterButtonMGR[buttonNum].RefreshGauge(time / characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCoolTime());
+            yield return null;
+        }
+
+        isSpawnCharacterArray[buttonNum] = false;
     }
     int ToCharacterTypeID(int buttonNum)
     {
@@ -232,12 +257,18 @@ public class GameManager : MonoBehaviour
     void SetCharacterTypeIDInCombat()
     {
         //とりあえず適当に出撃するモンスターを決めておく
-        for(int i = 0;i<numOfCharacterInCombat; i++)
-        {
-            IDsOfCharactersInCombat[i] = i;
+        //for(int i = 0;i<numOfCharacterInCombat; i++)
+        //{
+        //    IDsOfCharactersInCombat[i] = i;
 
-        }
+        //}
+        IDsOfCharactersInCombat[0] = 1;
+        IDsOfCharactersInCombat[1] = 2;
+        IDsOfCharactersInCombat[2] = 3;
+        IDsOfCharactersInCombat[3] = 4;
+
     }
+
     public int[,] CalcSearchRangeArray(int advancingDistance, int lookingForValue, int notLookingForValue, int centerValue) //マス目に置ける円形の索敵範囲を計算して、2次元配列で返す
     {
         int t = lookingForValue; //索敵範囲
