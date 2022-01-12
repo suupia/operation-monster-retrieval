@@ -18,6 +18,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
     CharacterMGR.Mode mode = CharacterMGR.Mode.Auto; //デフォルトはAutoMode
 
     //以下、ManualRoute用の変数
+   [SerializeField] bool isEditingManualRoute;
     Color selectedColor = Color.cyan;
     Color notSelectedColor = Color.white;
 
@@ -31,23 +32,40 @@ public class SelectCharacterButtonMGR : MonoBehaviour
     {
         modeSwitchButtonText.text = "Auto Mode"; //デフォルトはAutoMode
 
+        isEditingManualRoute = false;
+
         emptyGauge.color = Color.clear;
         filledGauge.color = Color.clear;
     }
     void Update()
     {
-        if(GameManager.instance.energyMGR.CurrentEnergy >=  GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetCost())
+
+        if (GameManager.instance.energyMGR.CurrentEnergy >= GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetCost())
         {
-            buttonImage.color = canSpawnCharacterColor;
-            //modeSwitchButtonImage.color = canSpawnCharacterColor;
+            if (isEditingManualRoute)
+            {
+                buttonImage.color = canSpawnCharacterColor * selectedColor; //乗算で処理する
+
+            }
+            else
+            {
+                buttonImage.color = canSpawnCharacterColor * notSelectedColor;
+
+            }
         }
         else
         {
-            buttonImage.color = canNotSpawnCharacterColor;
-            //modeSwitchButtonImage.color = canNotSpawnCharacterColor;
+            if (isEditingManualRoute)
+            {
+                buttonImage.color = canNotSpawnCharacterColor * selectedColor;
 
+            }
+            else
+            {
+                buttonImage.color = canNotSpawnCharacterColor * notSelectedColor;
+
+            }
         }
-
     }
     public void PointerDown() //EventTriggerで呼ぶ
     {
@@ -61,12 +79,15 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         }
         else if (Input.GetMouseButton(1))
         {
-            if (buttonImage.color != selectedColor) //このbuttonが選択されていない状態で、このbuttonがクリックされたとき
+            if (!isEditingManualRoute) //このbuttonが選択されていない状態で、このbuttonがクリックされたとき
             {
+                Debug.LogWarning("SetToSelectedColorを実行します");
                 SetToSelectedColor();
             }
             else //このbuttonが選択されている状態で、このbuttonがクリックされたとき
             {
+                Debug.LogWarning("ResetToNormalColorを実行します");
+
                 ResetToNormalColor();
                 GameManager.instance.inputMGR.SetManualRouteNumber(-1);
             }
@@ -98,7 +119,9 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         {
             GameManager.instance.inputMGR.GetSelectedButtonMGR().ResetToNormalColor(); //そのbuttonの色を戻す
         }
+        isEditingManualRoute = true;
         buttonImage.color = selectedColor;
+        Debug.LogWarning($"buttonImage.colorを{selectedColor}に変更しました");
         GameManager.instance.inputMGR.SetManualRouteNumber(buttonNum);
         GameManager.instance.inputMGR.SetSelectedButtonMGR(this);
         Debug.LogWarning($"ManualRouteを選択するキャラクターを決定しました number={GameManager.instance.inputMGR.GetManualRouteNumber()}");
@@ -106,6 +129,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 
     public void ResetToNormalColor()
     {
+        isEditingManualRoute = false;
         buttonImage.color = notSelectedColor;
         Debug.LogWarning($"ManualRouteのキャラクタ―選択を解除しました number={GameManager.instance.inputMGR.GetManualRouteNumber()}");
     }
