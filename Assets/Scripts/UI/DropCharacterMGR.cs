@@ -10,5 +10,7 @@ public class DropCharacterMGR : MonoBehaviour
     {
         Debug.LogWarning($"{dropNum}‚Éƒhƒƒbƒv‚³‚ê‚Ü‚µ‚½");
 
+        GameManager.instance.DropCharacterData(dropNum);
+
     }
 }

@@ -8,5 +8,7 @@ public class DragCharacterMGR : MonoBehaviour
     public void DragCharacter() //Event Trigger‚ÅŒÄ‚Ô
     {
         Debug.LogWarning($"{dragNum}‚ªƒhƒ‰ƒbƒO‚³‚ê‚Ü‚µ‚½");
+
+        GameManager.instance.DragCharacterData(dragNum);
     }
 }

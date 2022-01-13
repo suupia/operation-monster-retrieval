@@ -16,7 +16,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] public TimerMGR timerMGR;
     [SerializeField] public EnergyMGR energyMGR;
 
-    [SerializeField] GameObject selectStageCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
+    [SerializeField] public GameObject selectStageCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
+    [SerializeField] public GameObject menuCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
 
     [SerializeField] GameObject resultTextGO; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
     Text resultText;
@@ -41,6 +42,8 @@ public class GameManager : MonoBehaviour
 
     public GameObject[] characterPrefabs; //配列にしているのは仮。実際にはデータベースから情報を読み取ってインスタンス化するからプレハブは一つでよい と思ったがこれがデータベースになる
     CharacterMGR[] characterDatabase; //上のchraracterPrefabsをCharacter型に直したもの。データベースとして使う。
+
+    int dragNum; //ドラッグした番号を保持しておくために必要
 
     int characterCounter =0; //キャラクターが何体スポーンしたかを数える
     float characterDisplacement= 0.03f; //キャラクターがスポーンしたときにどれくらいズレるかを決める(10回で一周するようにする)
@@ -165,7 +168,7 @@ public class GameManager : MonoBehaviour
         timerMGR.InitiTimer();
         energyMGR.InitiEnergy();
 
-        SetCharacterTypeIDInCombat();
+        //SetCharacterTypeIDInCombat();
 
         mapMGR.SetupMap();
 
@@ -267,6 +270,17 @@ public class GameManager : MonoBehaviour
         IDsOfCharactersInCombat[2] = 3;
         IDsOfCharactersInCombat[3] = 4;
 
+    }
+
+    public void DragCharacterData(int dragNum)
+    {
+        this.dragNum = dragNum;
+    }
+
+    public void DropCharacterData(int dropNum)
+    {
+        IDsOfCharactersInCombat[dropNum] = dragNum;
+        Debug.LogWarning($"IDsOfCharactersInCombat[{dropNum}]:{IDsOfCharactersInCombat[dropNum] }");
     }
 
     public int[,] CalcSearchRangeArray(int advancingDistance, int lookingForValue, int notLookingForValue, int centerValue) //マス目に置ける円形の索敵範囲を計算して、2次元配列で返す

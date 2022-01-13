@@ -62,6 +62,7 @@
     <Compile Include="Assets\Scripts\Facility.cs" />
     <Compile Include="Assets\Scripts\ManualRouteData.cs" />
     <Compile Include="Assets\Scripts\DebugMGR.cs" />
+    <Compile Include="Assets\Scripts\UI\DropCharacterMGR.cs" />
     <Compile Include="Assets\Scripts\CharacterMGR.cs" />
     <Compile Include="Assets\Scripts\UI\SelectCharacterButtonMGR.cs" />
     <Compile Include="Assets\Scripts\AutoRouteData.cs" />
@@ -74,9 +75,10 @@
     <Compile Include="Assets\Scripts\MouseTrailerMGR.cs" />
     <Compile Include="Assets\Scripts\PointerTailMGR.cs" />
     <Compile Include="Assets\Scripts\UI\SelectStageButtonMGR.cs" />
-    <Compile Include="Assets\Scripts\UI\DragCharacterMGR.cs" />
-    <Compile Include="Assets\Scripts\UI\DropCharacterMGR.cs" />
     <Compile Include="Assets\Scripts\CharacterDatabase.cs" />
+    <Compile Include="Assets\Scripts\UI\DragCharacterMGR.cs" />
+    <Compile Include="Assets\Scripts\UI\OpenMenuButton.cs" />
+    <Compile Include="Assets\Scripts\UI\OpenSelectStageButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
