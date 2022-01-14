@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] public GameObject selectStageCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
     [SerializeField] public GameObject menuCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
+    [SerializeField] public StatusCanvasMGR statusCanvasMGR;
 
     [SerializeField] GameObject resultTextGO; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
     Text resultText;
@@ -40,7 +41,7 @@ public class GameManager : MonoBehaviour
     public readonly int facilityID = 5;
     public readonly int characterID = 11;
 
-    public GameObject[] characterPrefabs; //配列にしているのは仮。実際にはデータベースから情報を読み取ってインスタンス化するからプレハブは一つでよい と思ったがこれがデータベースになる
+    public GameObject[] characterPrefabs; 
     CharacterMGR[] characterDatabase; //上のchraracterPrefabsをCharacter型に直したもの。データベースとして使う。
 
     int dragNum; //ドラッグした番号を保持しておくために必要
@@ -85,6 +86,10 @@ public class GameManager : MonoBehaviour
         return ToWorldPosition(gridPosition.x, gridPosition.y);
     }
     //Getter
+    public CharacterMGR GetCharacterDatabase(int characterID)
+    {
+        return characterDatabase[characterID];
+    }
     public CharacterMGR GetCharacterMGRFromButtonNum(int buttonNum)
     {
         return characterDatabase[IDsOfCharactersInCombat[buttonNum]];

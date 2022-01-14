@@ -11,4 +11,9 @@ public class DragCharacterMGR : MonoBehaviour
 
         GameManager.instance.DragCharacterData(dragNum);
     }
+
+    public void PointerDownCharacterInReserve()
+    {
+        GameManager.instance.statusCanvasMGR.UpdateStatusCanvasInReserve(dragNum);
+    }
 }

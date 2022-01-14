@@ -79,6 +79,7 @@
     <Compile Include="Assets\Scripts\UI\DragCharacterMGR.cs" />
     <Compile Include="Assets\Scripts\UI\OpenMenuButton.cs" />
     <Compile Include="Assets\Scripts\UI\OpenSelectStageButton.cs" />
+    <Compile Include="Assets\Scripts\UI\StatusCanvasMGR.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

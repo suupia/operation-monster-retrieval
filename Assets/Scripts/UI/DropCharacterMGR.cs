@@ -13,4 +13,9 @@ public class DropCharacterMGR : MonoBehaviour
         GameManager.instance.DropCharacterData(dropNum);
 
     }
+
+    public void PointerDownCharacterInCombat()
+    {
+        GameManager.instance.statusCanvasMGR.UpdateStatusCanvasInCombat(dropNum);
+    }
 }

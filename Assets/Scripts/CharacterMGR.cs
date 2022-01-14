@@ -17,9 +17,9 @@ public class CharacterMGR : MonoBehaviour
 
     GameObject damageTextParent; //Findで取得する
     [SerializeField] GameObject damageTextPrefab; //インスペクター上でセットする
-    [SerializeField] float heightToDisplayDamage; //ダメージテキストをどのくらい高く表示するかを決める
+    float heightToDisplayDamage = 0.6f; //ダメージテキストをどのくらい高く表示するかを決める
 
-
+    [SerializeField] string characterName;
     [SerializeField] int characterTypeID;
     [SerializeField] int level;
     [SerializeField] int maxHp;
@@ -163,6 +163,39 @@ public class CharacterMGR : MonoBehaviour
         return GameManager.instance.ToWorldPosition(gridPos);
     }
     //Getter
+    public string GetCharacterName()
+    {
+        return characterName;
+    }
+    public int GetCharacterTypeID()
+    {
+        return characterTypeID;
+    }
+    public int GetLevel()
+    {
+        return level;
+    }
+    public int GetMaxHp()
+    {
+        return maxHp;
+    }
+    public int GetAtk()
+    {
+        return atk;
+    }
+    public float GetAttackInterval()
+    {
+        return attackInterval;
+    }
+    public int GetAttackRange()
+    {
+        return attackRange;
+    }
+    public float GetSpd()
+    {
+        return spd;
+    }
+
     public float GetCoolTime()
     {
         return coolTime;

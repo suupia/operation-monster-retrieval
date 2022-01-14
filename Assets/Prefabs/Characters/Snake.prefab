@@ -121,7 +121,7 @@ MonoBehaviour:
   directionVectorToTarget: {x: 0, y: 0}
   targetFacility: {fileID: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
-  heightToDisplayDamage: 0.6
+  characterName: Snake
   characterTypeID: 3
   level: 0
   maxHp: 6
