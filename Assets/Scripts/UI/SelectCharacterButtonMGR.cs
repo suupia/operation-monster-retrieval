@@ -10,6 +10,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
     [SerializeField] Image buttonImage; //インスペクター上でセットする
     [SerializeField] Image modeSwitchButtonImage;
     [SerializeField] Text modeSwitchButtonText;
+    [SerializeField] Text costText;
 
     Color canSpawnCharacterColor = Color.white;
     Color canNotSpawnCharacterColor = Color.gray;
@@ -30,12 +31,14 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 
     public void InitiSelectCharacterButton() //GameManagerがState.PlayingGameになったときに呼ぶ
     {
-        modeSwitchButtonText.text = "Auto Mode"; //デフォルトはAutoMode
+        modeSwitchButtonText.text = "Auto"; //デフォルトはAutoMode
 
         isEditingManualRoute = false;
 
         emptyGauge.color = Color.clear;
         filledGauge.color = Color.clear;
+
+        costText.text = GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[buttonNum]).GetCost() + "ene";
     }
     void Update()
     {
@@ -101,12 +104,12 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         {
             case CharacterMGR.Mode.Auto:
                 mode = CharacterMGR.Mode.Manual;
-                modeSwitchButtonText.text = "Manual Mode";
+                modeSwitchButtonText.text = "Manual";
                 GameManager.instance.SetCharacterMode(buttonNum, CharacterMGR.Mode.Manual);
                 break;
             case CharacterMGR.Mode.Manual:
                 mode = CharacterMGR.Mode.Auto;
-                modeSwitchButtonText.text = "Auto Mode";
+                modeSwitchButtonText.text = "Auto";
                 GameManager.instance.SetCharacterMode(buttonNum, CharacterMGR.Mode.Auto);
                 break;
         }
