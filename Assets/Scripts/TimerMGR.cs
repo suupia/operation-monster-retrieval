@@ -20,7 +20,7 @@ public class TimerMGR : MonoBehaviour
     {
         if (!isActive) return;
 
-        if (GameManager.instance.state != GameManager.State.PlayingGame) return; //ˆÈ‰º‚Ìˆ—‚ÍGameManager‚ªPlayingGame‚Ì‚Ì‚İÀs‚³‚ê‚é
+        if (GameManager.instance.state != GameManager.State.RunningGame) return; //ˆÈ‰º‚Ìˆ—‚ÍGameManager‚ªPlayingGame‚Ì‚Ì‚İÀs‚³‚ê‚é
 
 
         timer += Time.deltaTime;

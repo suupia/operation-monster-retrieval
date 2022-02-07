@@ -13,7 +13,7 @@ m_ProjectFiles:
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 637777202163377319
+      ticks: 637798148444661987
     m_Hash: 3394294237
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
@@ -3435,6 +3435,7 @@ m_PackageAssets:
         - 4.0.1
         - 4.0.2
         - 4.0.3
+        - 4.0.4
         - 5.0.0-pre.1
         - 5.0.0-pre.2
         - 5.0.0
@@ -3443,11 +3444,14 @@ m_PackageAssets:
         - 6.0.0-pre.4
         - 6.0.0
         - 6.0.1
+        - 6.0.2
         - 7.0.0-pre.3
+        - 7.0.0-pre.4
         compatible:
         - 4.0.2
         - 4.0.3
-        verified: 4.0.3
+        - 4.0.4
+        verified: 4.0.4
       dependencies:
       - name: com.unity.2d.sprite
         version: 1.0.0

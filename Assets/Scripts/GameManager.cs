@@ -66,7 +66,9 @@ public class GameManager : MonoBehaviour
     public enum State
     {
         SelectingStage,
-        PlayingGame,
+        SetupGame,
+        MakeTheFirstRoad,
+        RunningGame,
         ShowingResults
     }
 
@@ -161,9 +163,10 @@ public class GameManager : MonoBehaviour
         selectStageCanvas.SetActive(true);
         //次のPlayingGameに備えて前の戦闘のデータをここでリセットする（今は特に書くことはない）
     }
-    public  void StartPlayingGame()
+
+    public  void SetupGame()
     {
-        state = State.PlayingGame;
+        state = State.SetupGame;
         selectStageCanvas.SetActive(false);
 
         foreach(SelectCharacterButtonMGR MGR in selectCharacterButtonMGR)
@@ -177,6 +180,18 @@ public class GameManager : MonoBehaviour
 
         mapMGR.SetupMap();
 
+        MakeTheFirstRoad();
+
+    }
+    public void MakeTheFirstRoad()
+    {
+        state = State.MakeTheFirstRoad;
+        mapMGR.makeTheFirstRoadGO.SetActive(true);
+    }
+    public void RunningGame()
+    {
+        state = State.RunningGame;
+        mapMGR.makeTheFirstRoadGO.SetActive(false);
     }
     public void StartShowingResults( bool isWin)
     {
@@ -322,7 +337,7 @@ public class GameManager : MonoBehaviour
         return resultArray;
     }
 
-    public bool CanAttackTarget(Vector2Int gridPos, int attackRange,int targetID,out Vector2Int targetPos) //最も近い攻撃対象がの座標を返す（存在しないときはVector2Int.zeroを返す）
+    public bool CanAttackTarget(Vector2Int gridPos, int attackRange,int targetID,out Vector2Int targetPos) //最も近い攻撃対象がの座標を返す （//存在しないときはVector2Int.zeroを返す）
     {
         int lookingForValue = 1; //索敵範囲の値
         int notLookingForValue = 0; //索敵範囲外の値

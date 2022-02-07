@@ -22,7 +22,7 @@ public class SelectStageButtonMGR : MonoBehaviour
 
 
         GameManager.instance.mapMGR.SetStageNum(buttonNum);
-        GameManager.instance.StartPlayingGame();
+        GameManager.instance.SetupGame();
     }
 
 

@@ -68,7 +68,7 @@ public class EnergyMGR : MonoBehaviour
     {
         if (!isActive) return;
 
-        if (GameManager.instance.state != GameManager.State.PlayingGame) return; //以下の処理はGameManagerがPlayingGameの時のみ実行される
+        if (GameManager.instance.state != GameManager.State.RunningGame) return; //以下の処理はGameManagerがPlayingGameの時のみ実行される
 
         if (GameManager.instance.energyMGR.CurrentEnergy >= energyRequiredArray[LEVEL])
         {
@@ -96,7 +96,7 @@ public class EnergyMGR : MonoBehaviour
 
     public void LevelUpEnergy() //EventTriggerで呼ぶ
     {
-        if (GameManager.instance.state != GameManager.State.PlayingGame) return; //以下の処理はGameManagerがPlayingGameの時のみ実行される
+        if (GameManager.instance.state != GameManager.State.SetupGame) return; //以下の処理はGameManagerがPlayingGameの時のみ実行される
 
         if (CurrentEnergy < energyRequiredArray[LEVEL]) return; //Energyが足りないとレベルアップできない
 

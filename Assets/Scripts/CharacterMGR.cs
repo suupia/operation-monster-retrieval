@@ -29,6 +29,11 @@ public class CharacterMGR : MonoBehaviour
         get { return hp; }
         set
         {
+            if(value - hp < 0)
+            {
+                Debug.LogWarning("SetDamagedAnimationを呼びます");
+                SetDamageAnimation();
+            }
             hp = value;
             if (hp <= 0)
             {
@@ -290,7 +295,45 @@ public class CharacterMGR : MonoBehaviour
             animator.SetInteger("Vertical", 0);
         }
     }
+    public void SetDamageAnimation()
+    {
+        switch (direction)
+        {
+            case Direction.Back:
+                Debug.LogWarning($"{direction}のdamageアニメーションを設定します");
+                animator.SetTrigger("BackDamage");
+                break;
 
+            case Direction.DiagLeftBack:
+            case Direction.DiagRightBack:
+                Debug.LogWarning($"{direction}のdamageアニメーションを設定します");
+
+                animator.SetTrigger("DiagonalBackDamage");
+                break;
+
+            case Direction.Left:
+            case Direction.Right:
+                Debug.LogWarning($"{direction}のdamageアニメーションを設定します");
+
+                animator.SetTrigger("SideDamage");
+                break;
+
+            case Direction.DiagLeftFront:
+            case Direction.DiagRightFront:
+                Debug.LogWarning($"{direction}のdamageアニメーションを設定します");
+
+                animator.SetTrigger("DiagonalFrontDamage");
+                break;
+
+            case Direction.Front:
+                Debug.LogWarning($"{direction}のdamageアニメーションを設定します");
+
+                animator.SetTrigger("FrontDamage");
+                break;
+
+        }
+
+    }
     public void SetMode(Mode mode)
     {
         switch (mode)

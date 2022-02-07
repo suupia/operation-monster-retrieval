@@ -41,7 +41,7 @@ public class AutoRouteData
     {
         if (IsOutOfRange(x, y))
         {
-            Debug.LogError($"領域外の値を取得しようとしました(x,y)=({x},{y})");
+            Debug.LogError($"領域外の値を取得しようとしました (x,y):({x},{y})");
             return _errorValue;
         }
         if (IsOnTheEdge(x, y))
@@ -59,7 +59,7 @@ public class AutoRouteData
     {
         if (index < 0 || index > _values.Length)
         {
-            Debug.LogError("領域外の値を習得しようとしました");
+            Debug.LogError($"領域外の値を習得しようとしました index:{index}");
             return _errorValue;
         }
         return _values[index];
@@ -70,7 +70,7 @@ public class AutoRouteData
     {
         if (IsOutOfRange(x, y))
         {
-            Debug.LogError("領域外に値を設定しようとしました");
+            Debug.LogError($"領域外に値を設定しようとしました (x,y):({x},{y})");
             return;
         }
         _values[ToSubscript(x, y)] = value;

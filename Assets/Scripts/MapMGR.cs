@@ -15,7 +15,6 @@ public class MapMGR : MonoBehaviour
     [SerializeField] StageTileArray[]  tileArray;
     [SerializeField] int stageNum; //ステージの番号によって使うタイルマップを決める（0からスタート）
 
-
     MapData map;
 
     [SerializeField] int mapHeight;
@@ -31,6 +30,11 @@ public class MapMGR : MonoBehaviour
 
     [SerializeField] GameObject[] towerPrefabs;
     [SerializeField] Vector2Int[] towerPoss;
+
+    [SerializeField] int numOfFristRoad; //インスペクター上以外で値を代入してはいけない
+    int numOfFristRoadCounter; //SetUpMap()で numOfFristRoadCounter = numOfFristRoad; と初期化している
+    [SerializeField] public GameObject makeTheFirstRoadGO; //GameManagerでSetActiveを変える
+    Text makeTheFirstRoadText;
 
 
     //Getter
@@ -70,6 +74,10 @@ public class MapMGR : MonoBehaviour
     {
         return enemysCastlePos;
     }
+    public int GetNumOfFristRoad()
+    {
+        return numOfFristRoad;
+    }
 
     //Setter
     public void MultiplySetMapValue(Vector2Int vector, int value)
@@ -98,6 +106,11 @@ public class MapMGR : MonoBehaviour
         //初期化
         map = null;
         map = new MapData(mapWidth, mapHeight); //mapは1つしかないのでとりあえず、numberは0としておく
+
+        numOfFristRoadCounter = GetNumOfFristRoad();
+        makeTheFirstRoadText = makeTheFirstRoadGO.GetComponent<Text>();
+
+        Debug.LogWarning($"numOfFristRoadCounterを{GetNumOfFristRoad()}に初期化しました");
 
         RenderMap();
 
@@ -384,6 +397,17 @@ public class MapMGR : MonoBehaviour
         Debug.LogError($"CalculateTileNum({y} ,{x})に失敗しました");
         return -100;
     }
+    private bool IsOutRangeOfMap(int x, int y)
+    {
+        if (x < 0 || y < 0 || x > map.Width - 1 || y > map.Height - 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     public void MakeRoad(int x, int y)
     {
         Vector2Int vector = new Vector2Int(x, y);
@@ -415,6 +439,29 @@ public class MapMGR : MonoBehaviour
             }
             map.DivisionalSetValue(vector, GameManager.instance.wallID);
             map.MultiplySetValue(vector, GameManager.instance.groundID);
+
+            if (GameManager.instance.state == GameManager.State.MakeTheFirstRoad)
+            {
+                numOfFristRoadCounter--;
+                Debug.LogWarning($"numOfFristRoadCounterが{numOfFristRoadCounter}になりました");
+                makeTheFirstRoadText.text = $"敵の城につながるように\nあと"+$"{numOfFristRoadCounter}".PadLeft(2)+"つ道を配置してください";
+                if (numOfFristRoadCounter <=0)
+                {
+                    Debug.LogWarning("numOfFristRoadCounterが0以下になりました");
+                    if (IsReachable())
+                    {
+                        Debug.LogWarning($"GameManagerのStateをRunningGameにします");
+                        GameManager.instance.RunningGame();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("道が敵の城につながっていないため\nやり直してください");
+                        makeTheFirstRoadText.text = $"道が敵の城につながっていないため\nやり直してください";
+                        StartCoroutine(DisplayMakefristRoadAgaingCoroutine());
+                    }
+
+                }
+            }
 
             //周囲9マスのタイルを更新する必要がある
             for (int dy = -1; dy <= 1; dy++)
@@ -449,23 +496,231 @@ public class MapMGR : MonoBehaviour
             }
         }
     }
-    private bool IsOutRangeOfMap(int x, int y)
+
+    IEnumerator DisplayMakefristRoadAgaingCoroutine()
     {
-        if (x < 0 || y < 0 || x > map.Width-1 || y > map.Height-1)
+        yield return new WaitForSeconds(2);
+
+        GameManager.instance.SetupGame();
+
+        
+    }
+
+    bool IsReachable()
+    {
+        int initiValue = -10; //PlaceNumAroundで重複して数字を置かないようにするために必要
+        //int roadValue = 1; //roadのマス
+        int wallValue = -1; //wallのマス
+        int _errorValue = -88;
+        int[,] cell = new int[mapHeight,mapWidth]; //到達できるかどうかを判定する用の2次元配列
+        Vector2Int startPos = allysCastlePos;
+        Vector2Int targetPos = enemysCastlePos;
+
+        Queue<Vector2Int> searchQue = new Queue<Vector2Int>();
+        int i = 1; //1から始まることに注意
+        bool isComplete = false;
+        int maxDistance = 0;
+
+        //初期化
+        for (int y = 0; y < mapHeight; y++)
         {
+            for (int x = 0; x < mapWidth; x++)
+            {
+                    cell[y, x] = initiValue;  
+            }
+        }
+
+        //mapの壁のマスをwallValueにする。
+        for (int y = 0; y < mapHeight; y++)
+        {
+            for (int x = 0; x < mapWidth; x++)
+            {
+                if (map.GetValue(x, y) % GameManager.instance.wallID == 0)
+                {
+                    cell[y,x] = wallValue;  //実質これがinitiValueみたいな役割を持つ
+                }
+            }
+        }
+
+        //動けるマスに数字を順番に振っていく
+        Debug.Log($"WaveletSearchを実行します startPos:{startPos}");
+        WaveletSearch();
+
+        //デバッグ用
+        string debugCell = "";
+        for (int y = 0; y < mapHeight; y++)
+        {
+            for (int x = 0; x < mapWidth; x++)
+            {
+                //debugCell += $"({x},{mapHeight - y-1}){GetValue(mapHeight - y-1, x)}".PadRight(3) + ",";
+                debugCell += $"{GetValue(x,mapHeight - y-1)}".PadRight(3) + ",";
+            }
+            debugCell += "\n";
+        }
+        Debug.LogWarning($"cellの中身は\n{debugCell}");
+
+        
+
+        if (CanGetCloseToTheCastle())
+        {
+            Debug.LogWarning("IsReachableはtrueです");
             return true;
         }
         else
         {
-            return false;
+            Debug.LogWarning("IsReachableはfalseです");
+            return false; 
+        }
+
+
+        ////////////////////////////////////////////////////////////////////
+
+        //以下ローカル関数
+        int GetValue(int x, int y)
+        {
+            if (IsOutRangeOfMap(x, y))
+            {
+                Debug.LogError($"領域外に値を取得しようとしました (x,y):({x},{y})");
+                return _errorValue;
+            }
+            if (x == 0 || y == 0 || x == map.Width - 1 || y == map.Height - 1)
+            {
+                return wallValue; //端は壁扱いにする
+            }
+            return cell[y,x];
+        }
+
+        void SetValue(int x, int y, int value)
+        {
+            if (IsOutRangeOfMap(x, y))
+            {
+                Debug.LogError($"領域外に値を設定しようとしました (x,y):({x},{y})");
+                return;
+            }
+            cell[y, x] = value; 
+        }
+
+        void WaveletSearch()
+        {
+            SetValue(startPos.x,startPos.y,0); //startPosの部分だけ周囲の判定を行わないため、ここで個別に設定する 0としているのは0番目のマスだから
+            searchQue.Enqueue(startPos);
+
+            while (!isComplete)
+            {
+                int loopNum = searchQue.Count; //前のループでキューに追加された個数を数える
+                Debug.Log($"i:{i}のときloopNum:{loopNum}");
+                for (int k = 0; k < loopNum; k++)
+                {
+                    Debug.Log($"PlaceNumAround({searchQue.Peek()})を実行します");
+                    if (isComplete) break;
+                    PlaceNumAround(searchQue.Dequeue());
+                }
+                i++; //前のループでキューに追加された文を処理しきれたら、インデックスを増やして次のループに移る
+
+                if (i > 100) //無限ループを防ぐ用
+                {
+                    isComplete = true;
+                    Debug.LogError("SearchShortestRouteのwhile文でループが100回行われてしまいました");
+                }
+
+            }
+        }
+
+        void PlaceNumAround(Vector2Int centerPos)
+        {
+            Vector2Int inspectPos;
+
+            //8マス判定する（真ん中のマスの判定は必要ない）
+            for (int y = -1; y < 2; y++)
+            {
+                for (int x = -1; x < 2; x++)
+                {
+                    if (x == 0 && y == 0) continue; //真ん中のマスは飛ばす
+
+                    inspectPos = centerPos + new Vector2Int(x, y);
+
+                    if (IsOutRangeOfMap(inspectPos.x, inspectPos.y)) continue; //map外のマスの判定は飛ばす
+
+                    //Debug.Log($"centerPos:{centerPos},inspectPos:{inspectPos}のとき、CanMove(centerPos, inspectPos):{CanMove(centerPos, inspectPos)}");
+                    if (GetValue(inspectPos.x, inspectPos.y) == initiValue && CanMoveDiagonally(centerPos, inspectPos))
+                    {
+                        SetValue(inspectPos.x,inspectPos.y,i);
+                        if(GetValue(inspectPos.x, inspectPos.y)==0) Debug.LogError($"GetValue({inspectPos.x}, {inspectPos.y})が0です");
+
+                        searchQue.Enqueue(inspectPos);
+                        Debug.Log($"({inspectPos})を{i}にし、探索用キューに追加しました。");
+                    }
+                    if (inspectPos == targetPos)
+                    {
+                        isComplete = true;
+                        maxDistance = i - 1;
+                        Debug.Log($"isCompleteをtrueにしました。maxDistance:{maxDistance}");
+                        break; //探索終了
+                    }
+                }
+            }
+        }
+
+        bool CanMoveDiagonally(Vector2Int prePos, Vector2Int afterPos)
+        {
+            Vector2Int directionVector = afterPos - prePos;
+
+            //斜め移動の時にブロックの角を移動することはできない
+            if (directionVector.x != 0 && directionVector.y != 0)
+            {
+                //水平方向の判定
+                if (GetValue(prePos.x + directionVector.x, prePos.y) == wallValue)
+                {
+                    return false;
+                }
+
+                //垂直方向の判定
+                if (GetValue(prePos.x,prePos.y + directionVector.y) == wallValue)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        bool CanGetCloseToTheCastle()
+        {
+            Vector2Int inspectPos;
+            bool result = false;
+
+            //8マス判定する（真ん中のマスの判定は必要ない）
+            for (int y = -1; y < 2; y++)
+            {
+                for (int x = -1; x < 2; x++)
+                {
+                    if (x == 0 && y == 0) continue; //真ん中のマスは飛ばす
+
+                    inspectPos = targetPos + new Vector2Int(x, y);
+
+                    if (IsOutRangeOfMap(inspectPos.x, inspectPos.y)) continue; //map外のマスの判定は飛ばす
+
+                    if (GetValue(inspectPos.x, inspectPos.y) != initiValue && GetValue(inspectPos.x, inspectPos.y) != wallValue && CanMoveDiagonally(targetPos, inspectPos))
+                     //初期の値でもない　かつ　壁の値でもない　かつ　targetPosからinspectPosへ移動することができる
+                    {
+                        result = true;
+                    }
+                }
+            }
+
+            if (map.GetValue(allysCastlePos.x,allysCastlePos.y) % GameManager.instance.wallID == 0) //ここは本当のmapを参照して調べる
+            {
+                Debug.LogWarning("キャラクターのスポーン地点に道がないためfalseです");
+                result = false;
+            }
+
+            return result;
         }
     }
 
 
-
-
-
 }
+
 
 public class MapData
 {
@@ -718,5 +973,4 @@ public class MapData
         _edgeValue = value;
     }
 }
-
 
