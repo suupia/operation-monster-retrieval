@@ -35,7 +35,7 @@ public class MapMGR : MonoBehaviour
     int numOfFristRoadCounter; //SetUpMap()で numOfFristRoadCounter = numOfFristRoad; と初期化している
     [SerializeField] public GameObject makeTheFirstRoadGO; //GameManagerでSetActiveを変える
     Text makeTheFirstRoadText;
-
+    bool isDisplayMakefristRoadAgainCoroutine = false;
 
     //Getter
     public MapData GetMap()
@@ -444,6 +444,9 @@ public class MapMGR : MonoBehaviour
             {
                 numOfFristRoadCounter--;
                 Debug.LogWarning($"numOfFristRoadCounterが{numOfFristRoadCounter}になりました");
+
+                if (isDisplayMakefristRoadAgainCoroutine) return; //コルーチンが作動している間は以下の処理を行わない
+
                 makeTheFirstRoadText.text = $"敵の城につながるように\nあと"+$"{numOfFristRoadCounter}".PadLeft(2)+"つ道を配置してください";
                 if (numOfFristRoadCounter <=0)
                 {
@@ -457,7 +460,7 @@ public class MapMGR : MonoBehaviour
                     {
                         Debug.LogWarning("道が敵の城につながっていないため\nやり直してください");
                         makeTheFirstRoadText.text = $"道が敵の城につながっていないため\nやり直してください";
-                        StartCoroutine(DisplayMakefristRoadAgaingCoroutine());
+                        StartCoroutine(DisplayMakefristRoadAgainCoroutine());
                     }
 
                 }
@@ -497,13 +500,12 @@ public class MapMGR : MonoBehaviour
         }
     }
 
-    IEnumerator DisplayMakefristRoadAgaingCoroutine()
+    IEnumerator DisplayMakefristRoadAgainCoroutine()
     {
-        yield return new WaitForSeconds(2);
-
+        isDisplayMakefristRoadAgainCoroutine = true;
+        yield return new WaitForSeconds(1.2f);
         GameManager.instance.SetupGame();
-
-        
+        isDisplayMakefristRoadAgainCoroutine = false;
     }
 
     bool IsReachable()
