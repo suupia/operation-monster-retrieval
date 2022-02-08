@@ -49,6 +49,7 @@ public class CharacterMGR : MonoBehaviour
     float moveTime; // movetime = 1/spd [s]
     [SerializeField] float coolTime;
     [SerializeField] int cost;
+    [SerializeField] Sprite sprite;
 
     bool isMarching = false;
     bool isAttacking = false;
@@ -208,6 +209,10 @@ public class CharacterMGR : MonoBehaviour
     public int GetCost()
     {
         return cost;
+    }
+    public Sprite GetSprite()
+    {
+        return sprite;
     }
     //Setter
     public void SetCharacterData(int buttonNum, int characterTypeID)  //hpやatkなどの情報もここでセットする。

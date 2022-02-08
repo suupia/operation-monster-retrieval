@@ -15,6 +15,7 @@ public class StatusCanvasMGR : MonoBehaviour
     [SerializeField] Text spdText;
     [SerializeField] Text coolTimeText;
     [SerializeField] Text costText;
+    [SerializeField] Image characterImage;
 
     public void UpdateStatusCanvasInCombat(int dropNum)
     {
@@ -37,6 +38,12 @@ public class StatusCanvasMGR : MonoBehaviour
         attackIntervalText.text = "ATK Interval:"+GameManager.instance.GetCharacterDatabase(characterTypeID).GetAttackInterval().ToString();
         attackRangeText.text = " ATK Range :"+GameManager.instance.GetCharacterDatabase(characterTypeID).GetAttackRange().ToString();
         coolTimeText.text = "Cool Time:"+GameManager.instance.GetCharacterDatabase(characterTypeID).GetCoolTime().ToString();
+
+        if (GameManager.instance.GetCharacterDatabase(characterTypeID).GetSprite() != null)
+        {
+            characterImage.sprite = GameManager.instance.GetCharacterDatabase(characterTypeID).GetSprite();
+
+        }
     }
 
 }

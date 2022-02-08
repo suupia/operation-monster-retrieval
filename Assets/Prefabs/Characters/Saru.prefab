@@ -132,3 +132,4 @@ MonoBehaviour:
   spd: 2
   coolTime: 1
   cost: 100
+  sprite: {fileID: 21300000, guid: b191e8e6070bb054691ee0b4ecf36399, type: 3}
