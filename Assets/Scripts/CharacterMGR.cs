@@ -381,6 +381,11 @@ public class CharacterMGR : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.instance.state == GameManager.State.SelectingStage)
+        {
+            Destroy(this.gameObject);
+        }
+
         switch (state)
         {
             case State.Marching:

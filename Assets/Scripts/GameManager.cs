@@ -20,8 +20,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] public GameObject menuCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
     [SerializeField] public StatusCanvasMGR statusCanvasMGR;
 
-    [SerializeField] GameObject resultTextGO; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
-    Text resultText;
+    [SerializeField] GameObject resultCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
+    [SerializeField] Text resultText2;
+    //[SerializeField] GameObject resultTextGO; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
+    //Text resultText;
 
 
     int numOfCharacterInCombat = 4; //戦闘に参加するモンスターの種類は4種類
@@ -120,7 +122,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        resultText = resultTextGO.GetComponent<Text>();
+        //resultText = resultTextGO.GetComponent<Text>();
 
         idsOfCharactersInCombat = new int[numOfCharacterInCombat];
 
@@ -160,6 +162,8 @@ public class GameManager : MonoBehaviour
     public void StartSelectingStage()
     {
         state = State.SelectingStage;
+
+        resultCanvas.SetActive(false);
         selectStageCanvas.SetActive(true);
         //次のPlayingGameに備えて前の戦闘のデータをここでリセットする（今は特に書くことはない）
     }
@@ -197,15 +201,20 @@ public class GameManager : MonoBehaviour
     {
         state = State.ShowingResults;
 
-        resultTextGO.SetActive(true);
+        //resultTextGO.SetActive(true);
+        resultCanvas.SetActive(true);
 
         if (isWin)
         {
-            resultText.text = "勝利";
+            //resultText.text = "勝利";
+            resultText2.text = "勝利";
+
         }
         else
         {
-            resultText.text = "敗北";
+            //resultText.text = "敗北";
+            resultText2.text = "敗北";
+
         }
     }
     public void SpawnCharacter(int buttonNum)

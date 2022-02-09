@@ -32,7 +32,7 @@ public class MapMGR : MonoBehaviour
     [SerializeField] Vector2Int[] towerPoss;
 
     [SerializeField] int numOfFristRoad; //インスペクター上以外で値を代入してはいけない
-    int numOfFristRoadCounter; //SetUpMap()で numOfFristRoadCounter = numOfFristRoad; と初期化している
+    [SerializeField] int numOfFristRoadCounter; //SetUpMap()で numOfFristRoadCounter = numOfFristRoad; と初期化している  デバッグ用にSerializeFieldにしておく
     [SerializeField] public GameObject makeTheFirstRoadGO; //GameManagerでSetActiveを変える
     Text makeTheFirstRoadText;
     bool isDisplayMakefristRoadAgainCoroutine = false;
@@ -108,9 +108,12 @@ public class MapMGR : MonoBehaviour
         map = new MapData(mapWidth, mapHeight); //mapは1つしかないのでとりあえず、numberは0としておく
 
         numOfFristRoadCounter = GetNumOfFristRoad();
-        makeTheFirstRoadText = makeTheFirstRoadGO.GetComponent<Text>();
 
-        Debug.LogWarning($"numOfFristRoadCounterを{GetNumOfFristRoad()}に初期化しました");
+        makeTheFirstRoadText = makeTheFirstRoadGO.GetComponent<Text>();
+        makeTheFirstRoadText.text = $"敵の城につながるように\nあと" + $"{numOfFristRoadCounter}".PadLeft(2) + "つ道を配置してください"; //表示をリセットする
+
+
+        //Debug.Log($"numOfFristRoadCounterを{GetNumOfFristRoad()}に初期化しました");
 
         RenderMap();
 
@@ -443,22 +446,22 @@ public class MapMGR : MonoBehaviour
             if (GameManager.instance.state == GameManager.State.MakeTheFirstRoad)
             {
                 numOfFristRoadCounter--;
-                Debug.LogWarning($"numOfFristRoadCounterが{numOfFristRoadCounter}になりました");
+                Debug.Log($"numOfFristRoadCounterが{numOfFristRoadCounter}になりました");
 
                 if (isDisplayMakefristRoadAgainCoroutine) return; //コルーチンが作動している間は以下の処理を行わない
 
                 makeTheFirstRoadText.text = $"敵の城につながるように\nあと"+$"{numOfFristRoadCounter}".PadLeft(2)+"つ道を配置してください";
                 if (numOfFristRoadCounter <=0)
                 {
-                    Debug.LogWarning("numOfFristRoadCounterが0以下になりました");
+                    //Debug.Log("numOfFristRoadCounterが0以下になりました");
                     if (IsReachable())
                     {
-                        Debug.LogWarning($"GameManagerのStateをRunningGameにします");
+                        //Debug.Log($"GameManagerのStateをRunningGameにします");
                         GameManager.instance.RunningGame();
                     }
                     else
                     {
-                        Debug.LogWarning("道が敵の城につながっていないため\nやり直してください");
+                        //Debug.Log("道が敵の城につながっていないため\nやり直してください");
                         makeTheFirstRoadText.text = $"道が敵の城につながっていないため\nやり直してください";
                         StartCoroutine(DisplayMakefristRoadAgainCoroutine());
                     }
@@ -559,7 +562,7 @@ public class MapMGR : MonoBehaviour
             }
             debugCell += "\n";
         }
-        Debug.LogWarning($"cellの中身は\n{debugCell}");
+        //Debug.Log($"cellの中身は\n{debugCell}");
 
         
 

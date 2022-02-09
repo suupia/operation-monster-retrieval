@@ -24,6 +24,16 @@ public class TowerMGR : Facility
         base.Start();
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
+
+    private void Update()
+    {
+        if (GameManager.instance.state == GameManager.State.SelectingStage)
+        {
+            Debug.LogWarning("Towerオブジェクトを破棄します");
+            Destroy(this.gameObject);
+        }
+    }
+
     public override void SetDirection(Vector2 directionVector)
     {
         if (directionVector == Vector2.zero) //引数の方向ベクトルがゼロベクトルの時は何もしない

@@ -50,7 +50,7 @@ public class InputMGR : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 leftTouchFlag = true;
-                Debug.LogWarning("leftTouchFlag‚ðtrue‚É‚µ‚Ü‚µ‚½");
+                //Debug.Log("leftTouchFlag‚ðtrue‚É‚µ‚Ü‚µ‚½");
             }
             if (Input.GetMouseButtonUp(0))
             {

@@ -124,12 +124,12 @@ MonoBehaviour:
   characterName: Bat
   characterTypeID: 0
   level: 0
-  maxHp: 2
+  maxHp: 15
   hp: 2
-  atk: 1
+  atk: 5
   attackInterval: 1
   attackRange: 1
-  spd: 3.5
+  spd: 8
   coolTime: 1
-  cost: 100
+  cost: 10
   sprite: {fileID: 21300000, guid: 5510e554eeb1dbc4f812093154907800, type: 3}
