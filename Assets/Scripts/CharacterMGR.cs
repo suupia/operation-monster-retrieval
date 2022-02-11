@@ -386,6 +386,8 @@ public class CharacterMGR : MonoBehaviour
             Destroy(this.gameObject);
         }
 
+        //if (GameManager.instance.state != GameManager.State.RunningGame) return; //RunningGame意外だったらUpdateの処理をしない
+
         switch (state)
         {
             case State.Marching:
@@ -409,7 +411,7 @@ public class CharacterMGR : MonoBehaviour
 
         if (GameManager.instance.mapMGR.GetMapValue(gridPos + vector) % GameManager.instance.wallID == 0)
         {
-            Debug.Log($"移動先にwallIDがあるため、移動できません(gridPos:{gridPos}vector:{vector})\nGameManager.instance.mapMGR.GetMapValue(gridPos + vector)={GameManager.instance.mapMGR.GetMapValue(gridPos + vector)} GetDirectionVector={GetDirectionVector()}");
+            Debug.LogError($"移動先にwallIDがあるため、移動できません(gridPos:{gridPos}vector:{vector})\nGameManager.instance.mapMGR.GetMapValue(gridPos + vector)={GameManager.instance.mapMGR.GetMapValue(gridPos + vector)} GetDirectionVector={GetDirectionVector()}");
             return false;
         }
 
@@ -419,12 +421,15 @@ public class CharacterMGR : MonoBehaviour
             //水平方向の判定
             if (GameManager.instance.mapMGR.GetMapValue(gridPos.x + vector.x, gridPos.y) % GameManager.instance.wallID == 0)
             {
+                Debug.LogError($"水平方向に壁があるため、移動できません。");
+
                 return false;
             }
 
             //垂直方向の判定
             if (GameManager.instance.mapMGR.GetMapValue(gridPos.x, gridPos.y + vector.y) % GameManager.instance.wallID == 0)
             {
+                Debug.LogError($"鉛直方向に壁があるため、移動できません。");
                 return false;
             }
         }

@@ -54,15 +54,15 @@ public class MapMGR : MonoBehaviour
     {
         return mapWidth;
     }
-    public int GetMapValue(int x, int y)
+    public long GetMapValue(int x, int y)
     {
         return map.GetValue(x, y);
     }
-    public int GetMapValue(Vector2Int vector)
+    public long GetMapValue(Vector2Int vector)
     {
         return map.GetValue(vector);
     }
-    public int GetMapValue(int index)
+    public long GetMapValue(int index)
     {
         return map.GetValue(index);
     }
@@ -731,7 +731,7 @@ public class MapData
 {
     int _width;
     int _height;
-    int[] _values = null;
+    long[] _values = null;
     List<CharacterMGR>[] _characterMGRs = null;
     Facility[] _facilities = null;
     int _edgeValue;
@@ -747,7 +747,7 @@ public class MapData
         }
         _width = width;
         _height = height;
-        _values = new int[width * height];
+        _values = new long [width * height];
         _characterMGRs = new List<CharacterMGR>[width * height];
         for(int i= 0; i < width * height; i++)
         {
@@ -767,7 +767,7 @@ public class MapData
     {
         return _values.Length;
     }
-    public int GetValue(int x, int y)
+    public long GetValue(int x, int y)
     {
         if (IsOutOfRange(x, y))
         {
@@ -781,11 +781,11 @@ public class MapData
         }
         return _values[ToSubscript(x, y)];
     }
-    public int GetValue(Vector2Int vector)
+    public long GetValue(Vector2Int vector)
     {
         return GetValue(vector.x, vector.y);
     }
-    public int GetValue(int index)
+    public long GetValue(int index)
     {
         if (index < 0 || index > _values.Length)
         {
