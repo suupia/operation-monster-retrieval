@@ -8,14 +8,31 @@ public class PointerTailMGR : MonoBehaviour
     private List<Vector2Int> manualRoute;
     private List<GameObject> pointerTails;
     private MapData map;
+    private GameObject[] children;
+    private SpriteRenderer[] childRenderers;
+    private Vector2[] defaultPointerTailSizes;
+    private float pointerTailRate;
+    private Color noChangedColor;
+    [SerializeField] Color changedColor;
+    [SerializeField] Sprite[] firstTailSprites;
 
-    [SerializeField] bool nonDiagonal;     //これがtrueのとき、PointerTailは斜めを向かない
+    [SerializeField] bool nonDiagonal;     //これがtrueのとき、PointerTailは斜めを向けないようにする（最小の回転用）
+    [SerializeField] bool isDiagonal;      //斜めを向いてるとき、true
 
     //プロパティ
     public bool NonDiagonal
     {
         get { return nonDiagonal; }
         set { nonDiagonal = value; }
+    }
+
+    public bool GetDiagonal()
+    {
+        return isDiagonal;
+    }
+    public void SetDiagonal(bool b)
+    {
+        isDiagonal = b;
     }
     // Start is called before the first frame update
     void Start()
@@ -24,6 +41,26 @@ public class PointerTailMGR : MonoBehaviour
         pointerTailIndex = pointerTails.IndexOf(gameObject);    //pointerTailsにPointeTailが順番に仕舞われているので、Indexを取得しておく
         manualRoute = GameManager.instance.pointerMGR.GetManualRoute();
         map = GameManager.instance.mapMGR.GetMap();
+        children = new GameObject[2];
+        children[0] = transform.GetChild(0).gameObject;
+        children[1] = transform.GetChild(1).gameObject;
+        childRenderers = new SpriteRenderer[2];
+        childRenderers[0] = children[0].GetComponent<SpriteRenderer>();
+        childRenderers[1] = children[1].GetComponent<SpriteRenderer>();
+        defaultPointerTailSizes = new Vector2[2];
+        defaultPointerTailSizes[0] = childRenderers[0].size;
+        defaultPointerTailSizes[1] = childRenderers[1].size;
+        pointerTailRate = Mathf.Sqrt(2) * 19/20;//案1→19/20、案2→37/40
+        noChangedColor = childRenderers[0].color;
+
+        childRenderers[0].sortingOrder = pointerTailIndex;
+        childRenderers[1].sortingOrder = pointerTailIndex;
+
+        if(pointerTailIndex == 0)
+        {
+            childRenderers[0].sprite = firstTailSprites[0];
+            childRenderers[1].sprite = firstTailSprites[1];
+        }
     }
 
     private void LateUpdate()
@@ -33,6 +70,7 @@ public class PointerTailMGR : MonoBehaviour
             return;
         }
         RotatePointerTail();
+        ChangeColor();
     }
     private void RotatePointerTail()
     {
@@ -73,15 +111,18 @@ public class PointerTailMGR : MonoBehaviour
 
             if (angle != 0)
             {
-                transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-                transform.localScale = new Vector3(Mathf.Sqrt(2), 1, 1);                //斜めを向くときは長さをsqrt2にする
-                    pointerTails[pointerTailIndex + 1].SetActive(false);      //これを斜めに向かせる場合、この次のPointerTailは表示する必要がないので、非アクティブにする
-                                                                                                              //大丈夫だと思うけど、この次のPointerTailのUpdateが先に呼ばれると困る気がするので、一応メモとして
+                transform.rotation = Quaternion.AngleAxis(angle-45, Vector3.forward);
+                //childRenderers[0].size = new Vector2(pointerTailRate, 1)* defaultPointerTailSizes[0];                //斜めを向くときは長さをsqrt2にする
+                ChangeToDiagonal(true);
+                pointerTails[pointerTailIndex + 1].SetActive(false);      //これを斜めに向かせる場合、この次のPointerTailは表示する必要がないので、非アクティブにする
+                                                                          //大丈夫だと思うけど、この次のPointerTailのUpdateが先に呼ばれると困る気がするので、一応メモとして
+                SetDiagonal(true);
                 return;    //斜めを向いたときはここでreturnされる
             }
             else
             {
-                    pointerTails[pointerTailIndex + 1].SetActive(true);        //これが斜めを向かないときは、次のPointerTailをアクティブにする
+                pointerTails[pointerTailIndex + 1].SetActive(true);        //これが斜めを向かないときは、次のPointerTailをアクティブにする
+                SetDiagonal(false);
             }
         }
 
@@ -109,8 +150,8 @@ public class PointerTailMGR : MonoBehaviour
                 angle = 180;
             }
         }
-        transform.localScale = new Vector3(1, 1, 1);        //斜めを向かないときはscaleは長さを1に
-
+        //childRenderers[0].size = new Vector2(1, 1)* defaultPointerTailSizex[0];        //斜めを向かないときはscaleは長さを1に
+        ChangeToDiagonal(false);
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
     }
@@ -150,5 +191,38 @@ public class PointerTailMGR : MonoBehaviour
             }
         }
 
+    }
+
+    private void ChangeToDiagonal(bool b)
+    {
+        //斜めにする 
+        if (b)
+        {
+            children[0].SetActive(false);
+            children[1].SetActive(true);
+        }else  //横にする
+        {
+            children[0].SetActive(true);
+            children[1].SetActive(false);
+        }
+
+    }
+
+    private void ChangeColor()
+    {
+        foreach(Vector2Int m in manualRoute)
+        {
+            int i = manualRoute.IndexOf(m); 
+            if(m.x == manualRoute[pointerTailIndex].x && m.y == manualRoute[pointerTailIndex].y && i != pointerTailIndex && 
+                pointerTails[i].transform.rotation.Equals(transform.rotation) && pointerTails[i].GetComponent<PointerTailMGR>().GetDiagonal() == GetDiagonal())
+            {
+                childRenderers[0].color = changedColor;
+                childRenderers[1].color = changedColor;
+                return;
+            }
+        }
+
+        childRenderers[0].color = noChangedColor;
+        childRenderers[1].color = noChangedColor;
     }
 }
