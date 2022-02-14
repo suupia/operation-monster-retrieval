@@ -165,6 +165,7 @@ public class PointerTailMGR : MonoBehaviour
             {
                 for (int i = 0; i < 3; i++)
                 {
+                    if(i == 2 && !pointerTails[pointerTailIndex - i].GetComponent<PointerTailMGR>().isDiagonal) { break; }    //一番目の点が斜めになっていないとき(=0番目の点が斜めのとき)は一番目の点はそのままにする
                     pointerTails[pointerTailIndex - i].SetActive(true);              //斜めになっているPointerTailの次のPointerTailは非アクティブにしてあるので、アクティブにする
                     pointerTails[pointerTailIndex - i].GetComponent<PointerTailMGR>().NonDiagonal = true;
                 }

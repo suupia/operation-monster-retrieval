@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] public StatusCanvasMGR statusCanvasMGR;
 
     [SerializeField] GameObject resultCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
-    [SerializeField] Text resultText2;
+    [SerializeField] Text resultText;
     //[SerializeField] GameObject resultTextGO; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
     //Text resultText;
 
@@ -206,14 +206,19 @@ public class GameManager : MonoBehaviour
 
         if (isWin)
         {
-            //resultText.text = "勝利";
-            resultText2.text = "勝利";
+            int EXPGained = mapMGR.GetEXPOfTheStage() ;
+
+            //経験値を与える
+            statusCanvasMGR.EXPretained += EXPGained;
+
+            resultText.text = $"勝利！\nEXP{EXPGained}を獲得！";
+
 
         }
         else
         {
             //resultText.text = "敗北";
-            resultText2.text = "敗北";
+            resultText.text = "敗北";
 
         }
     }

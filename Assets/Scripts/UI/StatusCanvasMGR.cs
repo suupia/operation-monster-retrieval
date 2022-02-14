@@ -17,6 +17,18 @@ public class StatusCanvasMGR : MonoBehaviour
     [SerializeField] Text costText;
     [SerializeField] Image characterImage;
 
+    [SerializeField] Text EXPText;
+    int _EXPretained; //保持している経験値 プロパティのsetterでEXPTextを更新する
+
+    public int EXPretained
+    {
+        get{ return _EXPretained; }
+        set{ 
+            _EXPretained = value;
+            UpdateEXPText();
+        }
+    }
+
     public void UpdateStatusCanvasInCombat(int dropNum)
     {
         UpdateStatusCanvas(GameManager.instance.IDsOfCharactersInCombat[dropNum]);
@@ -44,6 +56,11 @@ public class StatusCanvasMGR : MonoBehaviour
             characterImage.sprite = GameManager.instance.GetCharacterDatabase(characterTypeID).GetSprite();
 
         }
+    }
+
+    void UpdateEXPText()
+    {
+        EXPText.text = $"EXP:{EXPretained,8:D}"; //alignmentとして8を指定している（右揃えで書式Dの8文字分。ただし、数字の幅と同じとは限らないみたい）
     }
 
 }

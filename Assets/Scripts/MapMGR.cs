@@ -13,7 +13,7 @@ public class MapMGR : MonoBehaviour
     }
     [SerializeField] Tilemap tilemap;
     [SerializeField] StageTileArray[]  tileArray;
-    [SerializeField] int stageNum; //ステージの番号によって使うタイルマップを決める（0からスタート）
+    [SerializeField] int stageNum; //ステージの番号によって使うタイルマップを決める（0からスタート）あと経験値の決定にも使う
 
     MapData map;
 
@@ -36,6 +36,8 @@ public class MapMGR : MonoBehaviour
     [SerializeField] public GameObject makeTheFirstRoadGO; //GameManagerでSetActiveを変える
     Text makeTheFirstRoadText;
     bool isDisplayMakefristRoadAgainCoroutine = false;
+
+    [SerializeField] int[] EXPOfTheStage; //クリア時にもらえる経験値をインスペクター上で決める
 
     //Getter
     public MapData GetMap()
@@ -77,6 +79,10 @@ public class MapMGR : MonoBehaviour
     public int GetNumOfFristRoad()
     {
         return numOfFristRoad;
+    }
+    public int GetEXPOfTheStage() 
+    {
+        return EXPOfTheStage[stageNum];
     }
 
     //Setter

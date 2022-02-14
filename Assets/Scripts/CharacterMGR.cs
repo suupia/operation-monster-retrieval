@@ -512,7 +512,17 @@ public class CharacterMGR : MonoBehaviour
     public void SetManualRoute()
     {
         Debug.Log("SetManualRoute‚ğÀs‚µ‚Ü‚·");
-        routeList = manualRoute.GetManualRoute();
+        if (manualRoute.GetManualRoute().Count == 0)
+        {
+            Debug.Log("manualRoute‚Ì’·‚³‚ª0‚Ì‚½‚ßAutoMode‚ÉØ‚è‘Ö‚¦‚Ü‚·");
+            SetMode(Mode.Auto);
+            SetAutoRoute();
+
+        }
+        else
+        {
+            routeList = manualRoute.GetManualRoute();
+        }
         nonDiagonalPoints = manualRoute.GetNonDiagonalPoints();
         Debug.Log("routeList:" + string.Join(",", routeList));
     }
