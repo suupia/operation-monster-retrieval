@@ -15,6 +15,8 @@ public class TimerMGR : MonoBehaviour
     public void InitiTimer() //GameManager‚ªState.PlayingGame‚É‚È‚Á‚½‚Æ‚«‚ÉŒÄ‚Ô
     {
         timer = 0;
+        timerText.text = ConvertStringTime(timeLimit - timer);
+
     }
     void Update()
     {
