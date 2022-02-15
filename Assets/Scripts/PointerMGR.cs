@@ -30,6 +30,14 @@ public class PointerMGR : MonoBehaviour
 
     }
 
+    private void Update()
+    {
+        if(transform.position != startPos && GameManager.instance.state == GameManager.State.ShowingResults)      //戦闘終了時の処理
+        {
+            ResetPointer();
+        }
+    }
+
     //public void MoveByArrowKey(Vector2Int directionVector) //矢印キーで移動
     //{
     //    //positionをグリッドに合わせる
@@ -175,6 +183,7 @@ public class PointerMGR : MonoBehaviour
         {
             pointerTails.Add(Instantiate(pointerTailPrefab, GameManager.instance.ToWorldPosition(manualRoute[pointerTails.Count]), pointerTailPrefab.transform.rotation));
             //pointerTailMGRs.Add(pointerTails[pointerTails.Count - 1].GetComponent<PointerTailMGR>());
+            SetOrder();
         }
 
         while (manualRoute.Count - 1 < pointerTails.Count)
@@ -213,6 +222,11 @@ public class PointerMGR : MonoBehaviour
         }
         manualRoute.Add(GameManager.instance.mapMGR.GetAllysCastlePos());
         Debug.Log($"Pointerを初期化:manualRoute={string.Join(",", manualRoute)}, isOnCastle={isOnCastle}, pointerTails={string.Join(",", pointerTails)}");
+    }
+
+    private void SetOrder()
+    {
+        this.GetComponent<SpriteRenderer>().sortingOrder = pointerTails.Count + 1;
     }
 
 }

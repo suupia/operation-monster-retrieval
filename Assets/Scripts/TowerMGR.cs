@@ -32,6 +32,11 @@ public class TowerMGR : Facility
             Debug.LogWarning("Towerオブジェクトを破棄します");
             Destroy(this.gameObject);
         }
+
+        if (GameManager.instance.state == GameManager.State.PauseTheGame) //ポーズ中の時はUpdateの処理をしない
+        {
+            return;
+        }
     }
 
     public override void SetDirection(Vector2 directionVector)

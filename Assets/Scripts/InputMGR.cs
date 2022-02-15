@@ -13,6 +13,9 @@ public class InputMGR : MonoBehaviour
     [SerializeField] int verticalInput;
     [SerializeField] int horizontalInput;
 
+    [SerializeField] GameObject PauseTheGameCanvas; //インスペクター上でセットする
+    bool pauseFlag = false; //ポーズ状態ならtrue
+
 
     Vector2 mousePos;
     Vector2Int mouseGridPos;
@@ -66,6 +69,28 @@ public class InputMGR : MonoBehaviour
         //        Debug.LogWarning(string.Join(",", m.GetManualRoute()));
         //    }
         //}
+
+        if (GameManager.instance.state == GameManager.State.RunningGame || GameManager.instance.state == GameManager.State.PauseTheGame) //戦闘中またはポーズ中の時のみ一時停止用のメニューを操作できる。
+        {
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                Debug.LogWarning($"pauseFlagは{pauseFlag}です");
+                if (pauseFlag == true)
+                {
+                    pauseFlag = false;
+                    Debug.LogWarning("RuuningGameを呼びます");
+                    GameManager.instance.RunningGame();
+                    PauseTheGameCanvas.SetActive(false);
+                }
+                else
+                {
+                    pauseFlag = true;
+                    Debug.LogWarning("PauseTheGameを呼びます");
+                    GameManager.instance.PauseTheGame();
+                    PauseTheGameCanvas.SetActive(true);
+                }
+            }
+        }
 
         if (GameManager.instance.state != GameManager.State.MakeTheFirstRoad && GameManager.instance.state != GameManager.State.RunningGame) return; //以下の処理はGameManagerがMakeTheFirstRoadまたはRunningGameの時のみ実行される
 

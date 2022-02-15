@@ -386,6 +386,11 @@ public class CharacterMGR : MonoBehaviour
             Destroy(this.gameObject);
         }
 
+        if (GameManager.instance.state == GameManager.State.PauseTheGame) //ポーズ中の時はUpdateの処理をしない
+        {
+            return;
+        }
+
         //if (GameManager.instance.state != GameManager.State.RunningGame) return; //RunningGame意外だったらUpdateの処理をしない
 
         switch (state)

@@ -71,7 +71,9 @@ public class GameManager : MonoBehaviour
         SetupGame,
         MakeTheFirstRoad,
         RunningGame,
-        ShowingResults
+        PauseTheGame,
+        ShowingResults,
+        ResetData
     }
 
 
@@ -197,6 +199,10 @@ public class GameManager : MonoBehaviour
         state = State.RunningGame;
         mapMGR.makeTheFirstRoadGO.SetActive(false);
     }
+    public void PauseTheGame()
+    {
+        state = State.PauseTheGame;
+    }
     public void StartShowingResults( bool isWin)
     {
         state = State.ShowingResults;
@@ -221,6 +227,10 @@ public class GameManager : MonoBehaviour
             resultText.text = "”s–k";
 
         }
+    }
+    public void ResetData()
+    {
+        state = State.ResetData;
     }
     public void SpawnCharacter(int buttonNum)
     {

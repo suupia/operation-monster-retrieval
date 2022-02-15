@@ -4,17 +4,23 @@ using UnityEngine;
 
 public class PointerTailMGR : MonoBehaviour
 {
-    private int pointerTailIndex;
+    [SerializeField] int pointerTailIndex;
     private List<Vector2Int> manualRoute;
     private List<GameObject> pointerTails;
     private MapData map;
+    private int numOfChildren;
     private GameObject[] children;
     private SpriteRenderer[] childRenderers;
     private Vector2[] defaultPointerTailSizes;
-    private float pointerTailRate;
     private Color noChangedColor;
     [SerializeField] Color changedColor;
     [SerializeField] Sprite[] firstTailSprites;
+    [SerializeField] bool isCrossing;             //これがtrueのときは終点のSpriteをchangedColorにする
+
+    private int horizontal1Index = 0;
+    private int horizontal2Index = 1;
+    private int diagonal1Index = 2;
+    private int diagonal2Index = 3;
 
     [SerializeField] bool nonDiagonal;     //これがtrueのとき、PointerTailは斜めを向けないようにする（最小の回転用）
     [SerializeField] bool isDiagonal;      //斜めを向いてるとき、true
@@ -26,13 +32,23 @@ public class PointerTailMGR : MonoBehaviour
         set { nonDiagonal = value; }
     }
 
-    public bool GetDiagonal()
+    public bool GetIsDiagonal()
     {
         return isDiagonal;
     }
-    public void SetDiagonal(bool b)
+    public void SetIsDiagonal(bool b)
     {
         isDiagonal = b;
+    }
+
+    public bool GetIsCrossing()
+    {
+        return isCrossing;
+    }
+
+    public void SetIsCrossing(bool b)
+    {
+        isCrossing = b;
     }
     // Start is called before the first frame update
     void Start()
@@ -41,36 +57,37 @@ public class PointerTailMGR : MonoBehaviour
         pointerTailIndex = pointerTails.IndexOf(gameObject);    //pointerTailsにPointeTailが順番に仕舞われているので、Indexを取得しておく
         manualRoute = GameManager.instance.pointerMGR.GetManualRoute();
         map = GameManager.instance.mapMGR.GetMap();
-        children = new GameObject[2];
-        children[0] = transform.GetChild(0).gameObject;
-        children[1] = transform.GetChild(1).gameObject;
-        childRenderers = new SpriteRenderer[2];
-        childRenderers[0] = children[0].GetComponent<SpriteRenderer>();
-        childRenderers[1] = children[1].GetComponent<SpriteRenderer>();
-        defaultPointerTailSizes = new Vector2[2];
-        defaultPointerTailSizes[0] = childRenderers[0].size;
-        defaultPointerTailSizes[1] = childRenderers[1].size;
-        pointerTailRate = Mathf.Sqrt(2) * 19/20;//案1→19/20、案2→37/40
-        noChangedColor = childRenderers[0].color;
 
-        childRenderers[0].sortingOrder = pointerTailIndex;
-        childRenderers[1].sortingOrder = pointerTailIndex;
-
-        if(pointerTailIndex == 0)
+        numOfChildren = 4;
+        children = new GameObject[numOfChildren];
+        childRenderers = new SpriteRenderer[numOfChildren];
+        defaultPointerTailSizes = new Vector2[numOfChildren];
+        for (int i = 0; i < numOfChildren; i++)
         {
-            childRenderers[0].sprite = firstTailSprites[0];
-            childRenderers[1].sprite = firstTailSprites[1];
+            children[i] = transform.GetChild(i).gameObject;
+            childRenderers[i] = children[i].GetComponent<SpriteRenderer>();
+            defaultPointerTailSizes[i] = childRenderers[i].size;
+            childRenderers[i].sortingOrder = pointerTailIndex;
+        }
+        noChangedColor = childRenderers[0].color;      //Inspectorの方で全子オブジェクトの色を統一して置く
+
+        if(pointerTailIndex == 0)        //一番最初のPointerTailは始点を表示するのでSpriteを変える
+        {
+            childRenderers[horizontal1Index].sprite = firstTailSprites[0];
+            childRenderers[diagonal1Index].sprite = firstTailSprites[1];
+            children[horizontal2Index].SetActive(false);
+            children[diagonal2Index].SetActive(false);
         }
     }
 
     private void LateUpdate()
     {
+        ChangeColor();
         if (pointerTailIndex < GameManager.instance.pointerMGR.GetPoinerTails().Count - 4)      //このPointerTailがある程度前のものだった場合、処理は行わない
         {
             return;
         }
         RotatePointerTail();
-        ChangeColor();
     }
     private void RotatePointerTail()
     {
@@ -112,17 +129,16 @@ public class PointerTailMGR : MonoBehaviour
             if (angle != 0)
             {
                 transform.rotation = Quaternion.AngleAxis(angle-45, Vector3.forward);
-                //childRenderers[0].size = new Vector2(pointerTailRate, 1)* defaultPointerTailSizes[0];                //斜めを向くときは長さをsqrt2にする
-                ChangeToDiagonal(true);
+                ChangeToDiagonal(true);                                   //斜めのSpriteを表示する
                 pointerTails[pointerTailIndex + 1].SetActive(false);      //これを斜めに向かせる場合、この次のPointerTailは表示する必要がないので、非アクティブにする
                                                                           //大丈夫だと思うけど、この次のPointerTailのUpdateが先に呼ばれると困る気がするので、一応メモとして
-                SetDiagonal(true);
+                SetIsDiagonal(true);
                 return;    //斜めを向いたときはここでreturnされる
             }
             else
             {
                 pointerTails[pointerTailIndex + 1].SetActive(true);        //これが斜めを向かないときは、次のPointerTailをアクティブにする
-                SetDiagonal(false);
+                SetIsDiagonal(false);
             }
         }
 
@@ -150,8 +166,7 @@ public class PointerTailMGR : MonoBehaviour
                 angle = 180;
             }
         }
-        //childRenderers[0].size = new Vector2(1, 1)* defaultPointerTailSizex[0];        //斜めを向かないときはscaleは長さを1に
-        ChangeToDiagonal(false);
+        ChangeToDiagonal(false);                 //SpriteをHorizontalにする
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
     }
@@ -199,31 +214,79 @@ public class PointerTailMGR : MonoBehaviour
         //斜めにする 
         if (b)
         {
-            children[0].SetActive(false);
-            children[1].SetActive(true);
+            children[horizontal1Index].SetActive(false);
+            children[horizontal2Index].SetActive(false);
+            children[diagonal1Index].SetActive(true);
+            children[diagonal2Index].SetActive(true);
         }else  //横にする
         {
-            children[0].SetActive(true);
-            children[1].SetActive(false);
+            children[horizontal1Index].SetActive(true);
+            children[horizontal2Index].SetActive(true);
+            children[diagonal1Index].SetActive(false);
+            children[diagonal2Index].SetActive(false);
         }
 
     }
 
     private void ChangeColor()
     {
-        foreach(Vector2Int m in manualRoute)
+        ManageIsCrossing();
+        for (int i = 0; i < manualRoute.Count; i++)
         {
-            int i = manualRoute.IndexOf(m); 
-            if(m.x == manualRoute[pointerTailIndex].x && m.y == manualRoute[pointerTailIndex].y && i != pointerTailIndex && 
-                pointerTails[i].transform.rotation.Equals(transform.rotation) && pointerTails[i].GetComponent<PointerTailMGR>().GetDiagonal() == GetDiagonal())
+            Vector2Int m = manualRoute[i];
+            if(m.x == manualRoute[pointerTailIndex].x && m.y == manualRoute[pointerTailIndex].y && i < pointerTailIndex && pointerTails[i].activeSelf)       //PointerTailが交差したとき
             {
-                childRenderers[0].color = changedColor;
-                childRenderers[1].color = changedColor;
-                return;
+                if (Vector3.Angle(pointerTails[i].transform.rotation.eulerAngles, transform.rotation.eulerAngles) % 180 == 0 && pointerTails[i].GetComponent<PointerTailMGR>().GetIsDiagonal() == GetIsDiagonal())    //PointerTailが重なったとき
+                {
+                    foreach (SpriteRenderer sr in childRenderers)        //自分自身が重なっているときは全子オブジェクトをchangedColorにする
+                    {
+                        sr.color = changedColor;
+                    }
+                    return;
+                }
             }
         }
 
-        childRenderers[0].color = noChangedColor;
-        childRenderers[1].color = noChangedColor;
+        childRenderers[horizontal1Index].color = noChangedColor;            //isCrossingのときはHorizotal2, Diagonal2はchangedColorにしたいので、ここではいじらない
+        childRenderers[diagonal1Index].color = noChangedColor;
+    }
+
+    private void ManageIsCrossing()
+    {
+        if (GetIsCrossing())
+        {
+            childRenderers[horizontal2Index].color = changedColor;
+            childRenderers[diagonal2Index].color = changedColor;
+        }
+        else          //Horizontal2, Diagonal2をnoChangedColorにするのはここだけ
+        {
+            childRenderers[horizontal2Index].color = noChangedColor;
+            childRenderers[diagonal2Index].color = noChangedColor;
+        }
+
+        for (int i = 0; i < manualRoute.Count; i++)
+        {
+            if (i >= pointerTailIndex) break;    //Thisより手前のPointerTailと重なっているかが知りたいので
+
+            Vector2Int m = manualRoute[i];
+            if (m.x == manualRoute[pointerTailIndex].x && m.y == manualRoute[pointerTailIndex].y && pointerTails[i].activeSelf)       //PointerTailが交差したとき
+            {
+                Debug.LogWarning("isCrossing:" + transform.position);
+                if (pointerTails[pointerTailIndex - 1].activeSelf)       //一つ前のPointerTailがactiveのとき
+                {
+                    pointerTails[pointerTailIndex - 1].GetComponent<PointerTailMGR>().SetIsCrossing(true);
+                }
+                else         //一つ前のPointerTailがactiveでないとき（＝二つ前の点と斜めで繋がっているとき）
+                {
+                    pointerTails[pointerTailIndex - 2].GetComponent<PointerTailMGR>().SetIsCrossing(true);
+                }
+                return;
+            }
+        }
+        if (pointerTailIndex > 0)
+        {
+            pointerTails[pointerTailIndex - 1].GetComponent<PointerTailMGR>().SetIsCrossing(false);
+        }
+
     }
 }

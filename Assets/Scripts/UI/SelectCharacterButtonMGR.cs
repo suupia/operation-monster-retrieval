@@ -69,6 +69,10 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 
             }
         }
+        if(GameManager.instance.state == GameManager.State.ShowingResults && isEditingManualRoute)
+        {
+            ResetToNormalColor();
+        }
     }
     public void PointerDown() //EventTrigger‚ÅŒÄ‚Ô
     {
@@ -95,6 +99,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
                 GameManager.instance.inputMGR.SetManualRouteNumber(-1);
             }
         }
+
     }
 
     public void SwitchMode()

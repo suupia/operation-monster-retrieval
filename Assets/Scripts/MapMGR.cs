@@ -574,12 +574,12 @@ public class MapMGR : MonoBehaviour
 
         if (CanGetCloseToTheCastle())
         {
-            Debug.LogWarning("IsReachable‚Ítrue‚Å‚·");
+            Debug.Log("IsReachable‚Ítrue‚Å‚·");
             return true;
         }
         else
         {
-            Debug.LogWarning("IsReachable‚Ífalse‚Å‚·");
+            Debug.Log("IsReachable‚Ífalse‚Å‚·");
             return false; 
         }
 
