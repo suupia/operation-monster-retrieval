@@ -559,7 +559,7 @@ public class CharacterMGR : MonoBehaviour
 
         if (GameManager.instance.CanAttackTarget(gridPos, attackRange, GameManager.instance.facilityID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワーがあるとき
         {
-            Debug.LogWarning($"攻撃範囲内にタワーがあるのでInBatteleに切り替えます targetFacilityPos:{targetFacilityPos}");
+            Debug.Log($"攻撃範囲内にタワーがあるのでInBatteleに切り替えます targetFacilityPos:{targetFacilityPos}");
             SetDirection(targetFacilityPos - gridPos);
             state = State.InBattle;
             return;

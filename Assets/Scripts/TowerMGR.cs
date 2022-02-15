@@ -25,19 +25,16 @@ public class TowerMGR : Facility
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    private void Update()
-    {
-        if (GameManager.instance.state == GameManager.State.SelectingStage)
-        {
-            Debug.LogWarning("Towerオブジェクトを破棄します");
-            Destroy(this.gameObject);
-        }
+    //private void Update()
+    //{
+    //    if (GameManager.instance.state == GameManager.State.SelectingStage)
+    //    {
+    //        Debug.Log("Towerオブジェクトを破棄します");
+    //        Destroy(this.gameObject);
+    //    }
 
-        if (GameManager.instance.state == GameManager.State.PauseTheGame) //ポーズ中の時はUpdateの処理をしない
-        {
-            return;
-        }
-    }
+
+    //}
 
     public override void SetDirection(Vector2 directionVector)
     {

@@ -74,7 +74,6 @@ public class InputMGR : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.M))
             {
-                Debug.LogWarning($"pauseFlag‚Í{pauseFlag}‚Å‚·");
                 if (pauseFlag == true)
                 {
                     pauseFlag = false;
@@ -162,5 +161,10 @@ public class InputMGR : MonoBehaviour
 
     }
 
+    public void ClosePauseTheGameCanvas()
+    {
+        pauseFlag = false;
+        PauseTheGameCanvas.SetActive(false);
+    }
 
 }

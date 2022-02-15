@@ -23,6 +23,7 @@ public class MapMGR : MonoBehaviour
 
     [SerializeField] GameObject allysCastlePrefab;
     [SerializeField] Vector2Int allysCastlePos;
+    [SerializeField] bool isFristTimePlaceAllyCastle = true; //自分の城にはスクリプトがついていないため、Destroyできない　そのため、boolで一回だけ配置されるようにする
     [SerializeField] Vector2Int[] characterSpawnPossFromCastle;
     [System.NonSerialized] public Vector2Int[] characterSpawnPoss;
     [SerializeField] GameObject enemysCastlePrefab;
@@ -144,7 +145,11 @@ public class MapMGR : MonoBehaviour
 
     private void PlaceCastle()
     {
-        Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x, allysCastlePos.y+1, 0), Quaternion.identity); //画像の中心が格子点にくるように、+1していることに注意
+        if (isFristTimePlaceAllyCastle)
+        {
+            isFristTimePlaceAllyCastle = false;
+            Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x, allysCastlePos.y + 1, 0), Quaternion.identity); //画像の中心が格子点にくるように、+1していることに注意
+        }
         GameObject enemyCastleGO = Instantiate(enemysCastlePrefab, new Vector3(enemysCastlePos.x + 1, enemysCastlePos.y, 0), Quaternion.identity);
         CastleMGR enemyCastleMGR = enemyCastleGO.GetComponent<CastleMGR>();
 

@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class LeavingCombatButton : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] GameObject pauseTheGameCanvas; //インスペクター上でセットする。（InputMGRにも同様にしてセットしていることに注意）
+    public void LeavingCombat() //EventTriggerで呼ぶ
     {
-        
-    }
+        GameManager.instance.StartSelectingStage();
+        GameManager.instance.selectStageCanvas.SetActive(false);
+        GameManager.instance.menuCanvas.SetActive(true);
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        //pauseTheGameCanvas.SetActive(false);
+
+        GameManager.instance.inputMGR.ClosePauseTheGameCanvas();
     }
 }

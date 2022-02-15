@@ -83,6 +83,15 @@ public abstract class Facility : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.instance.state == GameManager.State.SelectingStage)
+        {
+            Destroy(this.gameObject);
+        }
+
+        if (GameManager.instance.state == GameManager.State.PauseTheGame) //ƒ|[ƒY’†‚Ì‚ÍUpdate‚Ìˆ—‚ğ‚µ‚È‚¢
+        {
+            return;
+        }
         switch (state)
         {
             case State.Idle:
