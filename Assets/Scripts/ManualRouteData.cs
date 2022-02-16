@@ -36,4 +36,10 @@ public class ManualRouteData
         nonDiagonalPoints = list;
     }
 
+    public void ResetManualRouteData()
+    {
+        manualRoute.Clear();
+        nonDiagonalPoints.Clear();
+    }
+
 }

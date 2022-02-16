@@ -140,7 +140,9 @@ public class GameManager : MonoBehaviour
         characterDatabase = new CharacterMGR[characterPrefabs.Length];
         for(int i=0; i < characterPrefabs.Length; i++)
         {
-            characterDatabase[i] = characterPrefabs[i].GetComponent<CharacterMGR>();
+            //characterDatabase[i] = characterPrefabs[i].GetComponent<CharacterMGR>();
+            characterDatabase[i] = characterPrefabs[i].GetComponent<CharacterMGR>().Clone();
+
         }
 
         characterMode = new CharacterMGR.Mode[numOfCharacterInCombat];
@@ -187,6 +189,8 @@ public class GameManager : MonoBehaviour
         mapMGR.SetupMap();
 
         MakeTheFirstRoad();
+
+        InitiManualRouteData();
 
     }
     public void MakeTheFirstRoad()
@@ -431,6 +435,11 @@ public class GameManager : MonoBehaviour
         return atk; //‚Æ‚è‚ ‚¦‚¸¡‚ÍUŒ‚—Í‚ğ‚»‚Ì‚Ü‚Ü•Ô‚·‚¾‚¯
     }
 
-
-
+    public void InitiManualRouteData()
+    {
+        foreach(ManualRouteData m in manualRouteDatas)
+        {
+            m.ResetManualRouteData();
+        }
+    }
 }

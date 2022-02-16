@@ -32,7 +32,7 @@ public class PointerMGR : MonoBehaviour
 
     private void Update()
     {
-        if(transform.position != startPos && GameManager.instance.state == GameManager.State.ShowingResults)      //戦闘終了時の処理
+        if (transform.position != startPos && GameManager.instance.state == GameManager.State.ShowingResults)      //戦闘終了時の処理
         {
             ResetPointer();
         }
@@ -141,10 +141,16 @@ public class PointerMGR : MonoBehaviour
             Debug.Log("同じマスを通れるのは2回までです");
             return;
         }
-                                                                                                
-        if (finalManualRoute.Count(pos => pos == pointerGridPos) >= 2 && finalManualRoute[0] != pointerGridPos && finalManualRoute[finalManualRoute.IndexOf(pointerGridPos) - 1] == mouseGridPos && manualRoute[manualRoute.Count - 2] != mouseGridPos)    //前に通った道を逆向きに進もうとしていて、来た道を戻らない場合はreturn
+
+        if (finalManualRoute.Count(pos => pos == pointerGridPos) >= 2 && finalManualRoute[0] != pointerGridPos && finalManualRoute[finalManualRoute.IndexOf(pointerGridPos) - 1] == mouseGridPos && manualRoute[manualRoute.Count - 2] != mouseGridPos)    //前に通った道(縦or横)を逆向きに進もうとしていて、来た道を戻らない場合はreturn
         {
-            Debug.LogWarning("既にPointerTailが表示されているマスを逆向きに進むことはできません");
+            Debug.LogWarning("既にPointerTailが表示されているマスを逆向(縦or横)きに進むことはできません");
+            return;
+        }
+
+        if (manualRoute.Count >= 2 && finalManualRoute.Count(pos => pos == manualRoute[manualRoute.Count - 2]) >= 2 && finalManualRoute[0] != pointerGridPos && finalManualRoute[finalManualRoute.IndexOf(manualRoute[manualRoute.Count - 2]) - 1] == mouseGridPos && manualRoute[manualRoute.Count - 2] != mouseGridPos)    //前に通った道(縦or横)を逆向きに進もうとしていて、来た道を戻らない場合はreturn
+        {
+            Debug.LogWarning("既にPointerTailが表示されているマスを逆向き(斜め)に進むことはできません");
             return;
         }
 
@@ -159,6 +165,7 @@ public class PointerMGR : MonoBehaviour
         IsOnCastle();
         ManageManualRouteList();
         ManageMPointerTails();
+        ManageIsCrossing();
     }
     private void ManageManualRouteList()
     {
@@ -196,7 +203,7 @@ public class PointerMGR : MonoBehaviour
 
     private void IsOnCastle()
     {
-        if((int)transform.position.x >= GameManager.instance.mapMGR.GetEnemysCastlePos().x-1 && (int)transform.position.y <= GameManager.instance.mapMGR.GetEnemysCastlePos().y+1)
+        if ((int)transform.position.x >= GameManager.instance.mapMGR.GetEnemysCastlePos().x - 1 && (int)transform.position.y <= GameManager.instance.mapMGR.GetEnemysCastlePos().y + 1)
         {
             Debug.LogWarning("PointerがCastleに到達しました");
             isOnCastle = true;
@@ -215,9 +222,9 @@ public class PointerMGR : MonoBehaviour
         nonDiagonalPoints = new List<int>(); //同上
         isOnCastle = false;
         transform.position = startPos;
-        while(pointerTails.Count != 0)
+        while (pointerTails.Count != 0)
         {
-            Destroy(pointerTails[pointerTails.Count -1]);
+            Destroy(pointerTails[pointerTails.Count - 1]);
             pointerTails.RemoveAt(pointerTails.Count - 1);
         }
         manualRoute.Add(GameManager.instance.mapMGR.GetAllysCastlePos());
@@ -229,4 +236,31 @@ public class PointerMGR : MonoBehaviour
         this.GetComponent<SpriteRenderer>().sortingOrder = pointerTails.Count + 1;
     }
 
+    private void ManageIsCrossing()
+    {
+        int lastPointerTailIndex = pointerTails.Count - 1;
+        if (!pointerTails[lastPointerTailIndex].activeSelf)
+        {
+            lastPointerTailIndex--;
+        }
+
+        Vector2Int pointerGridPos = GameManager.instance.ToGridPosition(transform.position);
+
+        for (int i = 0; i < manualRoute.Count; i++)
+        {
+            if (i >= manualRoute.Count - 1) break;    //前に通った点かどうか知りたいので
+
+            Vector2Int m = manualRoute[i];
+            if (m.x == pointerGridPos.x && m.y == pointerGridPos.y)       //Poniterが、PointerTailが存在する点にいるとき
+            {
+                if (pointerTails[i].activeSelf)       //その点にあるPointerTailがactiveのとき
+                {
+                    pointerTails[lastPointerTailIndex].GetComponent<PointerTailMGR>().SetIsCrossing(true);
+                    //Debug.LogWarning("isCrossing,Index:" + lastPointerTailIndex + ",manualIndex:" + i);
+                    return;
+                }
+            }
+        }
+        pointerTails[lastPointerTailIndex].GetComponent<PointerTailMGR>().SetIsCrossing(false);
+    }
 }

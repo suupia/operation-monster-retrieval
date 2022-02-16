@@ -93,6 +93,7 @@
     <Compile Include="Assets\Scripts\UI\DragCharacterMGR.cs" />
     <Compile Include="Assets\Shapes2D\Scripts\PolyMap.cs" />
     <Compile Include="Assets\Scripts\UI\LeavingCombatButton.cs" />
+    <Compile Include="Assets\Scripts\UI\LevelUpButton.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Shapes2D\Shaders\Triangle.cginc" />

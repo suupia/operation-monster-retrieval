@@ -140,6 +140,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         isEditingManualRoute = false;
         buttonImage.color = notSelectedColor;
         Debug.LogWarning($"ManualRouteのキャラクタ―選択を解除しました number={GameManager.instance.inputMGR.GetManualRouteNumber()}");
+        GameManager.instance.inputMGR.SetManualRouteNumber(-1);       //InputMGRでのManualRouteの選択を外す
     }
 
     public void RefreshGauge(float percentage)

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class StatusCanvasMGR : MonoBehaviour
 {
+    CharacterMGR characterMGRDisplayed; //UpdateStatusCanvas()で更新する
     [SerializeField] Text nameText;
     [SerializeField] Text levelText;
     [SerializeField] Text hpText;
@@ -17,18 +18,36 @@ public class StatusCanvasMGR : MonoBehaviour
     [SerializeField] Text costText;
     [SerializeField] Image characterImage;
 
+    [SerializeField] Text levelUpCostText; //インスペクター上でセットする
+    [SerializeField] int[] levelUpCostArray; //レベルアップに必要な経験値をインスペクター上で決める
+
     [SerializeField] Text EXPText;
     int _EXPretained; //保持している経験値 プロパティのsetterでEXPTextを更新する
 
-    public int EXPretained
+    public int EXPretained //プロパティ
     {
         get{ return _EXPretained; }
         set{ 
             _EXPretained = value;
-            UpdateEXPText();
+            EXPText.text = $"EXP:{_EXPretained,8:D}"; //alignmentとして8を指定している（右揃えで書式Dの8文字分。ただし、数字の幅と同じとは限らないみたい）
+
         }
     }
 
+    public CharacterMGR GetCharacterMGRDisplayed()
+    {
+        return characterMGRDisplayed;
+    }
+
+    private void Start()
+    {
+        //Debug.LogWarning("StatusCanbasMGRのStart()を実行します");
+        UpdateStatusCanvas(0); //最初はID:0のBatを表示させておく
+
+
+        //デバッグ用
+        EXPretained += 10000; //レベルアップの実装をしやすいように最初から経験値を与えておく
+    }
     public void UpdateStatusCanvasInCombat(int dropNum)
     {
         UpdateStatusCanvas(GameManager.instance.IDsOfCharactersInCombat[dropNum]);
@@ -41,26 +60,38 @@ public class StatusCanvasMGR : MonoBehaviour
 
     void UpdateStatusCanvas(int characterTypeID)
     {
-        nameText.text = GameManager.instance.GetCharacterDatabase(characterTypeID).GetCharacterName();
-        levelText.text = " LV :"+GameManager.instance.GetCharacterDatabase(characterTypeID).GetLevel().ToString();
-        costText.text = "Cost:" + GameManager.instance.GetCharacterDatabase(characterTypeID).GetCost().ToString();
-        hpText.text ="  HP  :"+ GameManager.instance.GetCharacterDatabase(characterTypeID).GetMaxHp().ToString();
-        atkText.text = " ATK :"+GameManager.instance.GetCharacterDatabase(characterTypeID).GetAtk().ToString();
-        spdText.text = " SPD :" + GameManager.instance.GetCharacterDatabase(characterTypeID).GetSpd().ToString();
-        attackIntervalText.text = "ATK Interval:"+GameManager.instance.GetCharacterDatabase(characterTypeID).GetAttackInterval().ToString();
-        attackRangeText.text = " ATK Range :"+GameManager.instance.GetCharacterDatabase(characterTypeID).GetAttackRange().ToString();
-        coolTimeText.text = "Cool Time:"+GameManager.instance.GetCharacterDatabase(characterTypeID).GetCoolTime().ToString();
+        Debug.LogWarning("StatusCanvasを更新します");
+        characterMGRDisplayed = GameManager.instance.GetCharacterDatabase(characterTypeID);
 
-        if (GameManager.instance.GetCharacterDatabase(characterTypeID).GetSprite() != null)
+        nameText.text = characterMGRDisplayed.GetCharacterName();
+        levelText.text = " LV :"+(characterMGRDisplayed.GetLevel()+1).ToString();
+        costText.text = "Cost:" + characterMGRDisplayed.GetCost().ToString();
+        hpText.text ="  HP  :"+ characterMGRDisplayed.GetMaxHp().ToString();
+        atkText.text = " ATK :"+characterMGRDisplayed.GetAtk().ToString();
+        spdText.text = " SPD :" + characterMGRDisplayed.GetSpd().ToString();
+        attackIntervalText.text = "ATK Interval:"+characterMGRDisplayed.GetAttackInterval().ToString();
+        attackRangeText.text = " ATK Range :"+characterMGRDisplayed.GetAttackRange().ToString();
+        coolTimeText.text = "Cool Time:"+characterMGRDisplayed.GetCoolTime().ToString();
+
+        if (characterMGRDisplayed.GetLevel()< characterMGRDisplayed.GetMaxLevel())
         {
-            characterImage.sprite = GameManager.instance.GetCharacterDatabase(characterTypeID).GetSprite();
+            levelUpCostText.text = $"次のレベルまで\nEXP{levelUpCostArray[characterMGRDisplayed.GetLevel()]}";
+        }
+        else
+        {
+            levelUpCostText.text = $"最大レベルです";
+        }
 
+        if (characterMGRDisplayed.GetSprite() != null)
+        {
+            characterImage.sprite = characterMGRDisplayed.GetSprite();
         }
     }
 
-    void UpdateEXPText()
+    public void LevelUpCharacterDisplayed()
     {
-        EXPText.text = $"EXP:{EXPretained,8:D}"; //alignmentとして8を指定している（右揃えで書式Dの8文字分。ただし、数字の幅と同じとは限らないみたい）
-    }
+        characterMGRDisplayed.LevelUp();
 
+        UpdateStatusCanvas(characterMGRDisplayed.GetCharacterTypeID());
+    }
 }

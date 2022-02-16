@@ -21,7 +21,8 @@ public class CharacterMGR : MonoBehaviour
 
     [SerializeField] string characterName;
     [SerializeField] int characterTypeID;
-    [SerializeField] int level;
+    [SerializeField] int level; //0からスタートすることに注意
+    int maxLevel=9; //最大レベルは10
     [SerializeField] int maxHp;
     [SerializeField] int hp;
     public int HP
@@ -43,13 +44,21 @@ public class CharacterMGR : MonoBehaviour
         }
     } //プロパティ
     [SerializeField] int atk;
-    [SerializeField] float attackInterval;
-    [SerializeField] int attackRange;
+    [SerializeField] float atkInterval;
+    [SerializeField] int atkRange;
     [SerializeField] float spd; //1秒間に進むマスの数 [マス/s]  とりあえず１にしておく
     float moveTime; // movetime = 1/spd [s]
     [SerializeField] float coolTime;
     [SerializeField] int cost;
     [SerializeField] Sprite sprite;
+
+    [SerializeField] int[] hpGrowthRate; //成長率をインスペクター上で決めておく ex) 0,1,0 なら、最初のレベルアップでは変化せず、次のレベルアップで1上がる
+    [SerializeField] int[] atkGrowthRate;
+    [SerializeField] int[] spdGrowthRate;
+    [SerializeField] int[] atkIntervalGrowthRate;
+    [SerializeField] int[] atkRangeGrowthRate;
+    [SerializeField] int[] coolTimeGrowthRate;
+
 
     bool isMarching = false;
     bool isAttacking = false;
@@ -115,6 +124,10 @@ public class CharacterMGR : MonoBehaviour
         DiagLeftBack
     }
 
+    public CharacterMGR Clone() //ディープコピー用
+    {
+        return (CharacterMGR)MemberwiseClone();
+    }
 
     //Getter
     public Vector2Int GetGridPos()
@@ -181,6 +194,10 @@ public class CharacterMGR : MonoBehaviour
     {
         return level;
     }
+    public int GetMaxLevel()
+    {
+        return maxLevel;
+    }
     public int GetMaxHp()
     {
         return maxHp;
@@ -191,11 +208,11 @@ public class CharacterMGR : MonoBehaviour
     }
     public float GetAttackInterval()
     {
-        return attackInterval;
+        return atkInterval;
     }
     public int GetAttackRange()
     {
-        return attackRange;
+        return atkRange;
     }
     public float GetSpd()
     {
@@ -350,6 +367,28 @@ public class CharacterMGR : MonoBehaviour
                 this.mode = Mode.Manual;
                 break;
         }
+
+    }
+    public void LevelUp()
+    {
+        if (level == maxLevel)
+        {
+            Debug.LogWarning("最大レベルなのでレベルアップできません");
+            return;
+        }
+
+        Debug.LogWarning($"{characterName}のレベルを上げます");
+
+        maxHp += hpGrowthRate[level];
+        atk += atkGrowthRate[level];
+        spd += spdGrowthRate[level];
+        atkInterval += atkIntervalGrowthRate[level];
+        atkRange += atkRangeGrowthRate[level];
+        coolTime += coolTimeGrowthRate[level];
+
+        level++;
+
+        
 
     }
     private void Start()
@@ -557,9 +596,9 @@ public class CharacterMGR : MonoBehaviour
         //    return;
         //}
 
-        if (GameManager.instance.CanAttackTarget(gridPos, attackRange, GameManager.instance.facilityID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワーがあるとき
+        if (GameManager.instance.CanAttackTarget(gridPos, atkRange, GameManager.instance.facilityID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワーがあるとき
         {
-            Debug.Log($"攻撃範囲内にタワーがあるのでInBatteleに切り替えます targetFacilityPos:{targetFacilityPos}");
+            Debug.LogWarning($"攻撃範囲内にタワーがあるのでInBatteleに切り替えます targetFacilityPos:{targetFacilityPos}");
             SetDirection(targetFacilityPos - gridPos);
             state = State.InBattle;
             return;
@@ -639,7 +678,7 @@ public class CharacterMGR : MonoBehaviour
         targetFacility.HP -= damage;
         DrawDamage(damage);
 
-        while (timer < attackInterval)
+        while (timer < atkInterval)
         {
             timer += Time.deltaTime;
             yield return null;
