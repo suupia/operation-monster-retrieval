@@ -272,6 +272,7 @@ public class GameManager : MonoBehaviour
         Debug.Log($"displacement:{displacement}");
 
         GameObject characterGO = Instantiate(characterPrefabs[characterTypeID], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0) + displacement, Quaternion.identity);
+
         CharacterMGR characterMGR = characterGO.GetComponent<CharacterMGR>();
 
         //ƒXƒ|[ƒ“‚ÅCost‚ğÁ”ï‚·‚é

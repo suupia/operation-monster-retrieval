@@ -96,7 +96,6 @@ public class SelectCharacterButtonMGR : MonoBehaviour
                 Debug.LogWarning("ResetToNormalColor‚ğÀs‚µ‚Ü‚·");
 
                 ResetToNormalColor();
-                GameManager.instance.inputMGR.SetManualRouteNumber(-1);
             }
         }
 

@@ -69,8 +69,8 @@ public class StatusCanvasMGR : MonoBehaviour
         hpText.text ="  HP  :"+ characterMGRDisplayed.GetMaxHp().ToString();
         atkText.text = " ATK :"+characterMGRDisplayed.GetAtk().ToString();
         spdText.text = " SPD :" + characterMGRDisplayed.GetSpd().ToString();
-        attackIntervalText.text = "ATK Interval:"+characterMGRDisplayed.GetAttackInterval().ToString();
-        attackRangeText.text = " ATK Range :"+characterMGRDisplayed.GetAttackRange().ToString();
+        attackIntervalText.text = "ATK Interval:"+characterMGRDisplayed.GetAtkInterval().ToString();
+        attackRangeText.text = " ATK Range :"+characterMGRDisplayed.GetAtkRange().ToString();
         coolTimeText.text = "Cool Time:"+characterMGRDisplayed.GetCoolTime().ToString();
 
         if (characterMGRDisplayed.GetLevel()< characterMGRDisplayed.GetMaxLevel())
@@ -90,8 +90,28 @@ public class StatusCanvasMGR : MonoBehaviour
 
     public void LevelUpCharacterDisplayed()
     {
-        characterMGRDisplayed.LevelUp();
+        //Debug.LogWarning($"characterMGRDisplayed.GetLevel():{characterMGRDisplayed.GetLevel()}");
 
-        UpdateStatusCanvas(characterMGRDisplayed.GetCharacterTypeID());
+        if (characterMGRDisplayed.GetLevel() == characterMGRDisplayed.GetMaxLevel())
+        {
+            //Debug.LogWarning("最大レベルなので処理を中断します");
+            return;
+        }
+
+        if (EXPretained >= levelUpCostArray[characterMGRDisplayed.GetLevel()])
+        {
+            EXPretained -= levelUpCostArray[characterMGRDisplayed.GetLevel()];
+            characterMGRDisplayed.LevelUp();
+            UpdateStatusCanvas(characterMGRDisplayed.GetCharacterTypeID());
+
+        }
+        else
+        {
+            //Debug.LogWarning($"EXPが足りないためレベルアップできません");
+            levelUpCostText.text = $"EXPが足りないため\nレベルアップできません";
+            Invoke("UpdateStatusCanvas",1); //levelUpCostTextを更新するため
+
+        }
+
     }
 }

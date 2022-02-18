@@ -50,7 +50,8 @@ public class CharacterMGR : MonoBehaviour
     float moveTime; // movetime = 1/spd [s]
     [SerializeField] float coolTime;
     [SerializeField] int cost;
-    [SerializeField] Sprite sprite;
+    [SerializeField] Sprite sprite; //立ち絵
+    [SerializeField] Sprite thumbnailSprite; //ボタンに表示するスプライト
 
     [SerializeField] int[] hpGrowthRate; //成長率をインスペクター上で決めておく ex) 0,1,0 なら、最初のレベルアップでは変化せず、次のレベルアップで1上がる
     [SerializeField] int[] atkGrowthRate;
@@ -206,11 +207,11 @@ public class CharacterMGR : MonoBehaviour
     {
         return atk;
     }
-    public float GetAttackInterval()
+    public float GetAtkInterval()
     {
         return atkInterval;
     }
-    public int GetAttackRange()
+    public int GetAtkRange()
     {
         return atkRange;
     }
@@ -231,18 +232,23 @@ public class CharacterMGR : MonoBehaviour
     {
         return sprite;
     }
+    public Sprite GetThumbnailSprite()
+    {
+        return thumbnailSprite;
+    }
     //Setter
     public void SetCharacterData(int buttonNum, int characterTypeID)  //hpやatkなどの情報もここでセットする。
     {
         autoRoute = GameManager.instance.autoRouteDatas[buttonNum];
         manualRoute = GameManager.instance.manualRouteDatas[buttonNum];
 
-        //maxHp = CSVLoader.monsterDataList[characterTypeID].HP;
-        //atk = CSVLoader.monsterDataList[characterTypeID].ATK;
-        //attackInterval = CSVLoader.monsterDataList[characterTypeID].AttackInterval;
-        //attackRange = CSVLoader.monsterDataList[characterTypeID].AttackRange;
-        //spd = CSVLoader.monsterDataList[characterTypeID].SPD;
-        //coolTime = CSVLoader.monsterDataList[characterTypeID].CoolTime;
+        level = GameManager.instance.GetCharacterDatabase(characterTypeID).GetLevel();
+        maxHp = GameManager.instance.GetCharacterDatabase(characterTypeID).GetMaxHp();
+        atk = GameManager.instance.GetCharacterDatabase(characterTypeID).GetAtk();
+        atkInterval = GameManager.instance.GetCharacterDatabase(characterTypeID).GetAtkInterval();
+        atkRange = GameManager.instance.GetCharacterDatabase(characterTypeID).GetAtkRange();
+        spd = GameManager.instance.GetCharacterDatabase(characterTypeID).GetSpd();
+        coolTime = GameManager.instance.GetCharacterDatabase(characterTypeID).GetCoolTime();
 
     }
     public void SetDirection(Vector2 directionVector)
@@ -373,7 +379,7 @@ public class CharacterMGR : MonoBehaviour
     {
         if (level == maxLevel)
         {
-            Debug.LogWarning("最大レベルなのでレベルアップできません");
+            Debug.LogError("最大レベルなのでレベルアップできません"); //LevelUp()はレベルアップできることが確定しているときにのみ呼ばれるので、このログはエラー扱いにする
             return;
         }
 
@@ -386,9 +392,7 @@ public class CharacterMGR : MonoBehaviour
         atkRange += atkRangeGrowthRate[level];
         coolTime += coolTimeGrowthRate[level];
 
-        level++;
-
-        
+        level++;   
 
     }
     private void Start()
