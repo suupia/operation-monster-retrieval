@@ -17,9 +17,13 @@ public class StatusCanvasMGR : MonoBehaviour
     [SerializeField] Text coolTimeText;
     [SerializeField] Text costText;
     [SerializeField] Image characterImage;
+    [SerializeField] Image characterFullScreenImage;
 
     [SerializeField] Text levelUpCostText; //インスペクター上でセットする
     [SerializeField] int[] levelUpCostArray; //レベルアップに必要な経験値をインスペクター上で決める
+
+    [SerializeField] GameObject fullScreenCanvas; //インスペクタ上でセットする
+    bool isDisplayingFullScreen = false;
 
     [SerializeField] Text EXPText;
     int _EXPretained; //保持している経験値 プロパティのsetterでEXPTextを更新する
@@ -113,5 +117,24 @@ public class StatusCanvasMGR : MonoBehaviour
 
         }
 
+    }
+
+    public void SwitchFullScreen() //OpenであってもCloseであってもどちらもこの関数で対応できる
+    {
+        if (isDisplayingFullScreen)
+        {
+            Debug.LogWarning("全画面スクリーンを閉じます");
+            isDisplayingFullScreen = false;
+
+            fullScreenCanvas.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("全画面スクリーンを開きます");
+            isDisplayingFullScreen = true;
+
+            characterFullScreenImage.sprite = characterMGRDisplayed.GetSprite();
+            fullScreenCanvas.SetActive(true);
+        }
     }
 }

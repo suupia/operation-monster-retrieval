@@ -64,6 +64,7 @@
     <Compile Include="Assets\Scripts\Facility.cs" />
     <Compile Include="Assets\Shapes2D\Demos\Simple Effect\TapEffect.cs" />
     <Compile Include="Assets\Shapes2D\Scripts\Shapes2DPrefs.cs" />
+    <Compile Include="Assets\Scripts\UI\ButtonSizeMGR.cs" />
     <Compile Include="Assets\Scripts\ManualRouteData.cs" />
     <Compile Include="Assets\Scripts\UI\LeavingCombatButton.cs" />
     <Compile Include="Assets\Shapes2D\Scripts\Shape.cs" />
@@ -94,7 +95,7 @@
     <Compile Include="Assets\Scripts\CharacterDatabase.cs" />
     <Compile Include="Assets\Scripts\UI\DragCharacterMGR.cs" />
     <Compile Include="Assets\Shapes2D\Scripts\PolyMap.cs" />
-    <Compile Include="Assets\Scripts\UI\ButtonSizeMGR.cs" />
+    <Compile Include="Assets\Scripts\UI\FullScreenButton.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Shapes2D\Shaders\Triangle.cginc" />
