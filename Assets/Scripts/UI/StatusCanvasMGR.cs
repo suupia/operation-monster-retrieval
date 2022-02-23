@@ -23,6 +23,7 @@ public class StatusCanvasMGR : MonoBehaviour
     [SerializeField] int[] levelUpCostArray; //レベルアップに必要な経験値をインスペクター上で決める
 
     [SerializeField] GameObject fullScreenCanvas; //インスペクタ上でセットする
+    [SerializeField] Text fullScreenNameText;
     bool isDisplayingFullScreen = false;
 
     [SerializeField] Text EXPText;
@@ -90,6 +91,11 @@ public class StatusCanvasMGR : MonoBehaviour
         {
             characterImage.sprite = characterMGRDisplayed.GetSprite();
         }
+
+        //FullScreen用
+        fullScreenNameText.text = characterMGRDisplayed.GetCharacterName();
+        characterFullScreenImage.sprite = characterMGRDisplayed.GetSprite();
+
     }
 
     public void LevelUpCharacterDisplayed()
@@ -133,7 +139,7 @@ public class StatusCanvasMGR : MonoBehaviour
             Debug.LogWarning("全画面スクリーンを開きます");
             isDisplayingFullScreen = true;
 
-            characterFullScreenImage.sprite = characterMGRDisplayed.GetSprite();
+
             fullScreenCanvas.SetActive(true);
         }
     }
