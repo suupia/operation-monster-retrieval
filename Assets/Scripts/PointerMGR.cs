@@ -238,6 +238,7 @@ public class PointerMGR : MonoBehaviour
 
     private void ManageIsCrossing()
     {
+        if (pointerTails.Count < 1) return;
         int lastPointerTailIndex = pointerTails.Count - 1;
         if (!pointerTails[lastPointerTailIndex].activeSelf)
         {
