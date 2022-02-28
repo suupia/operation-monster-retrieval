@@ -107,8 +107,11 @@
      <None Include="Assets\Shapes2D\Shaders\Common.cginc" />
      <None Include="Assets\Shapes2D\Shaders\Ellipse.cginc" />
      <None Include="Assets\Shapes2D\Shaders\Shape.shader" />
+     <None Include="Assets\Art\Font\Reggae_One\OFL.txt" />
      <None Include="Assets\Shapes2D\Shaders\Rectangle.cginc" />
      <None Include="Assets\Shapes2D\Shaders\Polygon.cginc" />
+     <None Include="Assets\Art\Font\Stick\OFL.txt" />
+     <None Include="Assets\Art\Font\Best10-FONT\Best10-FONT\ReadMe.txt" />
      <None Include="Assets\Shapes2D\changelog.txt" />
      <None Include="Assets\Shapes2D\Shaders\Path.cginc" />
      <None Include="Assets\Shapes2D\readme.txt" />

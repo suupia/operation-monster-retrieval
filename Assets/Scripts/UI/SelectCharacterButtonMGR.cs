@@ -7,21 +7,24 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 {
     [SerializeField] int buttonNum; //インスペクター上でセットする
 
-    [SerializeField] Image buttonImage; //インスペクター上でセットする
+    [SerializeField] Image selectCharacterImage; //インスペクター上でセットする
+    [SerializeField] GameObject changeColorMask; //色をまったく載せない時にはこのGameObjectをfalseにする
+    [SerializeField] Image changeColorImage; //インスペクター上でセットする
     [SerializeField] Image modeSwitchButtonImage;
     [SerializeField] Text modeSwitchButtonText;
     [SerializeField] Text costText;
 
-    Color canSpawnCharacterColor = Color.white;
-    Color canNotSpawnCharacterColor = Color.gray;
+    Color canSpawnCharacterColor;
+    Color canNotSpawnCharacterColor;
 
+    bool spawningCharacter;
     //以下、modeSwitchButtonの変数
     CharacterMGR.Mode mode = CharacterMGR.Mode.Auto; //デフォルトはAutoMode
 
     //以下、ManualRoute用の変数
    [SerializeField] bool isEditingManualRoute;
-    Color selectedColor = Color.cyan;
-    Color notSelectedColor = Color.white;
+    Color selectedColor;
+    Color notSelectedColor;
 
     //以下、CoolTime用の変数
     [SerializeField] Image emptyGauge;
@@ -35,40 +38,78 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 
         isEditingManualRoute = false;
 
+        //色の初期化
+        canSpawnCharacterColor = Color.white;
+        canNotSpawnCharacterColor = new Color(0.4f,0.4f,0.4f,1); //若干濃いグレー
+        selectedColor = Color.cyan;
+        notSelectedColor = Color.gray;
         emptyGauge.color = Color.clear;
         filledGauge.color = Color.clear;
 
+        //画像の初期化
+        SetSelectCharacterImage(GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[buttonNum]).GetThumbnailSprite());
+
         costText.text = GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[buttonNum]).GetCost() + "ene";
     }
+
+    //Seeter
+    public void SetSelectCharacterImage(Sprite sprite)
+    {
+        selectCharacterImage.sprite = sprite;
+    }
+
     void Update()
     {
-
-        if (GameManager.instance.energyMGR.CurrentEnergy >= GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetCost())
+        Color finalColor;
+        if (GameManager.instance.energyMGR.CurrentEnergy >= GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetCost() && !spawningCharacter)
         {
             if (isEditingManualRoute)
             {
-                buttonImage.color = canSpawnCharacterColor * selectedColor; //乗算で処理する
+                finalColor = canSpawnCharacterColor * selectedColor; //乗算で処理する
+                Debug.LogWarning($"finalColor:{finalColor}");
+
 
             }
             else
             {
-                buttonImage.color = canSpawnCharacterColor * notSelectedColor;
-
+                finalColor = Color.clear; //この時だけ別で、透明扱いする
+                Debug.LogWarning($"finalColor:{finalColor}");
             }
         }
         else
         {
             if (isEditingManualRoute)
             {
-                buttonImage.color = canNotSpawnCharacterColor * selectedColor;
+                finalColor = canNotSpawnCharacterColor * selectedColor;
+                Debug.LogWarning($"finalColor:{finalColor}");
+
 
             }
             else
             {
-                buttonImage.color = canNotSpawnCharacterColor * notSelectedColor;
+                finalColor = canNotSpawnCharacterColor * notSelectedColor;
+                Debug.LogWarning($"canNotSpawnCharacterColor:{canNotSpawnCharacterColor}, notSelectedColor:{notSelectedColor}");
+                Debug.LogWarning($"finalColor:{finalColor}");
+
 
             }
         }
+
+        finalColor.a *= 0.5f;　//ここまでのif分でfinalColorは不透明色になっているので、透明度を50％にする
+
+
+        Debug.LogWarning($"finalColor:{finalColor}");
+
+        if (finalColor != Color.clear)
+        {
+            changeColorMask.SetActive(true);
+            changeColorImage.color = finalColor;
+        }
+        else
+        {
+            changeColorMask.SetActive(false);
+        }
+
         if(GameManager.instance.state == GameManager.State.ShowingResults && isEditingManualRoute)
         {
             ResetToNormalColor();
@@ -101,7 +142,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 
     }
 
-    public void SwitchMode()
+    public void SwitchMode() //ModeSwitchButtonのEventTriggerで呼ぶ
     {
         Debug.Log($"Button{buttonNum}のmodeSwitchButtonが押されました");
         switch (mode)
@@ -127,7 +168,9 @@ public class SelectCharacterButtonMGR : MonoBehaviour
             GameManager.instance.inputMGR.GetSelectedButtonMGR().ResetToNormalColor(); //そのbuttonの色を戻す
         }
         isEditingManualRoute = true;
-        buttonImage.color = selectedColor;
+        changeColorImage.color = selectedColor;
+        Debug.LogWarning($"changeColorImage.color:{changeColorImage.color}");
+
         Debug.LogWarning($"buttonImage.colorを{selectedColor}に変更しました");
         GameManager.instance.inputMGR.SetManualRouteNumber(buttonNum);
         GameManager.instance.inputMGR.SetSelectedButtonMGR(this);
@@ -137,7 +180,9 @@ public class SelectCharacterButtonMGR : MonoBehaviour
     public void ResetToNormalColor()
     {
         isEditingManualRoute = false;
-        buttonImage.color = notSelectedColor;
+        changeColorImage.color = notSelectedColor;
+        Debug.LogWarning($"changeColorImage.color:{changeColorImage.color}");
+
         Debug.LogWarning($"ManualRouteのキャラクタ―選択を解除しました number={GameManager.instance.inputMGR.GetManualRouteNumber()}");
         GameManager.instance.inputMGR.SetManualRouteNumber(-1);       //InputMGRでのManualRouteの選択を外す
     }
@@ -147,11 +192,13 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         filledGauge.fillAmount = percentage;
         if (percentage >= 1)
         {
+            spawningCharacter = false;
             emptyGauge.color = Color.clear;
             filledGauge.color = Color.clear;
         }
         else
         {
+            spawningCharacter = true;
             emptyGauge.color = emptyGaugeColor;
             filledGauge.color = filledGaugeColor;
         }

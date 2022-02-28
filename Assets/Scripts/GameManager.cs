@@ -164,8 +164,9 @@ public class GameManager : MonoBehaviour
             manualRouteDatas[i] = new ManualRouteData(); //¡‚ÍmanualRouteData‚ª‚È‚¢
         }
 
-        StartSelectingStage();
 
+
+        StartSelectingStage();
 
     }
     

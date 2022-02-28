@@ -32,7 +32,7 @@ public class CharacterMGR : MonoBehaviour
         {
             if(value - hp < 0)
             {
-                Debug.LogWarning("SetDamagedAnimationを呼びます");
+                Debug.Log("SetDamagedAnimationを呼びます");
                 SetDamageAnimation();
             }
             hp = value;
@@ -61,7 +61,7 @@ public class CharacterMGR : MonoBehaviour
     [SerializeField] int[] coolTimeGrowthRate;
 
 
-    bool isMarching = false;
+    //bool isMarching = false;  今は使っていないからコメントアウト
     bool isAttacking = false;
     bool isMoving = false;
 
@@ -328,33 +328,33 @@ public class CharacterMGR : MonoBehaviour
         switch (direction)
         {
             case Direction.Back:
-                Debug.LogWarning($"{direction}のdamageアニメーションを設定します");
+                Debug.Log($"{direction}のdamageアニメーションを設定します");
                 animator.SetTrigger("BackDamage");
                 break;
 
             case Direction.DiagLeftBack:
             case Direction.DiagRightBack:
-                Debug.LogWarning($"{direction}のdamageアニメーションを設定します");
+                Debug.Log($"{direction}のdamageアニメーションを設定します");
 
                 animator.SetTrigger("DiagonalBackDamage");
                 break;
 
             case Direction.Left:
             case Direction.Right:
-                Debug.LogWarning($"{direction}のdamageアニメーションを設定します");
+                Debug.Log($"{direction}のdamageアニメーションを設定します");
 
                 animator.SetTrigger("SideDamage");
                 break;
 
             case Direction.DiagLeftFront:
             case Direction.DiagRightFront:
-                Debug.LogWarning($"{direction}のdamageアニメーションを設定します");
+                Debug.Log($"{direction}のdamageアニメーションを設定します");
 
                 animator.SetTrigger("DiagonalFrontDamage");
                 break;
 
             case Direction.Front:
-                Debug.LogWarning($"{direction}のdamageアニメーションを設定します");
+                Debug.Log($"{direction}のdamageアニメーションを設定します");
 
                 animator.SetTrigger("FrontDamage");
                 break;
@@ -607,7 +607,7 @@ public class CharacterMGR : MonoBehaviour
 
         if (GameManager.instance.CanAttackTarget(gridPos, atkRange, GameManager.instance.facilityID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワーがあるとき
         {
-            Debug.LogWarning($"攻撃範囲内にタワーがあるのでInBatteleに切り替えます targetFacilityPos:{targetFacilityPos}");
+            Debug.Log($"攻撃範囲内にタワーがあるのでInBatteleに切り替えます targetFacilityPos:{targetFacilityPos}");
             SetDirection(targetFacilityPos - gridPos);
             state = State.InBattle;
             return;

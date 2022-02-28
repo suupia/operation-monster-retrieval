@@ -10,10 +10,17 @@ public class DragCharacterMGR : MonoBehaviour
 
     private void Start()
     {
-        if(dragNum < GameManager.instance.characterPrefabs.Length) //モンスターの種類だけサムネイル画像を取得する
+        StartCoroutine(LateStart(0.5f)); //characterDatabaseがGameManagerのStartで初期化されるため、若干遅れてからサムネイルの初期化をする
+    }
+
+    IEnumerator LateStart(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        if (dragNum < GameManager.instance.characterPrefabs.Length) //モンスターの種類だけサムネイル画像を取得する
         {
             this.gameObject.GetComponent<Image>().sprite = GameManager.instance.GetCharacterDatabase(dragNum).GetThumbnailSprite();
         }
+
     }
     public void DragCharacter() //EventTriggerで呼ぶ
     {

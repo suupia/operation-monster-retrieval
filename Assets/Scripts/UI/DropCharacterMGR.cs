@@ -13,12 +13,14 @@ public class DropCharacterMGR : MonoBehaviour
     private void Start()
     {
         thumbnailImage = GetComponent<Image>();
-        if (dropNum < GameManager.instance.characterPrefabs.Length) //モンスターの種類だけサムネイル画像を取得する
-        {
-            thumbnailImage.sprite = GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[dropNum]).GetThumbnailSprite();
 
-        }
+        StartCoroutine(LateStart(0.5f));
+    }
 
+    IEnumerator LateStart(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        thumbnailImage.sprite = GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[dropNum]).GetThumbnailSprite();
     }
     public void DropCharacter() //Event Triggerで呼ぶ
     {
@@ -26,8 +28,15 @@ public class DropCharacterMGR : MonoBehaviour
 
         GameManager.instance.DropCharacterData(dropNum);
 
-        thumbnailImage.sprite = GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[dropNum]).GetThumbnailSprite();
+        Sprite draggedSprite = GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[dropNum]).GetThumbnailSprite();
 
+
+        thumbnailImage.sprite = draggedSprite;
+
+        //サムネイルをSelectCharacterにもセットする
+        GameManager.instance.selectCharacterButtonMGR[dropNum].SetSelectCharacterImage(draggedSprite);
+
+        //ドラッグしていたサムネイルを消す
         GameManager.instance.inputMGR.GetDraggedCharacterThumbnail().HideDraggedCharacterThumbnail(); //dragNumの場合はそのままIDになる
 
 
