@@ -375,6 +375,11 @@ public class CharacterMGR : MonoBehaviour
         }
 
     }
+
+    public void SetInitiLevel(int initiLevel)
+    {
+        this.level = initiLevel;
+    }
     public void LevelUp()
     {
         if (level == maxLevel)
@@ -383,7 +388,7 @@ public class CharacterMGR : MonoBehaviour
             return;
         }
 
-        Debug.LogWarning($"{characterName}のレベルを上げます");
+        Debug.Log($"{characterName}のレベルを上げます");
 
         maxHp += hpGrowthRate[level];
         atk += atkGrowthRate[level];
@@ -654,11 +659,11 @@ public class CharacterMGR : MonoBehaviour
 
     public void Attack()
     {
-        Debug.Log($"Attackを実行します");
+        //Debug.Log($"Attackを実行します");
 
         if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) == null)
         { //towerMGRがないということはタワーを破壊したということなので、Marchingに切り替える
-            Debug.LogWarning($"タワーを破壊したのでMarchingに切り替えます targetFacilityPos:{targetFacilityPos}");
+            Debug.Log($"タワーを破壊したのでMarchingに切り替えます targetFacilityPos:{targetFacilityPos}");
             state = State.Marching;
             return;
         }

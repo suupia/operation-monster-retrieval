@@ -50,3 +50,6 @@ TagManager:
   - name: UI
     uniqueID: 4054307105
     locked: 0
+  - name: MousePointer
+    uniqueID: 3007462795
+    locked: 0

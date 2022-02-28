@@ -81,6 +81,10 @@ public class MapMGR : MonoBehaviour
     {
         return numOfFristRoad;
     }
+    public int GetStageNum()
+    {
+        return stageNum;
+    }
     public int GetEXPOfTheStage() 
     {
         return EXPOfTheStage[stageNum];

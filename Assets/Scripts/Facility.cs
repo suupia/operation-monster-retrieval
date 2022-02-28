@@ -118,7 +118,7 @@ public abstract class Facility : MonoBehaviour
     }
     protected void Battle()
     {
-        Debug.Log($"FacilityのBattleを実行します");
+        //Debug.Log($"FacilityのBattleを実行します");
 
         if (isFristBattle)
         {
@@ -145,7 +145,7 @@ public abstract class Facility : MonoBehaviour
     }
     protected void FacilityAttack()
     {
-        Debug.Log($"FacilityAttackを実行します");
+        //Debug.Log($"FacilityAttackを実行します");
 
         if (!isAttacking) StartCoroutine(FacilityAttackCoroutine());
     }

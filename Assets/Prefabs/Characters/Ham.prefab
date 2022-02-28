@@ -122,7 +122,7 @@ MonoBehaviour:
   targetFacility: {fileID: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
   characterName: Ham
-  characterTypeID: 5
+  characterTypeID: 1
   level: 0
   maxHp: 6
   hp: 0
@@ -133,7 +133,7 @@ MonoBehaviour:
   coolTime: 1
   cost: 100
   sprite: {fileID: 7066945721484374052, guid: 6ac9a60687fabd44ab362bc994bdb544, type: 3}
-  thumbnailSprite: {fileID: 7066945721484374052, guid: 6ac9a60687fabd44ab362bc994bdb544, type: 3}
+  thumbnailSprite: {fileID: 21300000, guid: 849b7f44197970f44918cfa3d74ca477, type: 3}
   hpGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   spdGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000

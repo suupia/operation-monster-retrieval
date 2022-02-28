@@ -122,7 +122,7 @@ MonoBehaviour:
   targetFacility: {fileID: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
   characterName: Saru
-  characterTypeID: 6
+  characterTypeID: 5
   level: 0
   maxHp: 6
   hp: 0
@@ -132,8 +132,8 @@ MonoBehaviour:
   spd: 1
   coolTime: 1
   cost: 10
-  sprite: {fileID: 21300000, guid: b191e8e6070bb054691ee0b4ecf36399, type: 3}
-  thumbnailSprite: {fileID: 21300000, guid: 54b310118173ce943a8dd7227e06cb6f, type: 3}
+  sprite: {fileID: -1653429110502446582, guid: 2c5546c048609c54799931ce8f62aa6e, type: 3}
+  thumbnailSprite: {fileID: 21300000, guid: 0f66ea8b460ee4b4a8b6787278c094ef, type: 3}
   hpGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   spdGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000

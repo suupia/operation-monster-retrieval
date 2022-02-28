@@ -122,7 +122,7 @@ MonoBehaviour:
   targetFacility: {fileID: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
   characterName: Snake
-  characterTypeID: 3
+  characterTypeID: 2
   level: 0
   maxHp: 6
   hp: 0
@@ -132,8 +132,8 @@ MonoBehaviour:
   spd: 5
   coolTime: 1
   cost: 200
-  sprite: {fileID: 21300000, guid: 0bde5335d2bf66e42bda68471ea2fa12, type: 3}
-  thumbnailSprite: {fileID: 21300000, guid: 0bde5335d2bf66e42bda68471ea2fa12, type: 3}
+  sprite: {fileID: 21300000, guid: 0c5fe6fbc87f7ab4aaeee56e03bf3e5b, type: 3}
+  thumbnailSprite: {fileID: 21300000, guid: 71b8a8296000d1941a297b7d56a9a53b, type: 3}
   hpGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   spdGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000

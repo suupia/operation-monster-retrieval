@@ -122,7 +122,7 @@ MonoBehaviour:
   targetFacility: {fileID: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
   characterName: Caterpilar
-  characterTypeID: 7
+  characterTypeID: 6
   level: 0
   maxHp: 6
   hp: 0
@@ -132,8 +132,8 @@ MonoBehaviour:
   spd: 3
   coolTime: 1
   cost: 300
-  sprite: {fileID: 21300000, guid: b191e8e6070bb054691ee0b4ecf36399, type: 3}
-  thumbnailSprite: {fileID: 21300000, guid: 54b310118173ce943a8dd7227e06cb6f, type: 3}
+  sprite: {fileID: 21300000, guid: e9da5e819bfa29843960c6b1b28204ab, type: 3}
+  thumbnailSprite: {fileID: 21300000, guid: efe8ea72bafb2c448bb9d8f3ba59be1c, type: 3}
   hpGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   spdGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000

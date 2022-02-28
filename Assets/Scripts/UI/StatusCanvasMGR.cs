@@ -18,6 +18,7 @@ public class StatusCanvasMGR : MonoBehaviour
     [SerializeField] Text costText;
     [SerializeField] Image characterImage;
     [SerializeField] Image characterFullScreenImage;
+    
 
     [SerializeField] Text levelUpCostText; //インスペクター上でセットする
     [SerializeField] int[] levelUpCostArray; //レベルアップに必要な経験値をインスペクター上で決める
@@ -29,7 +30,7 @@ public class StatusCanvasMGR : MonoBehaviour
     [SerializeField] Text EXPText;
     int _EXPretained; //保持している経験値 プロパティのsetterでEXPTextを更新する
 
-    public int EXPretained //プロパティ
+    public int EXPRetained //プロパティ
     {
         get{ return _EXPretained; }
         set{ 
@@ -49,9 +50,10 @@ public class StatusCanvasMGR : MonoBehaviour
         //Debug.LogWarning("StatusCanbasMGRのStart()を実行します");
         UpdateStatusCanvas(0); //最初はID:0のBatを表示させておく
 
+        EXPRetained = GameManager.instance.saveMGR.GetEXPAmount();
 
         //デバッグ用
-        EXPretained += 10000; //レベルアップの実装をしやすいように最初から経験値を与えておく
+        //EXPretained += 10000; //レベルアップの実装をしやすいように最初から経験値を与えておく
     }
     public void UpdateStatusCanvasInCombat(int dropNum)
     {
@@ -65,7 +67,7 @@ public class StatusCanvasMGR : MonoBehaviour
 
     void UpdateStatusCanvas(int characterTypeID)
     {
-        Debug.LogWarning("StatusCanvasを更新します");
+        Debug.Log("StatusCanvasを更新します");
         characterMGRDisplayed = GameManager.instance.GetCharacterDatabase(characterTypeID);
 
         nameText.text = characterMGRDisplayed.GetCharacterName();
@@ -108,12 +110,12 @@ public class StatusCanvasMGR : MonoBehaviour
             return;
         }
 
-        if (EXPretained >= levelUpCostArray[characterMGRDisplayed.GetLevel()])
+        if (EXPRetained >= levelUpCostArray[characterMGRDisplayed.GetLevel()])
         {
-            EXPretained -= levelUpCostArray[characterMGRDisplayed.GetLevel()];
+            EXPRetained -= levelUpCostArray[characterMGRDisplayed.GetLevel()];
             characterMGRDisplayed.LevelUp();
             UpdateStatusCanvas(characterMGRDisplayed.GetCharacterTypeID());
-
+            GameManager.instance.saveMGR.SaveEXPAmount(EXPRetained);
         }
         else
         {
@@ -122,6 +124,9 @@ public class StatusCanvasMGR : MonoBehaviour
             Invoke("UpdateStatusCanvas",1); //levelUpCostTextを更新するため
 
         }
+
+        //Saveする
+        GameManager.instance.saveMGR.SaveCharacterLevel(characterMGRDisplayed.GetCharacterTypeID(), characterMGRDisplayed.GetLevel());
 
     }
 
@@ -136,11 +141,13 @@ public class StatusCanvasMGR : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("全画面スクリーンを開きます");
+            Debug.Log("全画面スクリーンを開きます");
             isDisplayingFullScreen = true;
 
 
             fullScreenCanvas.SetActive(true);
         }
     }
+
+
 }

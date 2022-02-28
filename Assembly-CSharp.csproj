@@ -72,6 +72,7 @@
     <Compile Include="Assets\Scripts\DebugMGR.cs" />
     <Compile Include="Assets\Scripts\UI\DropCharacterMGR.cs" />
     <Compile Include="Assets\Scripts\CharacterMGR.cs" />
+    <Compile Include="Assets\Scripts\UI\DraggedCharacterThumbnail.cs" />
     <Compile Include="Assets\Scripts\UI\SelectCharacterButtonMGR.cs" />
     <Compile Include="Assets\Scripts\AutoRouteData.cs" />
     <Compile Include="Assets\Shapes2D\Demos\Flappy Shapes\Bird.cs" />
@@ -86,7 +87,10 @@
     <Compile Include="Assets\Scripts\UI\StatusCanvasMGR.cs" />
     <Compile Include="Assets\Shapes2D\Demos\InputUtils.cs" />
     <Compile Include="Assets\Scripts\MapMGR.cs" />
+    <Compile Include="Assets\Scripts\UI\FullScreenButton.cs" />
+    <Compile Include="Assets\Scripts\SaveData.cs" />
     <Compile Include="Assets\Scripts\UI\BackToMenuButtonMGR.cs" />
+    <Compile Include="Assets\Scripts\SaveMGR.cs" />
     <Compile Include="Assets\Scripts\MouseTrailerMGR.cs" />
     <Compile Include="Assets\Shapes2D\Demos\Showcase\PacMan.cs" />
     <Compile Include="Assets\Scripts\PointerTailMGR.cs" />
@@ -95,7 +99,6 @@
     <Compile Include="Assets\Scripts\CharacterDatabase.cs" />
     <Compile Include="Assets\Scripts\UI\DragCharacterMGR.cs" />
     <Compile Include="Assets\Shapes2D\Scripts\PolyMap.cs" />
-    <Compile Include="Assets\Scripts\UI\FullScreenButton.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Shapes2D\Shaders\Triangle.cginc" />

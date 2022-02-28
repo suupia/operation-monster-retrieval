@@ -16,6 +16,7 @@ public class InputMGR : MonoBehaviour
     [SerializeField] GameObject PauseTheGameCanvas; //インスペクター上でセットする
     bool pauseFlag = false; //ポーズ状態ならtrue
 
+    [SerializeField] DraggedCharacterThumbnail draggedCharacterThumbnail; //インスペクター上でセットする（SetActiveをfalseにしているため、ここで参照を保持しておく）
 
     Vector2 mousePos;
     Vector2Int mouseGridPos;
@@ -29,7 +30,10 @@ public class InputMGR : MonoBehaviour
     {
         return manualRouteNumber;
     }
-
+    public DraggedCharacterThumbnail GetDraggedCharacterThumbnail()
+    {
+        return draggedCharacterThumbnail;
+    }
     public void SetManualRouteNumber(int number)
     {
         manualRouteNumber = number;
@@ -166,5 +170,10 @@ public class InputMGR : MonoBehaviour
         pauseFlag = false;
         PauseTheGameCanvas.SetActive(false);
     }
+
+    //public bool IsInRectTransform(RectTransform targetRT)
+    //{
+    //    RectTransformExtension.Contains(targetRT,eventData);
+    //}
 
 }

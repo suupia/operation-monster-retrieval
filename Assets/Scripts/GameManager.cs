@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] public SelectCharacterButtonMGR[] selectCharacterButtonMGR; //4つセットする
     [SerializeField] public TimerMGR timerMGR;
     [SerializeField] public EnergyMGR energyMGR;
+    [SerializeField] public SaveMGR saveMGR;
 
     [SerializeField] public GameObject selectStageCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
     [SerializeField] public GameObject menuCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
@@ -120,6 +121,8 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+
     }
 
     void Start()
@@ -141,7 +144,11 @@ public class GameManager : MonoBehaviour
         for(int i=0; i < characterPrefabs.Length; i++)
         {
             //characterDatabase[i] = characterPrefabs[i].GetComponent<CharacterMGR>();
-            characterDatabase[i] = characterPrefabs[i].GetComponent<CharacterMGR>().Clone();
+            characterDatabase[i] = characterPrefabs[i].GetComponent<CharacterMGR>().Clone(); //ディープコピーをする
+
+            //キャラクターのレベルをファイルから読み込む
+            characterDatabase[i].SetInitiLevel(saveMGR.GetCharacterLevel(i));
+            
 
         }
 
@@ -219,7 +226,7 @@ public class GameManager : MonoBehaviour
             int EXPGained = mapMGR.GetEXPOfTheStage() ;
 
             //経験値を与える
-            statusCanvasMGR.EXPretained += EXPGained;
+            statusCanvasMGR.EXPRetained += EXPGained;
 
             resultText.text = $"勝利！\nEXP{EXPGained}を獲得！";
 
@@ -231,6 +238,14 @@ public class GameManager : MonoBehaviour
             resultText.text = "敗北";
 
         }
+
+        //Saveをする
+        saveMGR.SaveEXPAmount(statusCanvasMGR.EXPRetained);
+        if (saveMGR.GetStagesCleardNum() < mapMGR.GetStageNum())
+        {
+            saveMGR.SaveStagesCleardNum(mapMGR.GetStageNum());
+        }
+
     }
     public void ResetData()
     {
@@ -301,25 +316,6 @@ public class GameManager : MonoBehaviour
 
         isSpawnCharacterArray[buttonNum] = false;
     }
-    int ToCharacterTypeID(int buttonNum)
-    {
-        return buttonNum; //今のところはそのまま返す
-    }
-
-    void SetCharacterTypeIDInCombat()
-    {
-        //とりあえず適当に出撃するモンスターを決めておく
-        //for(int i = 0;i<numOfCharacterInCombat; i++)
-        //{
-        //    IDsOfCharactersInCombat[i] = i;
-
-        //}
-        IDsOfCharactersInCombat[0] = 1;
-        IDsOfCharactersInCombat[1] = 2;
-        IDsOfCharactersInCombat[2] = 3;
-        IDsOfCharactersInCombat[3] = 4;
-
-    }
 
     public void DragCharacterData(int dragNum)
     {
@@ -329,7 +325,7 @@ public class GameManager : MonoBehaviour
     public void DropCharacterData(int dropNum)
     {
         IDsOfCharactersInCombat[dropNum] = dragNum;
-        Debug.LogWarning($"IDsOfCharactersInCombat[{dropNum}]:{IDsOfCharactersInCombat[dropNum] }");
+        //Debug.Log($"IDsOfCharactersInCombat[{dropNum}]:{IDsOfCharactersInCombat[dropNum] }");
     }
 
     public int[,] CalcSearchRangeArray(int advancingDistance, int lookingForValue, int notLookingForValue, int centerValue) //マス目に置ける円形の索敵範囲を計算して、2次元配列で返す

@@ -122,7 +122,7 @@ MonoBehaviour:
   targetFacility: {fileID: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
   characterName: Tuti
-  characterTypeID: 4
+  characterTypeID: 8
   level: 0
   maxHp: 6
   hp: 0
@@ -132,8 +132,8 @@ MonoBehaviour:
   spd: 3
   coolTime: 1
   cost: 300
-  sprite: {fileID: 21300000, guid: 7621fb34a9dece747ad87f7bca26f17a, type: 3}
-  thumbnailSprite: {fileID: 21300000, guid: 7621fb34a9dece747ad87f7bca26f17a, type: 3}
+  sprite: {fileID: 21300000, guid: abfe7a1725340164b88be6ce074deb9f, type: 3}
+  thumbnailSprite: {fileID: 21300000, guid: f0a1f1fe658d02c4a8bb936514dff487, type: 3}
   hpGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   spdGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
