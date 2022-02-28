@@ -28,9 +28,10 @@ public class SelectStageButtonMGR : MonoBehaviour
 
     }
 
-    public void UpdateSelectStageButtonMGR() //GameManagerで戦闘終了後に呼ぶ
+    public void UpdateSelectStageButtonMGR() //StagesClearedNumのプロパティで更新する
     {
-        if (buttonNum <= GameManager.instance.StagesClearedNum) //（クリアステージの添え字）+1　のステージまで選択できる
+        Debug.LogWarning($"UpdateSelectStageButtonMGRを開始します\nStagesClearedNum +1:{GameManager.instance.StagesClearedNum + 1}");
+        if (buttonNum <= GameManager.instance.StagesClearedNum +1) //（クリアステージの添え字）+1　のステージまで選択できる
         {
             buttonSizeMGR.SetIsActive(true);
             selectSatageButtonImage.color = Color.white;
@@ -48,7 +49,7 @@ public class SelectStageButtonMGR : MonoBehaviour
     {
         Debug.Log($"SelectStageButton{buttonNum}が押されました");
 
-        if (buttonNum <= GameManager.instance.StagesClearedNum)
+        if (buttonNum <= GameManager.instance.StagesClearedNum +1)
         {
             GameManager.instance.mapMGR.SetStageNum(buttonNum);
             GameManager.instance.SetupGame();

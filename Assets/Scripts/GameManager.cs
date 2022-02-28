@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] public InputMGR inputMGR;
     [SerializeField] public DebugMGR debugMGR;
     [SerializeField] public PointerMGR pointerMGR;
+    [SerializeField] public SelectStageButtonMGR[] selectStageButtonMGRs; //7つセットする
     [SerializeField] public SelectCharacterButtonMGR[] selectCharacterButtonMGR; //4つセットする
     [SerializeField] public TimerMGR timerMGR;
     [SerializeField] public EnergyMGR energyMGR;
@@ -37,6 +38,20 @@ public class GameManager : MonoBehaviour
     int stagesClearedNum;
     public int StagesClearedNum { //プロパティ　どこのステージまでクリアしたかを記録しておく
         get { return stagesClearedNum; }
+        set
+        {
+            Debug.LogWarning($"StagesClearedNumのセッターを開始します");
+            if (value - stagesClearedNum < 0)
+            {
+                Debug.LogError("StagesCleardNumの値が小さくなるように値が代入されました");
+                return;
+            }
+            stagesClearedNum = value;
+            for (int i = 0;i<selectStageButtonMGRs.Length;i++)
+            {
+                selectStageButtonMGRs[i].UpdateSelectStageButtonMGR();
+            }
+        }
     }
 
 
@@ -170,7 +185,7 @@ public class GameManager : MonoBehaviour
             manualRouteDatas[i] = new ManualRouteData(); //今はmanualRouteDataがない
         }
 
-        stagesClearedNum = saveMGR.GetStagesCleardNum();
+        StagesClearedNum = saveMGR.GetStagesCleardNum();
 
 
         StartSelectingStage();
@@ -247,12 +262,18 @@ public class GameManager : MonoBehaviour
 
         }
 
+        Debug.LogWarning($"StagesClearedNum:{StagesClearedNum}");
+        //StagesClearedNumを更新する
+        if (StagesClearedNum < mapMGR.GetStageNum())
+        {
+            StagesClearedNum = mapMGR.GetStageNum();
+            Debug.LogWarning($"StagesClearedNumを更新して:{StagesClearedNum}　にしました");
+
+        }
+
         //Saveをする
         saveMGR.SaveEXPAmount(statusCanvasMGR.EXPRetained);
-        if (saveMGR.GetStagesCleardNum() < mapMGR.GetStageNum())
-        {
-            saveMGR.SaveStagesCleardNum(mapMGR.GetStageNum());
-        }
+        saveMGR.SaveStagesCleardNum(StagesClearedNum);
 
     }
     public void ResetData()
