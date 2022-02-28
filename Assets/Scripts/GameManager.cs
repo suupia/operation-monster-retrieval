@@ -29,10 +29,17 @@ public class GameManager : MonoBehaviour
 
     int numOfCharacterInCombat = 4; //戦闘に参加するモンスターの種類は4種類
     int[] idsOfCharactersInCombat; //戦闘に参加しているモンスターのID (numOfCharacterTypesの分だけ要素を用意する)
-    public int[] IDsOfCharactersInCombat
+    public int[] IDsOfCharactersInCombat //プロパティ
     {
         get { return idsOfCharactersInCombat; }
     } //getterのみ
+
+    int stagesClearedNum;
+    public int StagesClearedNum { //プロパティ　どこのステージまでクリアしたかを記録しておく
+        get { return stagesClearedNum; }
+    }
+
+
     [SerializeField] AutoRouteData autoRouteData; //インスペクター上でセットする
     [SerializeField] ManualRouteData manualRouteData; //インスペクター上でセットする
     public AutoRouteData[] autoRouteDatas;
@@ -149,7 +156,6 @@ public class GameManager : MonoBehaviour
             //キャラクターのレベルをファイルから読み込む
             characterDatabase[i].SetInitiLevel(saveMGR.GetCharacterLevel(i));
             
-
         }
 
         characterMode = new CharacterMGR.Mode[numOfCharacterInCombat];
@@ -164,6 +170,7 @@ public class GameManager : MonoBehaviour
             manualRouteDatas[i] = new ManualRouteData(); //今はmanualRouteDataがない
         }
 
+        stagesClearedNum = saveMGR.GetStagesCleardNum();
 
 
         StartSelectingStage();

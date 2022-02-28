@@ -14,7 +14,7 @@ public class DropCharacterMGR : MonoBehaviour
     {
         thumbnailImage = GetComponent<Image>();
 
-        StartCoroutine(LateStart(0.5f));
+        StartCoroutine(LateStart(0.3f));
     }
 
     IEnumerator LateStart(float waitTime)

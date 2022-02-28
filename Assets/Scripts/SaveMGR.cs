@@ -16,14 +16,6 @@ public class SaveMGR : MonoBehaviour
         saveData = new SaveData();
         Load();
 
-        //デバッグ用
-        //save.testString = "test";
-        //Debug.Log($"セーブ前 save:{save.testString}");
-        //Save();
-        //Debug.Log($"セーブ後 save:{save.testString}");
-        //Load();
-        //Debug.Log($"ロード後 save:{save.testString}");
-
     }
 
     //Getter

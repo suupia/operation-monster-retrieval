@@ -10,7 +10,7 @@ public class DragCharacterMGR : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(LateStart(0.5f)); //characterDatabaseがGameManagerのStartで初期化されるため、若干遅れてからサムネイルの初期化をする
+        StartCoroutine(LateStart(0.3f)); //characterDatabaseがGameManagerのStartで初期化されるため、若干遅れてからサムネイルの初期化をする
     }
 
     IEnumerator LateStart(float waitTime)

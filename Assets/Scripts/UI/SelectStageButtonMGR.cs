@@ -7,22 +7,57 @@ public class SelectStageButtonMGR : MonoBehaviour
 {
     [SerializeField] int buttonNum; //インスペクター上でセットする
 
-    private Button button;
+    [SerializeField] ButtonSizeMGR buttonSizeMGR; //インスペクター上でセットする
+    [SerializeField] Image selectSatageButtonImage; //インスペクター上でセットする 色を変えるため
+
+    Color cannotSelectColor; //黒に近い色にする
 
 
     private void Start()
     {
-        button = gameObject.GetComponent<Button>();
+        cannotSelectColor = new Color(0.04f,0.04f,0.04f,1);//黒に近い色にする
+
+        StartCoroutine(LateStart(0.3f)) ;
     }
 
-    public void PointerDown()
+    IEnumerator LateStart(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+
+        UpdateSelectStageButtonMGR();
+
+    }
+
+    public void UpdateSelectStageButtonMGR() //GameManagerで戦闘終了後に呼ぶ
+    {
+        if (buttonNum <= GameManager.instance.StagesClearedNum) //（クリアステージの添え字）+1　のステージまで選択できる
+        {
+            buttonSizeMGR.SetIsActive(true);
+            selectSatageButtonImage.color = Color.white;
+            //Debug.Log("buttonSizeMGRをtrueにしました");
+        }
+        else
+        {
+            buttonSizeMGR.SetIsActive(false);
+            selectSatageButtonImage.color = cannotSelectColor;
+            //Debug.Log("buttonSizeMGRをfalseにしました");
+        }
+    }
+
+    public void PointerDown() //EventTriggerで呼ぶ
     {
         Debug.Log($"SelectStageButton{buttonNum}が押されました");
 
-
-
-        GameManager.instance.mapMGR.SetStageNum(buttonNum);
-        GameManager.instance.SetupGame();
+        if (buttonNum <= GameManager.instance.StagesClearedNum)
+        {
+            GameManager.instance.mapMGR.SetStageNum(buttonNum);
+            GameManager.instance.SetupGame();
+        }
+        else
+        {
+            //何もしない
+            //押せない効果音とかつけるかもしれない
+        }
     }
 
 

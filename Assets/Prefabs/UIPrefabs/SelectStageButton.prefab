@@ -136,6 +136,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonNum: 0
+  selectSatageButtonImage: {fileID: 8726400367220931869}
+  buttonSizeMGR: {fileID: 730338608856177632}
 --- !u!114 &6423737869214620444
 MonoBehaviour:
   m_ObjectHideFlags: 0

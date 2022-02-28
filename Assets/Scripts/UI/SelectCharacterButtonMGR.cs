@@ -67,13 +67,11 @@ public class SelectCharacterButtonMGR : MonoBehaviour
             {
                 finalColor = canSpawnCharacterColor * selectedColor; //乗算で処理する
                 Debug.LogWarning($"finalColor:{finalColor}");
-
-
             }
             else
             {
                 finalColor = Color.clear; //この時だけ別で、透明扱いする
-                Debug.LogWarning($"finalColor:{finalColor}");
+                //Debug.Log($"finalColor:{finalColor}");
             }
         }
         else
@@ -81,24 +79,19 @@ public class SelectCharacterButtonMGR : MonoBehaviour
             if (isEditingManualRoute)
             {
                 finalColor = canNotSpawnCharacterColor * selectedColor;
-                Debug.LogWarning($"finalColor:{finalColor}");
-
-
+                //Debug.Log($"finalColor:{finalColor}");
             }
             else
             {
                 finalColor = canNotSpawnCharacterColor * notSelectedColor;
-                Debug.LogWarning($"canNotSpawnCharacterColor:{canNotSpawnCharacterColor}, notSelectedColor:{notSelectedColor}");
-                Debug.LogWarning($"finalColor:{finalColor}");
-
-
+                //Debug.Log($"canNotSpawnCharacterColor:{canNotSpawnCharacterColor}, notSelectedColor:{notSelectedColor}");
             }
         }
 
         finalColor.a *= 0.5f;　//ここまでのif分でfinalColorは不透明色になっているので、透明度を50％にする
 
 
-        Debug.LogWarning($"finalColor:{finalColor}");
+        //Debug.Log($"finalColor:{finalColor}");
 
         if (finalColor != Color.clear)
         {
@@ -129,12 +122,12 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         {
             if (!isEditingManualRoute) //このbuttonが選択されていない状態で、このbuttonがクリックされたとき
             {
-                Debug.LogWarning("SetToSelectedColorを実行します");
+                //Debug.Log("SetToSelectedColorを実行します");
                 SetToSelectedColor();
             }
             else //このbuttonが選択されている状態で、このbuttonがクリックされたとき
             {
-                Debug.LogWarning("ResetToNormalColorを実行します");
+                //Debug.Log("ResetToNormalColorを実行します");
 
                 ResetToNormalColor();
             }
