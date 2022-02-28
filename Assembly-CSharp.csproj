@@ -70,7 +70,7 @@
     <Compile Include="Assets\Shapes2D\Scripts\Shape.cs" />
     <Compile Include="Assets\Scripts\UI\OpenMenuButton.cs" />
     <Compile Include="Assets\Scripts\DebugMGR.cs" />
-    <Compile Include="Assets\Scripts\UI\DropCharacterMGR.cs" />
+    <Compile Include="Assets\Scripts\UI\CharacterInCombatMGR.cs" />
     <Compile Include="Assets\Scripts\CharacterMGR.cs" />
     <Compile Include="Assets\Scripts\UI\DraggedCharacterThumbnail.cs" />
     <Compile Include="Assets\Scripts\UI\SelectCharacterButtonMGR.cs" />
@@ -97,7 +97,7 @@
     <Compile Include="Assets\Scripts\UI\SelectStageButtonMGR.cs" />
     <Compile Include="Assets\Shapes2D\Demos\Flappy Shapes\Game.cs" />
     <Compile Include="Assets\Scripts\CharacterDatabase.cs" />
-    <Compile Include="Assets\Scripts\UI\DragCharacterMGR.cs" />
+    <Compile Include="Assets\Scripts\UI\CharacterInReserveMGR.cs" />
     <Compile Include="Assets\Shapes2D\Scripts\PolyMap.cs" />
   </ItemGroup>
   <ItemGroup>

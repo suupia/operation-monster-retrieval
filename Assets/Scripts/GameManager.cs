@@ -13,7 +13,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] public DebugMGR debugMGR;
     [SerializeField] public PointerMGR pointerMGR;
     [SerializeField] public SelectStageButtonMGR[] selectStageButtonMGRs; //7つセットする
-    [SerializeField] public SelectCharacterButtonMGR[] selectCharacterButtonMGR; //4つセットする
+    [SerializeField] public SelectCharacterButtonMGR[] selectCharacterButtonMGRs; //4つセットする
+    [SerializeField] public CharacterInReserveMGR[] characterInReserveMGRs; //とりあえず9つセットする
+    [SerializeField] public CharacterInCombatMGR[] characterInCombatMGRs; //4つセットする
     [SerializeField] public TimerMGR timerMGR;
     [SerializeField] public EnergyMGR energyMGR;
     [SerializeField] public SaveMGR saveMGR;
@@ -35,12 +37,20 @@ public class GameManager : MonoBehaviour
         get { return idsOfCharactersInCombat; }
     } //getterのみ
 
+    [SerializeField] int[] characterIDsThatCanBeUsed;
+    public int[] CharacterIDsThatCanBeUsed  //7つ用意する クリアしたステージを引数に取って、使えるキャラクターのIDの最大値を返す配列(この配列は単調増加であることに注意)
+    {
+        get { return characterIDsThatCanBeUsed; }
+    }
+
     int stagesClearedNum;
     public int StagesClearedNum { //プロパティ　どこのステージまでクリアしたかを記録しておく
         get { return stagesClearedNum; }
         set
         {
-            Debug.LogWarning($"StagesClearedNumのセッターを開始します");
+            //Debug.Log($"StagesClearedNumのSetterを開始します");
+
+            //StageButtonを更新する
             if (value - stagesClearedNum < 0)
             {
                 Debug.LogError("StagesCleardNumの値が小さくなるように値が代入されました");
@@ -50,6 +60,12 @@ public class GameManager : MonoBehaviour
             for (int i = 0;i<selectStageButtonMGRs.Length;i++)
             {
                 selectStageButtonMGRs[i].UpdateSelectStageButtonMGR();
+            }
+
+            //CharacterInReverseとCharacterInCombatを更新する
+            for (int i = 0; i<characterInReserveMGRs.Length;i++)
+            {
+                characterInReserveMGRs[i].UpdateCharacterInReserve();
             }
         }
     }
@@ -207,7 +223,7 @@ public class GameManager : MonoBehaviour
         state = State.SetupGame;
         selectStageCanvas.SetActive(false);
 
-        foreach(SelectCharacterButtonMGR MGR in selectCharacterButtonMGR)
+        foreach(SelectCharacterButtonMGR MGR in selectCharacterButtonMGRs)
         {
             MGR.InitiSelectCharacterButton();
         }
@@ -339,7 +355,7 @@ public class GameManager : MonoBehaviour
         while(time < characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCoolTime())
         {
             time += Time.deltaTime;
-            selectCharacterButtonMGR[buttonNum].RefreshGauge(time / characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCoolTime());
+            selectCharacterButtonMGRs[buttonNum].RefreshGauge(time / characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCoolTime());
             yield return null;
         }
 

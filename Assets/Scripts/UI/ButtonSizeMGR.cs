@@ -7,7 +7,7 @@ public class ButtonSizeMGR : MonoBehaviour
 
     [SerializeField] RectTransform rectTransform; //インスペクター上でセットしておく
 
-    bool isActive; //SelectStageButtonMGRからアクセスして変更する
+    bool isActive = true; //SelectStageButtonMGRからアクセスして変更する
 
     //Setter
     public void SetIsActive(bool flag)

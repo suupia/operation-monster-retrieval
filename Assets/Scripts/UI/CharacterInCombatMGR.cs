@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 
-public class DropCharacterMGR : MonoBehaviour
+public class CharacterInCombatMGR : MonoBehaviour
 {
     [SerializeField] int dropNum;
     Image thumbnailImage;
@@ -22,6 +22,8 @@ public class DropCharacterMGR : MonoBehaviour
         yield return new WaitForSeconds(waitTime);
         thumbnailImage.sprite = GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[dropNum]).GetThumbnailSprite();
     }
+
+
     public void DropCharacter() //Event Triggerで呼ぶ
     {
         //Debug.Log($"{dropNum}にドロップされました");
@@ -34,7 +36,7 @@ public class DropCharacterMGR : MonoBehaviour
         thumbnailImage.sprite = draggedSprite;
 
         //サムネイルをSelectCharacterにもセットする
-        GameManager.instance.selectCharacterButtonMGR[dropNum].SetSelectCharacterImage(draggedSprite);
+        GameManager.instance.selectCharacterButtonMGRs[dropNum].SetSelectCharacterImage(draggedSprite);
 
         //ドラッグしていたサムネイルを消す
         GameManager.instance.inputMGR.GetDraggedCharacterThumbnail().HideDraggedCharacterThumbnail(); //dragNumの場合はそのままIDになる
