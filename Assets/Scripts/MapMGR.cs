@@ -30,7 +30,6 @@ public class MapMGR : MonoBehaviour
     [SerializeField] Vector2Int enemysCastlePos;
 
     [SerializeField] GameObject[] towerPrefabs;
-    [SerializeField] Vector2Int[] towerPoss;
 
     [SerializeField] int numOfFristRoad; //インスペクター上以外で値を代入してはいけない
     [SerializeField] int numOfFristRoadCounter; //SetUpMap()で numOfFristRoadCounter = numOfFristRoad; と初期化している  デバッグ用にSerializeFieldにしておく
@@ -76,6 +75,10 @@ public class MapMGR : MonoBehaviour
     public Vector2Int GetEnemysCastlePos()
     {
         return enemysCastlePos;
+    }
+    public int GetMaxTowerNum()
+    {
+        return towerPrefabs.Length; //これは仮置きであることに注意 
     }
     public int GetNumOfFristRoad()
     {
@@ -132,6 +135,31 @@ public class MapMGR : MonoBehaviour
 
         PlaceTower();
     }
+    private void ReSetupMap() //MakeTheFirstRoadで失敗したときに呼ばれる
+    {
+        for (int x =0;x<map.Width;x++)
+        {
+            for(int y = 0; y < map.Height; y++)
+            {
+                if(map.GetValue(x,y) % GameManager.instance.groundID == 0) //MakeTheFirstRoadで作った道を壁に戻す
+                {
+                    map.SetValue(x, y,GameManager.instance.wallID); //直接値を代入していることに注意
+                }
+            }
+        }
+
+        numOfFristRoadCounter = GetNumOfFristRoad();
+
+        makeTheFirstRoadText = makeTheFirstRoadGO.GetComponent<Text>();
+        makeTheFirstRoadText.text = $"敵の城につながるように\nあと" + $"{numOfFristRoadCounter}".PadLeft(2) + "つ道を配置してください"; //表示をリセットする
+
+
+        //Debug.Log($"numOfFristRoadCounterを{GetNumOfFristRoad()}に初期化しました");
+
+        RenderMap();
+
+        //SetupMap()に比べて、PlaceCastle()とPlaceTower()がない
+    }
     private void RenderMap()
     {
         //マップをクリアする（重複しないようにする）
@@ -171,15 +199,32 @@ public class MapMGR : MonoBehaviour
 
     private void PlaceTower()
     {
-        for (int i = 0; i < towerPrefabs.Length; i++)
+
+        for (int y = 0;y< mapHeight;y++)
         {
-            GameObject towerGO =  Instantiate(towerPrefabs[i], new Vector3(towerPoss[i].x + 0.5f, towerPoss[i].y + 0.75f, 0), Quaternion.identity);
-            TowerMGR towerMGR = towerGO.GetComponent<TowerMGR>();
+            for (int x = 0; x < mapWidth; x++)
+            {
+                int towerType = GameManager.instance.towerPosDataMGR.GetTowerPosDataArray()[stageNum].posData[y * mapWidth + x]; //(x,y)に対応するjsonファイルに書いてある値
+                if (towerType != -1) //-1でないならば入っている数字に応じて   タワーの種類と位置を決める
+                {
+                    if (towerType >= towerPrefabs.Length) //入っている数字が適切かどうかチェックする
+                    {
+                        Debug.LogError($"towerPosDataArrayにタワーの種類以上の値が入っています");
+                        return;
+                    }
 
-            map.MultiplySetValue(towerPoss[i], GameManager.instance.facilityID); //数値データをセット
-            map.SetFacility(towerPoss[i],towerMGR); //スクリプトをセット
+                    Vector2Int towerSpawnPos = new Vector2Int(x, y);
 
+                    GameObject towerGO = Instantiate(towerPrefabs[towerType], new Vector3(towerSpawnPos.x + 0.5f, towerSpawnPos.y + 0.75f, 0), Quaternion.identity);
+                    TowerMGR towerMGR = towerGO.GetComponent<TowerMGR>();
+
+                    map.MultiplySetValue(towerSpawnPos, GameManager.instance.facilityID); //数値データをセット
+                    map.SetFacility(towerSpawnPos, towerMGR); //スクリプトをセット
+
+                }
+            }
         }
+
     }
 
 
@@ -426,15 +471,71 @@ public class MapMGR : MonoBehaviour
             return false;
         }
     }
-    public void MakeRoad(int x, int y)
+    public void MakeRoadByPointer(int x, int y)
+    {
+        if (x < 1 || y < 1 || x > map.Width - 2 || y > map.Height - 2)
+        {
+            //Debug.Log($"MakeRoad({x},{y})の引数で掘れる範囲の外が指定されました。");
+            return;
+        }
+
+        if (GameManager.instance.energyMGR.CurrentEnergy < GameManager.instance.energyMGR.EnergyToMakeRoad && GameManager.instance.state == GameManager.State.RunningGame)
+        {
+            //Debug.Log("エネルギーが足りないので道を作れません");
+            return;
+        }
+        if(GetMapValue(x,y) / GameManager.instance.wallID != 1) //普通の割り算をしていることに注意
+        {
+            //Debug.Log("壁のみのマスでないのでMakeROadByPointerを中断します");
+            return;
+        }
+        if (GameManager.instance.state == GameManager.State.RunningGame) //MakeTheFirstRoadの時はエネルギーを消費しない
+        {
+            GameManager.instance.energyMGR.CurrentEnergy -= GameManager.instance.energyMGR.EnergyToMakeRoad;
+        }
+        if (GameManager.instance.state == GameManager.State.MakeTheFirstRoad && map.GetValue(x,y) == GameManager.instance.wallID) //MakeTheFirstRoadの処理
+        {
+            numOfFristRoadCounter--;
+            Debug.Log($"numOfFristRoadCounterが{numOfFristRoadCounter}になりました");
+
+            if (isDisplayMakefristRoadAgainCoroutine) return; //コルーチンが作動している間は以下の処理を行わない
+
+            makeTheFirstRoadText.text = $"敵の城につながるように\nあと" + $"{numOfFristRoadCounter}".PadLeft(2) + "つ道を配置してください";
+            if (numOfFristRoadCounter <= 0)
+            {
+                //Debug.Log("numOfFristRoadCounterが0以下になりました");
+                if (IsReachable())
+                {
+                    //Debug.Log($"GameManagerのStateをRunningGameにします");
+                    GameManager.instance.RunningGame();
+                }
+                else
+                {
+                    //Debug.Log("道が敵の城につながっていないため\nやり直してください");
+                    makeTheFirstRoadText.text = $"道が敵の城につながっていないため\nやり直してください";
+                    StartCoroutine(DisplayMakefristRoadAgainCoroutine());
+                }
+
+            }
+        }
+
+        MakeRoad(x,y);
+
+    }
+    public void MakeRoadByTowerDead(int x, int y) //タワーが破壊されたときに呼ぶ
+    {
+        if (x < 1 || y < 1 || x > map.Width - 2 || y > map.Height - 2)
+        {
+            //Debug.Log($"MakeRoad({x},{y})の引数で掘れる範囲の外が指定されました。");
+            return;
+        }
+
+        MakeRoad(x,y);
+    }
+    public void MakeRoad(int x , int y)
     {
         Vector2Int vector = new Vector2Int(x, y);
 
-        if (x < 1 || y < 1 || x > map.Width-2 || y > map.Height-2)
-        {
-            Debug.Log($"MakeRoad({x},{y})の引数で掘れる範囲の外が指定されました。");
-            return;
-        }
 
         if (map.GetValue(vector) == GameManager.instance.wallID)
         {
@@ -455,34 +556,11 @@ public class MapMGR : MonoBehaviour
                     }
                 }
             }
+
+
             map.DivisionalSetValue(vector, GameManager.instance.wallID);
             map.MultiplySetValue(vector, GameManager.instance.groundID);
 
-            if (GameManager.instance.state == GameManager.State.MakeTheFirstRoad)
-            {
-                numOfFristRoadCounter--;
-                Debug.Log($"numOfFristRoadCounterが{numOfFristRoadCounter}になりました");
-
-                if (isDisplayMakefristRoadAgainCoroutine) return; //コルーチンが作動している間は以下の処理を行わない
-
-                makeTheFirstRoadText.text = $"敵の城につながるように\nあと"+$"{numOfFristRoadCounter}".PadLeft(2)+"つ道を配置してください";
-                if (numOfFristRoadCounter <=0)
-                {
-                    //Debug.Log("numOfFristRoadCounterが0以下になりました");
-                    if (IsReachable())
-                    {
-                        //Debug.Log($"GameManagerのStateをRunningGameにします");
-                        GameManager.instance.RunningGame();
-                    }
-                    else
-                    {
-                        //Debug.Log("道が敵の城につながっていないため\nやり直してください");
-                        makeTheFirstRoadText.text = $"道が敵の城につながっていないため\nやり直してください";
-                        StartCoroutine(DisplayMakefristRoadAgainCoroutine());
-                    }
-
-                }
-            }
 
             //周囲9マスのタイルを更新する必要がある
             for (int dy = -1; dy <= 1; dy++)
@@ -517,12 +595,16 @@ public class MapMGR : MonoBehaviour
             }
         }
     }
-
     IEnumerator DisplayMakefristRoadAgainCoroutine()
     {
         isDisplayMakefristRoadAgainCoroutine = true;
+        //ここに到達したとき、GameManager.instance.stateはState.MakeTheFirstRoad
         yield return new WaitForSeconds(1.2f);
-        GameManager.instance.SetupGame();
+        //コルーチンの後も、State.MakeTheFirstRoadのまま（なぜならば、次の遷移状態はRuuningGameだが、MakeRoadByPointer()のMakeTheFirstRoadの処理のIsReachableのif文でtrueの時に初めて移るから）
+        //GameManager.instance.SetupGame(); //SetupGameに戻すのはよくない。遷移状態はMakeTheFirstRoadのままマップの再配置を行う
+
+        ReSetupMap();
+
         isDisplayMakefristRoadAgainCoroutine = false;
     }
 
@@ -637,10 +719,10 @@ public class MapMGR : MonoBehaviour
                 }
                 i++; //前のループでキューに追加された文を処理しきれたら、インデックスを増やして次のループに移る
 
-                if (i > 100) //無限ループを防ぐ用
+                if (i > 100) //無限ループを防ぐ用   100まで探索して道が見つからないのならば、処理を中断する
                 {
                     isComplete = true;
-                    Debug.LogError("SearchShortestRouteのwhile文でループが100回行われてしまいました");
+                    Debug.Log("SearchShortestRouteのwhile文でループが100回行われたため処理を終了します");
                 }
 
             }

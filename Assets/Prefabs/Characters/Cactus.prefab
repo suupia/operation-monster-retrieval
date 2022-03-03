@@ -124,9 +124,9 @@ MonoBehaviour:
   characterName: Cactus
   characterTypeID: 3
   level: 0
-  maxHp: 6
+  maxHp: 200
   hp: 0
-  atk: 3
+  atk: 20
   atkInterval: 1
   atkRange: 1
   spd: 5
@@ -134,6 +134,8 @@ MonoBehaviour:
   cost: 150
   sprite: {fileID: 21300000, guid: 6944f7f96169e3e44a87284e1c88ca58, type: 3}
   thumbnailSprite: {fileID: 21300000, guid: 0bab62192cd8a07489628385785459e2, type: 3}
+  introduction: "\u30B5\u30DC\u30C6\u30F3\u3067\u3059\uFF01"
+  skillNum: 0
   hpGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   spdGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000

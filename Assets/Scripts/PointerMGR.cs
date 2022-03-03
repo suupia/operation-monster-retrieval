@@ -12,8 +12,8 @@ public class PointerMGR : MonoBehaviour
     private List<PointerTailMGR> pointerTailMGRs;
     private List<int> nonDiagonalPoints;
 
-    [SerializeField] List<Vector2Int> manualRoute;
-    [SerializeField] List<Vector2Int> finalManualRoute;
+    [SerializeField] List<Vector2Int> manualRoute;  //斜めに進むところを斜めにしない状態のRouteを持たせる
+    [SerializeField] List<Vector2Int> finalManualRoute;  //斜めに進むところは斜めにした状態のRouteを持たせる
     private bool isOnCastle;
 
     private Vector3 startPos;
@@ -129,7 +129,6 @@ public class PointerMGR : MonoBehaviour
         Vector2Int pointerGridPos = GameManager.instance.ToGridPosition(transform.position); //Updateで呼び出されるので毎回更新される
 
         SetFinalManualRoute();
-
         if ((mouseGridPos - pointerGridPos).magnitude > 1)       //mouseとpointerが隣接していない場合はなにもしない
         {
             Debug.Log($"縦横のいずれかで隣接しているマスを選んでください　(mouseGridPos - pointerGridPos).magnitude:{(mouseGridPos - pointerGridPos).magnitude}");
@@ -144,11 +143,11 @@ public class PointerMGR : MonoBehaviour
 
         if (finalManualRoute.Count(pos => pos == pointerGridPos) >= 2 && finalManualRoute[0] != pointerGridPos && finalManualRoute[finalManualRoute.IndexOf(pointerGridPos) - 1] == mouseGridPos && manualRoute[manualRoute.Count - 2] != mouseGridPos)    //前に通った道(縦or横)を逆向きに進もうとしていて、来た道を戻らない場合はreturn
         {
-            Debug.LogWarning("既にPointerTailが表示されているマスを逆向(縦or横)きに進むことはできません");
+            Debug.LogWarning("既にPointerTailが表示されているマスを逆向き(縦or横)に進むことはできません");
             return;
         }
 
-        if (manualRoute.Count >= 2 && finalManualRoute.Count(pos => pos == manualRoute[manualRoute.Count - 2]) >= 2 && finalManualRoute[0] != pointerGridPos && finalManualRoute[finalManualRoute.IndexOf(manualRoute[manualRoute.Count - 2]) - 1] == mouseGridPos && manualRoute[manualRoute.Count - 2] != mouseGridPos)    //前に通った道(縦or横)を逆向きに進もうとしていて、来た道を戻らない場合はreturn
+        if (manualRoute.Count >= 2 && finalManualRoute.Count(pos => pos == manualRoute[manualRoute.Count - 2]) >= 2 && finalManualRoute[0] != manualRoute[manualRoute.Count - 2] && finalManualRoute[finalManualRoute.IndexOf(manualRoute[manualRoute.Count - 2]) - 1] == mouseGridPos && manualRoute[manualRoute.Count - 2] != mouseGridPos)    //前に通った道(縦or横)を逆向きに進もうとしていて、来た道を戻らない場合はreturn
         {
             Debug.LogWarning("既にPointerTailが表示されているマスを逆向き(斜め)に進むことはできません");
             return;

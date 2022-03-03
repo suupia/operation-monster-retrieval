@@ -53,7 +53,7 @@ public abstract class Facility : MonoBehaviour
             _state = value;
         }
     }
-     public int HP
+     public virtual int HP
     {
         get { return hp; }
         set
@@ -170,6 +170,9 @@ public abstract class Facility : MonoBehaviour
 
         while (timer < attackInterval){
             timer += Time.deltaTime;
+
+            while (GameManager.instance.state == GameManager.State.PauseTheGame) { yield return null; } //ƒ|[ƒY’†‚ÍŽ~‚ß‚é
+
             yield return null;
         }
 

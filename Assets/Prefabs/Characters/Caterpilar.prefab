@@ -124,16 +124,18 @@ MonoBehaviour:
   characterName: Caterpilar
   characterTypeID: 6
   level: 0
-  maxHp: 6
+  maxHp: 150
   hp: 0
-  atk: 3
+  atk: 30
   atkInterval: 1
   atkRange: 1
   spd: 3
   coolTime: 1
-  cost: 300
+  cost: 100
   sprite: {fileID: 21300000, guid: e9da5e819bfa29843960c6b1b28204ab, type: 3}
   thumbnailSprite: {fileID: 21300000, guid: efe8ea72bafb2c448bb9d8f3ba59be1c, type: 3}
+  introduction: 
+  skillNum: 0
   hpGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   spdGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000

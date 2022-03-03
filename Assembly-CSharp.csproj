@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\PointerMGR.cs" />
+    <Compile Include="Assets\Scripts\TowerPosData.cs" />
     <Compile Include="Assets\Shapes2D\Demos\DragCamera.cs" />
     <Compile Include="Assets\Scripts\DamageTextMGR.cs" />
     <Compile Include="Assets\Scripts\InputMGR.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Assets\Scripts\UI\LevelUpButton.cs" />
     <Compile Include="Assets\Shapes2D\Demos\Stress Test\Spawner.cs" />
     <Compile Include="Assets\Scripts\TowerMGR.cs" />
+    <Compile Include="Assets\Scripts\UI\BackToTheGameButtonMGR.cs" />
     <Compile Include="Assets\Scripts\CastleMGR.cs" />
     <Compile Include="Assets\Scripts\TimerMGR.cs" />
     <Compile Include="Assets\Scripts\EnergyMGR.cs" />
@@ -90,15 +92,19 @@
     <Compile Include="Assets\Scripts\UI\FullScreenButton.cs" />
     <Compile Include="Assets\Scripts\SaveData.cs" />
     <Compile Include="Assets\Scripts\UI\BackToMenuButtonMGR.cs" />
+    <Compile Include="Assets\Scripts\TowerPosDataMGR.cs" />
     <Compile Include="Assets\Scripts\SaveMGR.cs" />
     <Compile Include="Assets\Scripts\MouseTrailerMGR.cs" />
     <Compile Include="Assets\Shapes2D\Demos\Showcase\PacMan.cs" />
     <Compile Include="Assets\Scripts\PointerTailMGR.cs" />
     <Compile Include="Assets\Scripts\UI\SelectStageButtonMGR.cs" />
     <Compile Include="Assets\Shapes2D\Demos\Flappy Shapes\Game.cs" />
+    <Compile Include="Assets\Scripts\UI\PauseButtonMGR.cs" />
     <Compile Include="Assets\Scripts\CharacterDatabase.cs" />
     <Compile Include="Assets\Scripts\UI\CharacterInReserveMGR.cs" />
     <Compile Include="Assets\Shapes2D\Scripts\PolyMap.cs" />
+    <Compile Include="Assets\Scripts\CharacterSkillsMGR.cs" />
+    <Compile Include="Assets\Scripts\CharacterSkills.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Shapes2D\Shaders\Triangle.cginc" />

@@ -7,28 +7,25 @@ using UnityEngine.UI;
 public class CharacterInReserveMGR : MonoBehaviour
 {
     [SerializeField] int dragNum; //CharacterInReverse(GameObject)の添え字をインスペクター上でセットしておく
-    Image characterInReserveImage;
+    [SerializeField] Image characterInReserveImage; //インスペクター上でセットする
 
     private void Start()
     {
-        characterInReserveImage = this.gameObject.GetComponent<Image>();
-        StartCoroutine(LateStart(0.3f)); //characterDatabaseがGameManagerのStartで初期化されるため、若干遅れてからサムネイルの初期化をする
-    }
+        if (GameManager.instance.InitializationFlag == false) GameManager.instance.Initialization();
 
-    IEnumerator LateStart(float waitTime)
-    {
-        yield return new WaitForSeconds(waitTime);
         if (dragNum < GameManager.instance.characterPrefabs.Length) //モンスターの種類だけサムネイル画像を取得する
         {
-           characterInReserveImage.sprite = GameManager.instance.GetCharacterDatabase(dragNum).GetThumbnailSprite();
+            characterInReserveImage.sprite = GameManager.instance.GetCharacterDatabase(dragNum).GetThumbnailSprite();
         }
-
     }
+
 
     public void UpdateCharacterInReserve() //サムネイルの色を決める
     {
-        if (dragNum <= GameManager.instance.CharacterIDsThatCanBeUsed[GameManager.instance.StagesClearedNum])
+        //Debug.Log($"UpdateCharacterInReserveを実行します\ndragNum:{dragNum}");
+        if (dragNum < GameManager.instance.CharacterIDsThatCanBeUsed[GameManager.instance.StagesClearedNum] && dragNum <GameManager.instance.characterInReserveMGRs.Length /*今の実装ではdragNumは9まで(0～8)*/)
         {
+
             characterInReserveImage.color = Color.white;
         }
         else
@@ -41,7 +38,7 @@ public class CharacterInReserveMGR : MonoBehaviour
     {
         //Debug.Log($"{dragNum}がドラッグされました");
 
-        if (!(dragNum <= GameManager.instance.CharacterIDsThatCanBeUsed[GameManager.instance.StagesClearedNum]))
+        if (!(dragNum < GameManager.instance.CharacterIDsThatCanBeUsed[GameManager.instance.StagesClearedNum]))
         {
             return;
         }
@@ -52,7 +49,7 @@ public class CharacterInReserveMGR : MonoBehaviour
 
     public void PointerDownCharacterInReserve() //EventTriggerで呼ぶ（２つセットしていることに注意）
     {
-        if (!(dragNum <= GameManager.instance.CharacterIDsThatCanBeUsed[GameManager.instance.StagesClearedNum]))
+        if (!(dragNum < GameManager.instance.CharacterIDsThatCanBeUsed[GameManager.instance.StagesClearedNum]))
         {
             return;
         }
@@ -61,7 +58,7 @@ public class CharacterInReserveMGR : MonoBehaviour
 
     public void PointerDown() //EventTriggerで呼ぶ　DraggedCharacterThumbnail用
     {
-        if (!(dragNum <= GameManager.instance.CharacterIDsThatCanBeUsed[GameManager.instance.StagesClearedNum]))
+        if (!(dragNum < GameManager.instance.CharacterIDsThatCanBeUsed[GameManager.instance.StagesClearedNum]))
         {
             return;
         }
@@ -70,7 +67,7 @@ public class CharacterInReserveMGR : MonoBehaviour
     }
     public void PointerUp() //EventTriggerで呼ぶ　DraggedCharacterThumbnail用
     {
-        if (!(dragNum <= GameManager.instance.CharacterIDsThatCanBeUsed[GameManager.instance.StagesClearedNum]))
+        if (!(dragNum < GameManager.instance.CharacterIDsThatCanBeUsed[GameManager.instance.StagesClearedNum]))
         {
             return;
         }

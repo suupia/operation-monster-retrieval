@@ -12,10 +12,16 @@ public class TimerMGR : MonoBehaviour
     [SerializeField] float timeLimit; //秒で指定する
     [SerializeField] float timer; //デバッグしやすいようにSerializeFieldにしておく
 
+    //プロパティ
+    public float Timer //CharacterSkillsMGRから呼びたいのでプロパティを作っておく
+    {
+        get { return timer; }
+        set { timer = value; }
+    }
     public void InitiTimer() //GameManagerがState.PlayingGameになったときに呼ぶ
     {
-        timer = 0;
-        timerText.text = ConvertStringTime(timeLimit - timer);
+        Timer = 0;
+        timerText.text = ConvertStringTime(timeLimit - Timer);
 
     }
     void Update()
@@ -25,10 +31,10 @@ public class TimerMGR : MonoBehaviour
         if (GameManager.instance.state != GameManager.State.RunningGame) return; //以下の処理はGameManagerがPlayingGameの時のみ実行される
 
 
-        timer += Time.deltaTime;
-        timerText.text = ConvertStringTime(timeLimit - timer);
+        Timer += Time.deltaTime;
+        timerText.text = ConvertStringTime(timeLimit - Timer);
 
-        if (timer > timeLimit)
+        if (Timer > timeLimit)
         {
             Debug.LogWarning("戦闘に負けました");
             GameManager.instance.StartShowingResults(false);

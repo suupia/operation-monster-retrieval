@@ -244,6 +244,7 @@ GameObject:
   - component: {fileID: 1264923484980192675}
   - component: {fileID: 7517407415526071365}
   - component: {fileID: 824134437430700679}
+  - component: {fileID: 7775639067585899973}
   m_Layer: 5
   m_Name: SelectCharacterButton
   m_TagString: Untagged
@@ -374,6 +375,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonNum: 0
+  buttonSizeMGR: {fileID: 7775639067585899973}
   selectCharacterImage: {fileID: 5475280492074232600}
   changeColorMask: {fileID: 5006581311063386897}
   changeColorImage: {fileID: 5843564720024768623}
@@ -381,6 +383,7 @@ MonoBehaviour:
   modeSwitchButtonText: {fileID: 3707469013689063769}
   costText: {fileID: 1112092866023034227}
   isEditingManualRoute: 0
+  selectedColor: {r: 0, g: 0, b: 0, a: 0}
   emptyGauge: {fileID: 2322799907621231800}
   filledGauge: {fileID: 8711394553369639526}
   emptyGaugeColor: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 1}
@@ -405,6 +408,38 @@ MonoBehaviour:
         - m_Target: {fileID: 1264923484980192675}
           m_TargetAssemblyTypeName: ButtonMGR, Assembly-CSharp
           m_MethodName: PointerDown
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 7775639067585899973}
+          m_TargetAssemblyTypeName: ButtonSizeMGR, Assembly-CSharp
+          m_MethodName: IncreaseSize
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 7775639067585899973}
+          m_TargetAssemblyTypeName: ButtonSizeMGR, Assembly-CSharp
+          m_MethodName: RestoreSize
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -471,6 +506,20 @@ MonoBehaviour:
     _usePolygonMap: 0
   wasConverted: 0
   preConvertedScale: {x: 0, y: 0, z: 0}
+--- !u!114 &7775639067585899973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421535067278608576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a44d4b41f08699a498ef3281795454c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rectTransform: {fileID: 1421535067278608579}
+  magnificationPower: 1.07
 --- !u!1 &1760603904917102088
 GameObject:
   m_ObjectHideFlags: 0
@@ -874,10 +923,10 @@ RectTransform:
   m_Father: {fileID: 1421535067278608579}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 240, y: 144.1651}
+  m_SizeDelta: {x: -24, y: -19.8349}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8997540707842773533
 CanvasRenderer:
@@ -1158,6 +1207,7 @@ GameObject:
   - component: {fileID: 2050215309400072016}
   - component: {fileID: 4808015607322668196}
   - component: {fileID: 1112092866023034227}
+  - component: {fileID: 3041655707864777569}
   m_Layer: 5
   m_Name: CostText
   m_TagString: Untagged
@@ -1226,6 +1276,21 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: 888ene
+--- !u!114 &3041655707864777569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8697841980859767513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 1, g: 1, b: 1, a: 0.5}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 1
 --- !u!1 &8710592978591902436
 GameObject:
   m_ObjectHideFlags: 0

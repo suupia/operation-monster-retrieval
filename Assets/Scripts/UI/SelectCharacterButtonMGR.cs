@@ -7,6 +7,8 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 {
     [SerializeField] int buttonNum; //インスペクター上でセットする
 
+    [SerializeField] ButtonSizeMGR buttonSizeMGR; //インスペクター上でセットする
+
     [SerializeField] Image selectCharacterImage; //インスペクター上でセットする
     [SerializeField] GameObject changeColorMask; //色をまったく載せない時にはこのGameObjectをfalseにする
     [SerializeField] Image changeColorImage; //インスペクター上でセットする
@@ -23,7 +25,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 
     //以下、ManualRoute用の変数
    [SerializeField] bool isEditingManualRoute;
-    Color selectedColor;
+    [SerializeField] Color selectedColor;
     Color notSelectedColor;
 
     //以下、CoolTime用の変数
@@ -31,6 +33,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
     [SerializeField] Image filledGauge;
     [SerializeField] Color emptyGaugeColor;
     [SerializeField] Color filledGaugeColor;
+
 
     public void InitiSelectCharacterButton() //GameManagerがState.PlayingGameになったときに呼ぶ
     {
@@ -41,7 +44,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         //色の初期化
         canSpawnCharacterColor = Color.white;
         canNotSpawnCharacterColor = new Color(0.4f,0.4f,0.4f,1); //若干濃いグレー
-        selectedColor = Color.cyan;
+        //selectedColor = Color.cyan;    色調整のためにInspector上で変更する
         notSelectedColor = Color.gray;
         emptyGauge.color = Color.clear;
         filledGauge.color = Color.clear;
@@ -60,13 +63,23 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.instance.energyMGR.CurrentEnergy >= GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetCost())
+        {
+            buttonSizeMGR.SetIsActive(true);
+        }
+        else
+        {
+            buttonSizeMGR.SetIsActive(false);
+        }
+
+
         Color finalColor;
         if (GameManager.instance.energyMGR.CurrentEnergy >= GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetCost() && !spawningCharacter)
         {
             if (isEditingManualRoute)
             {
                 finalColor = canSpawnCharacterColor * selectedColor; //乗算で処理する
-                Debug.LogWarning($"finalColor:{finalColor}");
+                //Debug.Log($"finalColor:{finalColor}");
             }
             else
             {

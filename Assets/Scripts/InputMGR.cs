@@ -15,6 +15,7 @@ public class InputMGR : MonoBehaviour
 
     [SerializeField] GameObject PauseTheGameCanvas; //インスペクター上でセットする
     bool pauseFlag = false; //ポーズ状態ならtrue
+    //bool isPausingAtMakeTheFirstRoad; //ポーズしたときに前の状態がMakeTheFirstRoadであったことを知るために必要  PauseButonMGRに同値な変数を置いたのでコメントアウトしておく
 
     [SerializeField] DraggedCharacterThumbnail draggedCharacterThumbnail; //インスペクター上でセットする（SetActiveをfalseにしているため、ここで参照を保持しておく）
 
@@ -74,26 +75,52 @@ public class InputMGR : MonoBehaviour
         //    }
         //}
 
-        if (GameManager.instance.state == GameManager.State.RunningGame || GameManager.instance.state == GameManager.State.PauseTheGame) //戦闘中またはポーズ中の時のみ一時停止用のメニューを操作できる。
-        {
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                if (pauseFlag == true)
-                {
-                    pauseFlag = false;
-                    Debug.LogWarning("RuuningGameを呼びます");
-                    GameManager.instance.RunningGame();
-                    PauseTheGameCanvas.SetActive(false);
-                }
-                else
-                {
-                    pauseFlag = true;
-                    Debug.LogWarning("PauseTheGameを呼びます");
-                    GameManager.instance.PauseTheGame();
-                    PauseTheGameCanvas.SetActive(true);
-                }
-            }
-        }
+        //以下の処理は、PauseButtonMGRとBackToTheGameButtonMGRで行うためコメントアウトしておく
+
+        //if (GameManager.instance.state == GameManager.State.RunningGame || GameManager.instance.state == GameManager.State.PauseTheGame || GameManager.instance.state == GameManager.State.MakeTheFirstRoad) //戦闘中またはポーズ中の時のみ一時停止用のメニューを操作できる。
+        //{
+        //    if (Input.GetKeyDown(KeyCode.M))
+        //    {
+        //        if (pauseFlag == true)
+        //        {
+        //            if (isPausingAtMakeTheFirstRoad)
+        //            {
+        //                pauseFlag = false;
+        //                isPausingAtMakeTheFirstRoad = false;
+        //                Debug.Log("MakeTheFirstRoadを呼びます");
+        //                GameManager.instance.MakeTheFirstRoad();
+        //                PauseTheGameCanvas.SetActive(false);
+        //            }
+        //            else
+        //            {
+        //                pauseFlag = false;
+        //                Debug.Log("RuuningGameを呼びます");
+        //                GameManager.instance.RunningGame();
+        //                PauseTheGameCanvas.SetActive(false);
+        //            }
+
+        //        }
+        //        else
+        //        {
+
+        //            if (GameManager.instance.state == GameManager.State.MakeTheFirstRoad)
+        //            {
+        //                pauseFlag = true;
+        //                isPausingAtMakeTheFirstRoad = true;
+        //                Debug.Log("PauseTheGameを呼びます");
+        //                GameManager.instance.PauseTheGame();
+        //                PauseTheGameCanvas.SetActive(true);
+        //            }
+        //            else
+        //            {
+        //                pauseFlag = true;
+        //                Debug.Log("PauseTheGameを呼びます");
+        //                GameManager.instance.PauseTheGame();
+        //                PauseTheGameCanvas.SetActive(true);
+        //            }
+        //        }
+        //    }
+        //}
 
         if (GameManager.instance.state != GameManager.State.MakeTheFirstRoad && GameManager.instance.state != GameManager.State.RunningGame) return; //以下の処理はGameManagerがMakeTheFirstRoadまたはRunningGameの時のみ実行される
 
@@ -141,7 +168,7 @@ public class InputMGR : MonoBehaviour
             //Debug.Log($"mousePosは{mousePos}");
             //Debug.Log($"mouseGridPosは{mouseGridPos}");
 
-            GameManager.instance.mapMGR.MakeRoad(mouseGridPos.x, mouseGridPos.y);
+            GameManager.instance.mapMGR.MakeRoadByPointer(mouseGridPos.x, mouseGridPos.y);
         }
 
 
@@ -170,10 +197,5 @@ public class InputMGR : MonoBehaviour
         pauseFlag = false;
         PauseTheGameCanvas.SetActive(false);
     }
-
-    //public bool IsInRectTransform(RectTransform targetRT)
-    //{
-    //    RectTransformExtension.Contains(targetRT,eventData);
-    //}
 
 }

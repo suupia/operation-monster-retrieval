@@ -8,20 +8,18 @@ using UnityEngine.EventSystems;
 public class CharacterInCombatMGR : MonoBehaviour
 {
     [SerializeField] int dropNum;
-    Image thumbnailImage;
+    [SerializeField] Image thumbnailImage;
 
     private void Start()
     {
         thumbnailImage = GetComponent<Image>();
 
-        StartCoroutine(LateStart(0.3f));
+        if (GameManager.instance.InitializationFlag == false) GameManager.instance.Initialization();
+
+        thumbnailImage.sprite = GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[dropNum]).GetThumbnailSprite();
+
     }
 
-    IEnumerator LateStart(float waitTime)
-    {
-        yield return new WaitForSeconds(waitTime);
-        thumbnailImage.sprite = GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[dropNum]).GetThumbnailSprite();
-    }
 
 
     public void DropCharacter() //Event Triggerで呼ぶ
@@ -40,6 +38,9 @@ public class CharacterInCombatMGR : MonoBehaviour
 
         //ドラッグしていたサムネイルを消す
         GameManager.instance.inputMGR.GetDraggedCharacterThumbnail().HideDraggedCharacterThumbnail(); //dragNumの場合はそのままIDになる
+
+        //順番をセーブする
+        GameManager.instance.saveMGR.SaveCharacterInCombatID(dropNum,GameManager.instance.IDsOfCharactersInCombat[dropNum]);
 
 
     }

@@ -124,16 +124,18 @@ MonoBehaviour:
   characterName: Saru
   characterTypeID: 5
   level: 0
-  maxHp: 6
+  maxHp: 100
   hp: 0
-  atk: 2
+  atk: 10
   atkInterval: 1
-  atkRange: 2
-  spd: 1
+  atkRange: 1
+  spd: 2
   coolTime: 1
-  cost: 10
+  cost: 30
   sprite: {fileID: -1653429110502446582, guid: 2c5546c048609c54799931ce8f62aa6e, type: 3}
   thumbnailSprite: {fileID: 21300000, guid: 0f66ea8b460ee4b4a8b6787278c094ef, type: 3}
+  introduction: 
+  skillNum: 0
   hpGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   spdGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000

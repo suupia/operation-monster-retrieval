@@ -267,7 +267,7 @@ public class DebugMGR : MonoBehaviour
         {
             for(int x = 0; x < GameManager.instance.mapMGR.GetMapWidth(); x++)
             {
-                GameManager.instance.mapMGR.MakeRoad(x, y);
+                GameManager.instance.mapMGR.MakeRoadByPointer(x, y);
             }
         }
     }

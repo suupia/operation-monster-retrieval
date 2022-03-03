@@ -6,33 +6,49 @@ using UnityEngine.UI;
 
 public class EnergyMGR : MonoBehaviour
 {
+    [SerializeField] ButtonSizeMGR buttonSizeMGR; //インスペクター上でセットする
+
     [SerializeField] Text energyText; //インスペクター上でセットする
     [SerializeField] Image energyLevelUpImage;
     [SerializeField] Text energyLevelUpText;
+    [SerializeField] GameObject energyLevelUpHighlight;
 
     [SerializeField] Image ImageToChangeColor;
 
     bool isActive = true;
 
     float energyGain; //1秒あたりのエネルギー獲得量
+
+    [SerializeField] int energyToMakeRoad; //道を作るために必要なエネルギーの量
+    public int EnergyToMakeRoad
+    {
+        get { return energyToMakeRoad; }
+    }
+
     [SerializeField] float[] energyGainArray; //レベルアップでどのように変化していくか配列で決める
     float energyMax; //エネルギーの最大値
     [SerializeField] float[] energyMaxArray; //レベルアップでどのように変化していくか配列で決める
 
     [SerializeField] float currentEnergy; //現在のエネルギー量　デバッグしやすいようにSerializeFieldにしておく
 
-    [SerializeField] int level; //デバッグしやすいようにSerializeFieldにしておく
+    [SerializeField] int level; //デバッグしやすいようにSerializeFieldにしておく 初期値は0なので実際のレベルはlevel+1
     [SerializeField] float[] energyRequiredArray;
 
     Color canLevelUpColor = Color.clear;//透明
     Color canNotLevelUpColor = new Color(0, 0, 0, 0.3f); //不当明度がある灰色
+
+    [SerializeField] Color[] energyLevelUpButtonColors; //Levelによって色を変える用
+
+    //デバッグモード
+    [SerializeField] bool isInDebugMode;
 
 
     //プロパティ
     public float CurrentEnergy
     {
         get { return currentEnergy; }
-        set { 
+        set {
+
             if(value >= energyMax)
             {
                 currentEnergy = energyMax; //ピッタリ最大値にする
@@ -62,6 +78,7 @@ public class EnergyMGR : MonoBehaviour
         LEVEL = 0;
         energyGain = energyGainArray[LEVEL];
         energyMax = energyMaxArray[LEVEL];
+        energyLevelUpImage.color = energyLevelUpButtonColors[LEVEL];
     }
 
     void Update()
@@ -70,16 +87,29 @@ public class EnergyMGR : MonoBehaviour
 
         if (GameManager.instance.state != GameManager.State.RunningGame) return; //以下の処理はGameManagerがPlayingGameの時のみ実行される
 
-        if (GameManager.instance.energyMGR.CurrentEnergy >= energyRequiredArray[LEVEL])
+        if(LEVEL + 1 >= energyRequiredArray.Length)
+        {
+            ImageToChangeColor.color = canLevelUpColor; //LEVELが最大のときはcolorをclearにする
+            energyLevelUpHighlight.SetActive(true);
+            buttonSizeMGR.SetIsActive(false); //LEVELが最大の時はカーソルを合わせてもボタンは大きくならない
+        }
+        else if (GameManager.instance.energyMGR.CurrentEnergy >= energyRequiredArray[LEVEL])
         {
             ImageToChangeColor.color = canLevelUpColor;
+            energyLevelUpHighlight.SetActive(true);
+            buttonSizeMGR.SetIsActive(true);
         }
         else
         {
             ImageToChangeColor.color = canNotLevelUpColor;
+            energyLevelUpHighlight.SetActive(false);
+            buttonSizeMGR.SetIsActive(false);
         }
 
         CurrentEnergy += energyGain * Time.deltaTime;
+
+        //デバッグモード
+        if (isInDebugMode) CurrentEnergy = energyMax;
 
     }
 
@@ -100,12 +130,15 @@ public class EnergyMGR : MonoBehaviour
 
         if (CurrentEnergy < energyRequiredArray[LEVEL]) return; //Energyが足りないとレベルアップできない
 
-        if (LEVEL >= energyRequiredArray.Length) return; //LEVELが最大なのでこれ以上レベルアップしない
+        if (LEVEL +1 >= energyRequiredArray.Length) return; //LEVELが最大なのでこれ以上レベルアップしない
 
         CurrentEnergy -= energyRequiredArray[LEVEL];
         LEVEL++;
         energyGain = energyGainArray[LEVEL];
         energyMax = energyMaxArray[LEVEL];
+
+        //levelによってbuttonの色を変える
+        energyLevelUpImage.color = energyLevelUpButtonColors[LEVEL];
     }
 
 }

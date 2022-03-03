@@ -163,3 +163,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropNum: 0
+  thumbnailImage: {fileID: 2593982318869323187}

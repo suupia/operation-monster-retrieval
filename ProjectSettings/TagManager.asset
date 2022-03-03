@@ -11,7 +11,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - UIframe
   - 
   - 
   - 
@@ -52,4 +52,7 @@ TagManager:
     locked: 0
   - name: MousePointer
     uniqueID: 3007462795
+    locked: 0
+  - name: UIFrame
+    uniqueID: 2185056473
     locked: 0

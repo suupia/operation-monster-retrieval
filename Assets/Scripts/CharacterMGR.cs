@@ -52,6 +52,8 @@ public class CharacterMGR : MonoBehaviour
     [SerializeField] int cost;
     [SerializeField] Sprite sprite; //立ち絵
     [SerializeField] Sprite thumbnailSprite; //ボタンに表示するスプライト
+    [SerializeField] string introduction; //モンスターの紹介文
+    [SerializeField] int skillNum; //どのスキルを持つか決める
 
     [SerializeField] int[] hpGrowthRate; //成長率をインスペクター上で決めておく ex) 0,1,0 なら、最初のレベルアップでは変化せず、次のレベルアップで1上がる
     [SerializeField] int[] atkGrowthRate;
@@ -73,6 +75,7 @@ public class CharacterMGR : MonoBehaviour
     List<int> nonDiagonalPoints;
 
     int moveAlongWithCounter = 0;
+    int causeSkillPoint = -1;  //moceAlongWithCounterがcauseSkillPointと等しい時にskillを発動する
 
     State _state;
     private State state
@@ -207,6 +210,10 @@ public class CharacterMGR : MonoBehaviour
     {
         return atk;
     }
+    public void SetAtk(int atkNum)
+    {
+        atk = atkNum;
+    }
     public float GetAtkInterval()
     {
         return atkInterval;
@@ -218,6 +225,11 @@ public class CharacterMGR : MonoBehaviour
     public float GetSpd()
     {
         return spd;
+    }
+    public void SetSpd(float spdNum)
+    {
+        spd = spdNum;
+        moveTime = 1 / spd;
     }
 
     public float GetCoolTime()
@@ -236,6 +248,11 @@ public class CharacterMGR : MonoBehaviour
     {
         return thumbnailSprite;
     }
+    public string GetIntroduction()
+    {
+        return introduction;
+    }
+
     //Setter
     public void SetCharacterData(int buttonNum, int characterTypeID)  //hpやatkなどの情報もここでセットする。
     {
@@ -413,6 +430,7 @@ public class CharacterMGR : MonoBehaviour
 
         targetCastlePos = GameManager.instance.mapMGR.GetEnemysCastlePos();
 
+
         //routeに関する処理
         //mode = Mode.Manual;
         switch (mode)
@@ -424,6 +442,7 @@ public class CharacterMGR : MonoBehaviour
                 SetManualRoute();
                 break;
         }
+        causeSkillPoint = GameManager.instance.charactercSkillsMGR.JudgeSkillTrigger(skillNum, routeList); //skillが発動する点を判定し、そのIndexを受け取る
         InitiMoveAlongWith();
     }
 
@@ -501,10 +520,10 @@ public class CharacterMGR : MonoBehaviour
         Vector2 startPos;
         Vector2 endPos;
 
-
         isMoving = true;
 
         MoveData(GetDirectionVector()); //先にMoveDateを行う
+
 
 
         startPos = transform.position;
@@ -521,6 +540,10 @@ public class CharacterMGR : MonoBehaviour
             //3つ目の引数は"1フレームの最大移動距離"　単位は実質[m/s](コルーチンが1フレームずつ回っているからTime.deltaTimeが消える。moveTime経った時に1マス進む。)
 
             remainingDistance = (endPos - new Vector2(transform.position.x, transform.position.y)).sqrMagnitude;
+
+
+            while (GameManager.instance.state == GameManager.State.PauseTheGame) { yield return null; } //ポーズ中は止める
+
 
             yield return null;  //1フレーム停止させる。
         }
@@ -593,10 +616,15 @@ public class CharacterMGR : MonoBehaviour
 
     public void MoveAlongWith()
     {
-        Vector2Int nextPos, nextNextPos;
+        Vector2Int nextPos;
+        //Vector2Int nextNextPos;  RouteListは既に斜めに進めるところは斜めにした状態になっているので、この変数と下の方にあるのif文の処理はいらない。コメントアウトしておく
 
         if (isMoving) return;
 
+        if(moveAlongWithCounter == causeSkillPoint)
+        {
+            GameManager.instance.charactercSkillsMGR.CauseSkill(skillNum, this);
+        }
         //if (moveAlongWithCounter == routeList.Count -1) //ルートの終点にいるときの処理
         //{
         //    Debug.Log("ルートの終点にいるのでInBatteleに切り替えます");
@@ -615,19 +643,19 @@ public class CharacterMGR : MonoBehaviour
 
         nextPos = routeList[moveAlongWithCounter + 1];
 
-        if (moveAlongWithCounter < routeList.Count - 2 && !nonDiagonalPoints.Contains(moveAlongWithCounter))  //↓斜め移動できるときはそうする。
-        {
-            nextNextPos = routeList[moveAlongWithCounter + 2];
-            if (((nextPos - gridPos).x == 0 && (nextNextPos - nextPos).y == 0) || ((nextPos - gridPos).y == 0 && (nextNextPos - nextPos).x == 0)) //nextPosが角マスのときtrue
-            {
-                if (CanMove(nextNextPos - gridPos))
-                {
-                    Debug.Log($"斜め移動が可能なため、nextPos:{nextPos}をnextNextPos:{nextNextPos}で置き換えます gridPos:{gridPos}");
-                    nextPos = nextNextPos;
-                    moveAlongWithCounter++;
-                }
-            }
-        }
+        //if (moveAlongWithCounter < routeList.Count - 2 && !nonDiagonalPoints.Contains(moveAlongWithCounter))  //↓斜め移動できるときはそうする。
+        //{
+        //    nextNextPos = routeList[moveAlongWithCounter + 2];
+        //    if (((nextPos - gridPos).x == 0 && (nextNextPos - nextPos).y == 0) || ((nextPos - gridPos).y == 0 && (nextNextPos - nextPos).x == 0)) //nextPosが角マスのときtrue
+        //    {
+        //        if (CanMove(nextNextPos - gridPos))
+        //        {
+        //            Debug.Log($"斜め移動が可能なため、nextPos:{nextPos}をnextNextPos:{nextNextPos}で置き換えます gridPos:{gridPos}");
+        //            nextPos = nextNextPos;
+        //            moveAlongWithCounter++;
+        //        }
+        //    }
+        //}
 
         SetDirection(nextPos - gridPos);
 
@@ -690,6 +718,9 @@ public class CharacterMGR : MonoBehaviour
         while (timer < atkInterval)
         {
             timer += Time.deltaTime;
+
+            while (GameManager.instance.state == GameManager.State.PauseTheGame) { yield return null; } //ポーズ中は止める
+
             yield return null;
         }
 
@@ -698,7 +729,23 @@ public class CharacterMGR : MonoBehaviour
 
     public int CalcDamage(int atk)
     {
-        return atk; //とりあえず、今は何もしないで攻撃力をそのまま返す
+        //return atk; //とりあえず、今は何もしないで攻撃力をそのまま返す
+
+        int result =0;
+
+        if(GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) is CastleMGR) //今ターゲットとしている施設が城であった場合、タワーの数を考慮した計算式に変える
+        {
+            result = (int)Mathf.Ceil(atk * Mathf.Pow((float)(GameManager.instance.MaxTowerNum-GameManager.instance.CurrentTowerNum)/GameManager.instance.MaxTowerNum,2)); //切り上げ 2乗して滑らかにする
+
+            //Debug.Log($"CalcDamageのresult:{result}");
+        }
+        else
+        {
+            //とりあえず、タワーへの攻撃は何もしないでそのまま値を返す
+            result = atk;
+        }
+
+        return result;
     }
 
 

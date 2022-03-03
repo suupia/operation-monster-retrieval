@@ -124,16 +124,18 @@ MonoBehaviour:
   characterName: Kumo
   characterTypeID: 7
   level: 0
-  maxHp: 6
+  maxHp: 400
   hp: 0
-  atk: 3
+  atk: 20
   atkInterval: 1
-  atkRange: 1
+  atkRange: 2
   spd: 3
   coolTime: 1
   cost: 50
   sprite: {fileID: 21300000, guid: c2a3c1ee5dfbe9a4d9f65f0fe9163c54, type: 3}
   thumbnailSprite: {fileID: 21300000, guid: 525e39a4be7491e48ae15de271317b61, type: 3}
+  introduction: 
+  skillNum: 0
   hpGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   spdGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000

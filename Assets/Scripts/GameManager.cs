@@ -18,17 +18,24 @@ public class GameManager : MonoBehaviour
     [SerializeField] public CharacterInCombatMGR[] characterInCombatMGRs; //4つセットする
     [SerializeField] public TimerMGR timerMGR;
     [SerializeField] public EnergyMGR energyMGR;
+    [SerializeField] public TowerPosDataMGR towerPosDataMGR;
     [SerializeField] public SaveMGR saveMGR;
+    public CharacterSkillsMGR charactercSkillsMGR; 
 
     [SerializeField] public GameObject selectStageCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
     [SerializeField] public GameObject menuCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
     [SerializeField] public StatusCanvasMGR statusCanvasMGR;
+    [SerializeField] GameObject frameCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
 
     [SerializeField] GameObject resultCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
     [SerializeField] Text resultText;
-    //[SerializeField] GameObject resultTextGO; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
-    //Text resultText;
 
+
+    bool initializationFlag = false;
+    public bool InitializationFlag
+    {
+        get { return initializationFlag; }
+    }
 
     int numOfCharacterInCombat = 4; //戦闘に参加するモンスターの種類は4種類
     int[] idsOfCharactersInCombat; //戦闘に参加しているモンスターのID (numOfCharacterTypesの分だけ要素を用意する)
@@ -38,12 +45,28 @@ public class GameManager : MonoBehaviour
     } //getterのみ
 
     [SerializeField] int[] characterIDsThatCanBeUsed;
-    public int[] CharacterIDsThatCanBeUsed  //7つ用意する クリアしたステージを引数に取って、使えるキャラクターのIDの最大値を返す配列(この配列は単調増加であることに注意)
+    public int[] CharacterIDsThatCanBeUsed  //8つ用意する(最大でStage7の値7が入るから) クリアしたステージを引数に取って、使えるキャラクターのIDの最大値を返す配列(この配列は単調増加であることに注意)
     {
         get { return characterIDsThatCanBeUsed; }
     }
 
-    int stagesClearedNum;
+    int maxTowerNum; //各ステージでのタワーの最大値(ステージごとに変わる)
+    public int MaxTowerNum //Getterのみ
+    {
+        get { return maxTowerNum; }
+    }
+    [SerializeField] int currentTowerNum; //生き残っているタワーの数　デバッグようにSerializeFieldにしている
+    public int CurrentTowerNum
+    {
+        get { return currentTowerNum; }
+        set { 
+            currentTowerNum = value;
+            Debug.LogWarning($"currentTowerNumを{currentTowerNum}にしました");
+        }
+    }
+
+
+    int stagesClearedNum =0;
     public int StagesClearedNum { //プロパティ　どこのステージまでクリアしたかを記録しておく
         get { return stagesClearedNum; }
         set
@@ -165,12 +188,17 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        //resultText = resultTextGO.GetComponent<Text>();
+        if (InitializationFlag == false) Initialization();
+    }
+    
+    public void Initialization() //Start関数の変わり。他の関数の初期化で参照したいため、InitializationFlag(bool)を用意し、他から呼ぶときに初期化されていなければ初期化するようにする
+    {
+        initializationFlag = true;
 
         idsOfCharactersInCombat = new int[numOfCharacterInCombat];
 
         isSpawnCharacterArray = new bool[numOfCharacterInCombat];
-        for (int i =0;i< isSpawnCharacterArray.Length;i++)
+        for (int i = 0; i < isSpawnCharacterArray.Length; i++)
         {
             isSpawnCharacterArray[i] = false;
         }
@@ -179,36 +207,41 @@ public class GameManager : MonoBehaviour
         manualRouteDatas = new ManualRouteData[numOfCharacterInCombat];
 
         characterDatabase = new CharacterMGR[characterPrefabs.Length];
-        for(int i=0; i < characterPrefabs.Length; i++)
+        for (int i = 0; i < characterPrefabs.Length; i++)
         {
             //characterDatabase[i] = characterPrefabs[i].GetComponent<CharacterMGR>();
             characterDatabase[i] = characterPrefabs[i].GetComponent<CharacterMGR>().Clone(); //ディープコピーをする
 
             //キャラクターのレベルをファイルから読み込む
             characterDatabase[i].SetInitiLevel(saveMGR.GetCharacterLevel(i));
-            
+
         }
 
         characterMode = new CharacterMGR.Mode[numOfCharacterInCombat];
-        for(int i = 0; i<characterMode.Length; i++)
+        for (int i = 0; i < characterMode.Length; i++)
         {
             characterMode[i] = CharacterMGR.Mode.Auto; //デフォルトはAutoMode
         }
 
-        for (int i=0;i<numOfCharacterInCombat;i++)
+        for (int i = 0; i < numOfCharacterInCombat; i++)
         {
-            autoRouteDatas[i] = new AutoRouteData(mapMGR.GetMapWidth(),mapMGR.GetMapHeight());
+            autoRouteDatas[i] = new AutoRouteData(mapMGR.GetMapWidth(), mapMGR.GetMapHeight());
             manualRouteDatas[i] = new ManualRouteData(); //今はmanualRouteDataがない
         }
 
         StagesClearedNum = saveMGR.GetStagesCleardNum();
 
+        statusCanvasMGR.InitiStatusCanvasMGR();
+
+        for (int i = 0; i< IDsOfCharactersInCombat.Length;i++) //CharacterInCombatの順番をファイルから読み込む
+        {
+            IDsOfCharactersInCombat[i] = saveMGR.GetCharacterInCombatID(i);
+        }
+
 
         StartSelectingStage();
 
     }
-    
-
     public void StartSelectingStage()
     {
         state = State.SelectingStage;
@@ -216,6 +249,8 @@ public class GameManager : MonoBehaviour
         resultCanvas.SetActive(false);
         selectStageCanvas.SetActive(true);
         //次のPlayingGameに備えて前の戦闘のデータをここでリセットする（今は特に書くことはない）
+
+        frameCanvas.SetActive(true);      //SelectStageCanvasとMenuCanvasではFrameCanvasを表示する
     }
 
     public  void SetupGame()
@@ -232,7 +267,12 @@ public class GameManager : MonoBehaviour
 
         //SetCharacterTypeIDInCombat();
 
+        frameCanvas.SetActive(false);    //戦闘画面ではFrameCanvasを非表示にする
+
         mapMGR.SetupMap();
+
+        maxTowerNum = mapMGR.GetMaxTowerNum();
+        CurrentTowerNum = maxTowerNum;
 
         MakeTheFirstRoad();
 
@@ -280,9 +320,9 @@ public class GameManager : MonoBehaviour
 
         Debug.LogWarning($"StagesClearedNum:{StagesClearedNum}");
         //StagesClearedNumを更新する
-        if (StagesClearedNum < mapMGR.GetStageNum())
+        if (StagesClearedNum < mapMGR.GetStageNum()+1)
         {
-            StagesClearedNum = mapMGR.GetStageNum();
+            StagesClearedNum = mapMGR.GetStageNum()+1;
             Debug.LogWarning($"StagesClearedNumを更新して:{StagesClearedNum}　にしました");
 
         }
@@ -356,6 +396,9 @@ public class GameManager : MonoBehaviour
         {
             time += Time.deltaTime;
             selectCharacterButtonMGRs[buttonNum].RefreshGauge(time / characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCoolTime());
+
+            while (GameManager.instance.state == GameManager.State.PauseTheGame){yield return null;} //ポーズ中は止める
+
             yield return null;
         }
 

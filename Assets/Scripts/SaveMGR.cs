@@ -31,6 +31,11 @@ public class SaveMGR : MonoBehaviour
     {
         return saveData.characterLevel[index];
     }
+
+    public int GetCharacterInCombatID(int index)
+    {
+        return saveData.characterInCombatID[index];
+    }
     
     //Setter
     public void SaveStagesCleardNum(int stageNum)
@@ -50,6 +55,11 @@ public class SaveMGR : MonoBehaviour
         Save();
     }
 
+    public void SaveCharacterInCombatID(int index,int id)
+    {
+        saveData.characterInCombatID[index] = id;
+        Save();
+    }
 
 
     // 省略。以下のSave関数やLoad関数を呼び出して使用すること

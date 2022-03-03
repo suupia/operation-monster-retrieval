@@ -25,17 +25,6 @@ public class TowerMGR : Facility
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    //private void Update()
-    //{
-    //    if (GameManager.instance.state == GameManager.State.SelectingStage)
-    //    {
-    //        Debug.Log("Towerオブジェクトを破棄します");
-    //        Destroy(this.gameObject);
-    //    }
-
-
-    //}
-
     public override void SetDirection(Vector2 directionVector)
     {
         if (directionVector == Vector2.zero) //引数の方向ベクトルがゼロベクトルの時は何もしない
@@ -110,10 +99,18 @@ public class TowerMGR : Facility
 
     public override void Die()
     {
-        Debug.Log($"HPが0以下になったので、タワーを破壊します gridPos:{gridPos}のタワー");
+        //Debug.Log($"HPが0以下になったので、タワーを破壊します gridPos:{gridPos}のタワー");
         
         GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos,GameManager.instance.facilityID); //先にデータを消去する
 
+        GameManager.instance.CurrentTowerNum--;
+
+        GameManager.instance.mapMGR.MakeRoadByTowerDead(gridPos.x,gridPos.y);
+
+
         Destroy(this.gameObject);
+
+        Debug.LogWarning($"{gridPos}のタワーをDestroyしました。");
+
     }
 }

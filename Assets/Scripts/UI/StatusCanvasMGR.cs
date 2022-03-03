@@ -18,6 +18,7 @@ public class StatusCanvasMGR : MonoBehaviour
     [SerializeField] Text costText;
     [SerializeField] Image characterImage;
     [SerializeField] Image characterFullScreenImage;
+    [SerializeField] Text characterIntroductionText;
     
 
     [SerializeField] Text levelUpCostText; //インスペクター上でセットする
@@ -45,7 +46,7 @@ public class StatusCanvasMGR : MonoBehaviour
         return characterMGRDisplayed;
     }
 
-    private void Start()
+    public void InitiStatusCanvasMGR()
     {
         //Debug.LogWarning("StatusCanbasMGRのStart()を実行します");
         UpdateStatusCanvas(0); //最初はID:0のBatを表示させておく
@@ -97,6 +98,7 @@ public class StatusCanvasMGR : MonoBehaviour
         //FullScreen用
         fullScreenNameText.text = characterMGRDisplayed.GetCharacterName();
         characterFullScreenImage.sprite = characterMGRDisplayed.GetSprite();
+        characterIntroductionText.text = characterMGRDisplayed.GetIntroduction();
 
     }
 

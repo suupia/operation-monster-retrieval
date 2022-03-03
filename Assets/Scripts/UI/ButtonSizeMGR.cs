@@ -7,15 +7,15 @@ public class ButtonSizeMGR : MonoBehaviour
 
     [SerializeField] RectTransform rectTransform; //インスペクター上でセットしておく
 
-    bool isActive = true; //SelectStageButtonMGRからアクセスして変更する
+    bool isActive = true;
 
     //Setter
-    public void SetIsActive(bool flag)
+    public void SetIsActive(bool flag) //外部から変更する
     {
         isActive = flag;
     }
 
-    float magnificationPower = 1.15f; //拡大倍率
+    [SerializeField] float magnificationPower = 1.15f; //拡大倍率
     float time = 0.08f; //サイズ変更が完了するまでの時間
 
     float initiWidth; //ゲーム開始時のサイズを保持しておく
@@ -26,13 +26,13 @@ public class ButtonSizeMGR : MonoBehaviour
         initiWidth = rectTransform.sizeDelta.x;
         initiHeight = rectTransform.sizeDelta.y;
     }
-    public void MakeButtonBigger() //EventTriggerのPointerEnterで呼ぶ
+    public void IncreaseSize() //EventTriggerのPointerEnterで呼ぶ
     {
         if (!isActive) return;
         StartCoroutine(MakeButtonBiggerCoroutine());
     }
 
-    public void RestoreTheSize() //EventTriggerのPointerExitで呼ぶ
+    public void RestoreSize() //EventTriggerのPointerExitで呼ぶ
     {
         if (!isActive) return;
         StartCoroutine(RestoreTheSizeCoroutine());

@@ -124,16 +124,18 @@ MonoBehaviour:
   characterName: Bat
   characterTypeID: 0
   level: 0
-  maxHp: 20
+  maxHp: 100
   hp: 0
-  atk: 5
+  atk: 20
   atkInterval: 1
   atkRange: 1
-  spd: 5
+  spd: 3
   coolTime: 1
-  cost: 10
+  cost: 100
   sprite: {fileID: 21300000, guid: 52ee45ee611995848adb3a2f7428820d, type: 3}
   thumbnailSprite: {fileID: 21300000, guid: 0b646e09ef6b39945b8ffe429182e509, type: 3}
+  introduction: "\u30B3\u30A6\u30E2\u30EA\u3067\u3059\uFF01"
+  skillNum: 0
   hpGrowthRate: 010000000100000001000000010000000100000001000000010000000100000001000000
   atkGrowthRate: 010000000100000001000000010000000100000001000000010000000100000001000000
   spdGrowthRate: 010000000100000001000000010000000100000001000000010000000100000001000000
