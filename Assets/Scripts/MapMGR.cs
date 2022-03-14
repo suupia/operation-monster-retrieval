@@ -508,7 +508,7 @@ public class MapMGR : MonoBehaviour
             if (numOfFristRoadCounter <= 0)
             {
                 //Debug.Log("numOfFristRoadCounterが0以下になりました");
-                if (IsReachable())
+                if (IsReachable2())
                 {
                     //Debug.Log($"GameManagerのStateをRunningGameにします");
                     GameManager.instance.RunningGame();
@@ -824,6 +824,62 @@ public class MapMGR : MonoBehaviour
         }
     }
 
+    bool IsReachable2()
+    {
+        bool result = false;
+        Vector2Int startPos = allysCastlePos;
+        Vector2Int targetPos = enemysCastlePos;
+        var adjacentPosList = new List<Vector2Int>();//targetPosに隣接する、壁でないマス
+
+
+        //targetPosの周囲8マスを判定して、adjacentPosListを決める
+        Vector2Int inspectPos;
+        for (int y = -1; y < 2; y++)
+        {
+            for (int x = -1; x < 2; x++)
+            {
+                if (x == 0 && y == 0) continue; //真ん中のマスは飛ばす
+
+                inspectPos = targetPos + new Vector2Int(x, y);
+
+                if (IsOutRangeOfMap(inspectPos.x, inspectPos.y)) continue; //map外のマスの判定は飛ばす
+
+                if (map.GetValue(inspectPos.x, inspectPos.y) % GameManager.instance.wallID !=0)
+                {
+                    adjacentPosList.Add(inspectPos);
+                }
+            }
+        }
+
+        if(adjacentPosList.Count == 0)
+        {
+            Debug.Log("敵の城の周辺に壁のマスしかないためIsReachableはfalseです");
+            return false;
+        }
+
+        if (map.GetValue(allysCastlePos) % GameManager.instance.wallID == 0)
+        {
+            Debug.Log("キャラクターのスポーン地点が壁のためfalseです");
+            result = false;
+        }
+
+        foreach (Vector2Int adjacentPos in adjacentPosList)
+        {
+            if (Function.SearchShortestRoute(mapWidth, mapHeight, startPos, adjacentPos) == null)
+            {
+                result = false;
+                continue;
+            }
+
+            if (Function.SearchShortestRoute(mapWidth, mapHeight, startPos ,adjacentPos).Count >=(mapWidth-3)+(mapHeight-3)-1) //少なくとも最短場合よりルートが長くなる (-3は城があるところは壁が確定していることに注意)
+            {
+                result = true;
+            }
+        }
+
+        return result;
+
+    }
 
 }
 

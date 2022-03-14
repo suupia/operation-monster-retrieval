@@ -188,12 +188,12 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         OpenSkillCanvas(); //SkillCanvasを開く(色の変更と同時なのでここに書く)
         isEditingManualRoute = true;
         changeColorImage.color = selectedColor;
-        Debug.LogWarning($"changeColorImage.color:{changeColorImage.color}");
+        //Debug.Log($"changeColorImage.color:{changeColorImage.color}");
 
-        Debug.LogWarning($"buttonImage.colorを{selectedColor}に変更しました");
+        //Debug.Log($"buttonImage.colorを{selectedColor}に変更しました");
         GameManager.instance.inputMGR.SetManualRouteNumber(buttonNum);
         GameManager.instance.inputMGR.SetSelectedButtonMGR(this);
-        Debug.LogWarning($"ManualRouteを選択するキャラクターを決定しました number={GameManager.instance.inputMGR.GetManualRouteNumber()}");
+        Debug.Log($"ManualRouteを選択するキャラクターを決定しました number={GameManager.instance.inputMGR.GetManualRouteNumber()}");
     }
 
     public void ResetToNormalColor()
@@ -201,9 +201,9 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         CloseSkillCanvas(); //SkillCanvasを閉じる
         isEditingManualRoute = false;
         changeColorImage.color = notSelectedColor;
-        Debug.LogWarning($"changeColorImage.color:{changeColorImage.color}");
+        //Debug.Log($"changeColorImage.color:{changeColorImage.color}");
 
-        Debug.LogWarning($"ManualRouteのキャラクタ―選択を解除しました number={GameManager.instance.inputMGR.GetManualRouteNumber()}");
+        Debug.Log($"ManualRouteのキャラクタ―選択を解除しました number={GameManager.instance.inputMGR.GetManualRouteNumber()}");
         GameManager.instance.inputMGR.SetManualRouteNumber(-1);       //InputMGRでのManualRouteの選択を外す
     }
 

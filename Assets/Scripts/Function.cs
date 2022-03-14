@@ -7,7 +7,7 @@ public static class Function
 
 
 
-    public static List<Vector2Int> SearchShortestRoute(int width,int height,Vector2Int startPos, Vector2Int targetPos)  //AutoRouteDataを改良して、public　staticな関数一つに収まるようにした。
+    public static List<Vector2Int> SearchShortestRoute(int width,int height,Vector2Int startPos, Vector2Int endPos)  //startPosからendPosへの最短経路を返す（startPos、endPosどちらも含む）
     {
         int[] _values = null;  //2次元配列のように扱う
         int _initiValue = -10; //PlaceNumAroundで重複して数字を置かないようにするために必要
@@ -24,7 +24,17 @@ public static class Function
         //引数が適切かどうかチェックする
         if (width <= 0 || height <= 0)
         {
-            Debug.LogError("SearchShortestRouteの幅または高さが0以下になっています");
+            Debug.LogWarning("SearchShortestRouteの幅または高さが0以下になっています");
+            return null;
+        }
+        if (GameManager.instance.mapMGR.GetMapValue(startPos) % GameManager.instance.wallID == 0)
+        {
+            Debug.LogWarning("SearchShortestRouteのstatPosにwallIDが含まれています");
+            return null;
+        }
+        if (GameManager.instance.mapMGR.GetMapValue(endPos) % GameManager.instance.wallID == 0)
+        {
+            Debug.LogWarning("SearchShortestRouteのendPosにwallIDが含まれています");
             return null;
         }
 
@@ -68,8 +78,8 @@ public static class Function
 
 
         //数字をもとに、大きい数字から巻き戻すようにして最短ルートを配列に格納する
-        Debug.Log($"StoreRouteAround({targetPos},{maxDistance})を実行します");
-        StoreShortestRoute(targetPos, maxDistance);
+        Debug.Log($"StoreRouteAround({endPos},{maxDistance})を実行します");
+        StoreShortestRoute(endPos, maxDistance);
 
         Debug.Log($"resultRouteList:{string.Join(",", shortestRouteList)}");
 
@@ -101,7 +111,7 @@ public static class Function
                 if (n > 100) //無限ループを防ぐ用
                 {
                     isComplete = true;
-                    Debug.LogError("SearchShortestRouteのwhile文でループが100回行われてしまいました");
+                    Debug.Log("SearchShortestRouteのwhile文でループが100回行われてしまいました");
                 }
             }
         }
@@ -161,7 +171,7 @@ public static class Function
                     //    Debug.Log($"isCompleteをtrueにしました。maxDistance:{maxDistance}");
                     //    break; //探索終了
                     //}
-                    if (inspectPos == targetPos && CanMoveDiagonally(centerPos, inspectPos))
+                    if (inspectPos == endPos && CanMoveDiagonally(centerPos, inspectPos))
                     {
                         isComplete = true;
                         SetValueByVector(inspectPos, n);
