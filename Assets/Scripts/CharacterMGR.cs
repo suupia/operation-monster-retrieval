@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(CharacterSkillMGR))]
 public class CharacterMGR : MonoBehaviour
 {
     Animator animator;
@@ -18,6 +19,10 @@ public class CharacterMGR : MonoBehaviour
     GameObject damageTextParent; //Findで取得する
     [SerializeField] GameObject damageTextPrefab; //インスペクター上でセットする
     float heightToDisplayDamage = 0.6f; //ダメージテキストをどのくらい高く表示するかを決める
+
+    [SerializeField] CharacterSkillMGR characterSkillMGR;
+    [SerializeField] ParticleSystem skillIconParticle;
+    Material skillAuraMaterial; 
 
     [SerializeField] string characterName;
     [SerializeField] int characterTypeID;
@@ -53,7 +58,6 @@ public class CharacterMGR : MonoBehaviour
     [SerializeField] Sprite sprite; //立ち絵
     [SerializeField] Sprite thumbnailSprite; //ボタンに表示するスプライト
     [SerializeField] string introduction; //モンスターの紹介文
-    [SerializeField] int skillNum; //どのスキルを持つか決める
 
     [SerializeField] int[] hpGrowthRate; //成長率をインスペクター上で決めておく ex) 0,1,0 なら、最初のレベルアップでは変化せず、次のレベルアップで1上がる
     [SerializeField] int[] atkGrowthRate;
@@ -75,7 +79,7 @@ public class CharacterMGR : MonoBehaviour
     List<int> nonDiagonalPoints;
 
     int moveAlongWithCounter = 0;
-    int causeSkillPoint = -1;  //moceAlongWithCounterがcauseSkillPointと等しい時にskillを発動する
+    List<int> causeSkillPoints;  //moceAlongWithCounterがcauseSkillPointと等しい時にskillを発動する
 
     State _state;
     private State state
@@ -253,6 +257,15 @@ public class CharacterMGR : MonoBehaviour
         return introduction;
     }
 
+    public int GetSkillNum()
+    {
+        return characterSkillMGR.GetSkillNum();
+    }
+    public CharacterSkillMGR GetCharacterSkillMGR()
+    {
+        return characterSkillMGR;
+    }
+
     //Setter
     public void SetCharacterData(int buttonNum, int characterTypeID)  //hpやatkなどの情報もここでセットする。
     {
@@ -423,6 +436,10 @@ public class CharacterMGR : MonoBehaviour
 
         damageTextParent = GameObject.Find("DamageTextParent");
 
+        GetComponent<Renderer>().material = GameManager.instance.characterSkillsDataMGR.skillAuraMaterials[characterSkillMGR.GetSkillNum()];
+        skillAuraMaterial = GetComponent<Renderer>().material;  //「レンダラーに割り当てられている最初にインスタンス化されたMaterialを返します」by リファレンス
+
+
         HP = maxHp;
         moveTime = 1 / spd;
         gridPos = GameManager.instance.ToGridPosition(transform.position);
@@ -442,7 +459,7 @@ public class CharacterMGR : MonoBehaviour
                 SetManualRoute();
                 break;
         }
-        causeSkillPoint = GameManager.instance.charactercSkillsMGR.JudgeSkillTrigger(skillNum, routeList); //skillが発動する点を判定し、そのIndexを受け取る
+        causeSkillPoints = characterSkillMGR.JudgeSkillTrigger(routeList); //skillが発動する点を判定し、そのIndexを受け取る
         InitiMoveAlongWith();
     }
 
@@ -621,9 +638,9 @@ public class CharacterMGR : MonoBehaviour
 
         if (isMoving) return;
 
-        if(moveAlongWithCounter == causeSkillPoint)
+        if(causeSkillPoints.Contains(moveAlongWithCounter))
         {
-            GameManager.instance.charactercSkillsMGR.CauseSkill(skillNum, this);
+            characterSkillMGR.CauseSkill(this, skillIconParticle,skillAuraMaterial);
         }
         //if (moveAlongWithCounter == routeList.Count -1) //ルートの終点にいるときの処理
         //{

@@ -14,7 +14,7 @@ public class InputMGR : MonoBehaviour
     [SerializeField] int horizontalInput;
 
     [SerializeField] GameObject PauseTheGameCanvas; //インスペクター上でセットする
-    bool pauseFlag = false; //ポーズ状態ならtrue
+    //bool pauseFlag = false; //ポーズ状態ならtrue
     //bool isPausingAtMakeTheFirstRoad; //ポーズしたときに前の状態がMakeTheFirstRoadであったことを知るために必要  PauseButonMGRに同値な変数を置いたのでコメントアウトしておく
 
     [SerializeField] DraggedCharacterThumbnail draggedCharacterThumbnail; //インスペクター上でセットする（SetActiveをfalseにしているため、ここで参照を保持しておく）
@@ -189,12 +189,32 @@ public class InputMGR : MonoBehaviour
             }
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha1)) //SelectCharacterButtonMGRのPointerDownの左クリックの時の処理の中身のみを記述している
+        {
+            GameManager.instance.SpawnCharacter(0);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            GameManager.instance.SpawnCharacter(1);
+
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            GameManager.instance.SpawnCharacter(2);
+
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            GameManager.instance.SpawnCharacter(3);
+
+        }
+
 
     }
 
     public void ClosePauseTheGameCanvas()
     {
-        pauseFlag = false;
+        //pauseFlag = false;
         PauseTheGameCanvas.SetActive(false);
     }
 

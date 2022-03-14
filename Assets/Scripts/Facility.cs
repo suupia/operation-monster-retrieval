@@ -105,7 +105,7 @@ public abstract class Facility : MonoBehaviour
 
     protected void Idle() //Update()‚ÅŒÄ‚Î‚ê‚é‚±‚Æ‚É’ˆÓ
     {
-        Debug.Log("Facility‚ÌIdle‚ğÀs‚µ‚Ü‚·");
+        //Debug.Log("Facility‚ÌIdle‚ğÀs‚µ‚Ü‚·");
 
         if (GameManager.instance.CanAttackTarget(gridPos,attackRange,GameManager.instance.characterID,out targetCharacterPos))
         {

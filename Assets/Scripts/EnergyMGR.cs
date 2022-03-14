@@ -79,6 +79,10 @@ public class EnergyMGR : MonoBehaviour
         energyGain = energyGainArray[LEVEL];
         energyMax = energyMaxArray[LEVEL];
         energyLevelUpImage.color = energyLevelUpButtonColors[LEVEL];
+
+        ImageToChangeColor.color = canNotLevelUpColor;
+        energyLevelUpHighlight.SetActive(false);
+        buttonSizeMGR.SetIsActive(false);
     }
 
     void Update()

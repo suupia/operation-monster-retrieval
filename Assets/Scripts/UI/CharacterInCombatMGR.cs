@@ -12,7 +12,6 @@ public class CharacterInCombatMGR : MonoBehaviour
 
     private void Start()
     {
-        thumbnailImage = GetComponent<Image>();
 
         if (GameManager.instance.InitializationFlag == false) GameManager.instance.Initialization();
 
@@ -24,7 +23,16 @@ public class CharacterInCombatMGR : MonoBehaviour
 
     public void DropCharacter() //Event Triggerで呼ぶ
     {
-        //Debug.Log($"{dropNum}にドロップされました");
+        Debug.Log($"{dropNum}にドロップされました");
+
+        if(GameManager.instance.DragFlag == true)
+        {
+            GameManager.instance.DragFlag = false; //フラグをfalseにして次の処理へ移行
+        }
+        else
+        {
+            return; //フラグが立っていなかったら処理を中断
+        }
 
         GameManager.instance.DropCharacterData(dropNum);
 
@@ -47,19 +55,22 @@ public class CharacterInCombatMGR : MonoBehaviour
 
     public void PointerDownCharacterInCombat()
     {
+        Debug.Log("PointerDownCharacterInCombat()を実行します");
         GameManager.instance.statusCanvasMGR.UpdateStatusCanvasInCombat(dropNum);
     }
 
     public void PointerDown() //EventTriggerで呼ぶ　DraggedCharacterThumbnail用
     {
-        //Debug.Log($"{dropNum}がPointerDownされました");
+        Debug.Log($"{dropNum}がPointerDownされました");
+
+        GameManager.instance.DragFlag = false; //CharacterInReserveでPointerDownのときはフラグを立てない
 
         GameManager.instance.inputMGR.GetDraggedCharacterThumbnail().ShowDraggedCharacterThumbnail(GameManager.instance.IDsOfCharactersInCombat[dropNum]); //dragNumの場合はそのままIDになる
 
     }
     public void PointerUp() //EventTriggerで呼ぶ　DraggedCharacterThumbnail用
     {
-        //Debug.Log($"{dropNum}がPointerUpされました");
+        Debug.Log($"{dropNum}がPointerUpされました");
 
         GameManager.instance.inputMGR.GetDraggedCharacterThumbnail().HideDraggedCharacterThumbnail(); //dragNumの場合はそのままIDになる
     }

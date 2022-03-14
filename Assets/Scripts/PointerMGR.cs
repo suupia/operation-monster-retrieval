@@ -105,7 +105,7 @@ public class PointerMGR : MonoBehaviour
         nonDiagonalPoints.Clear();
         for (int i = 0; i < manualRoute.Count; i++)
         {
-            if (i + 1 != manualRoute.Count)
+            if (i + 1 != manualRoute.Count) //iがmanualRouteの最後のインデックスでない場合
             {
                 if (pointerTails[i].activeSelf)
                 {

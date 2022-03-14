@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 9212154694335707493}
   - component: {fileID: 9213731899227868462}
   - component: {fileID: 2840364881195636771}
+  - component: {fileID: 3061072399414420942}
   m_Layer: 0
   m_Name: Caterpilar
   m_TagString: Untagged
@@ -29,7 +30,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 11.062875, y: 5.016679, z: -1.341372}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 2571821866393583023}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -121,6 +123,8 @@ MonoBehaviour:
   directionVectorToTarget: {x: 0, y: 0}
   targetFacility: {fileID: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
+  characterSkillMGR: {fileID: 3061072399414420942}
+  skillIconParticle: {fileID: 2571821866393583016}
   characterName: Caterpilar
   characterTypeID: 6
   level: 0
@@ -135,10 +139,91 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: e9da5e819bfa29843960c6b1b28204ab, type: 3}
   thumbnailSprite: {fileID: 21300000, guid: efe8ea72bafb2c448bb9d8f3ba59be1c, type: 3}
   introduction: 
-  skillNum: 0
   hpGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   spdGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkIntervalGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkRangeGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   coolTimeGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
+--- !u!114 &3061072399414420942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6960445815220418439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eef209953fb88d340b0bc01bd498a8d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillNum: 0
+  duration: 3
+  amount: 3
+--- !u!1001 &3925162369214289470
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1649078258387532217}
+    m_Modifications:
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623124, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_Name
+      value: SkillTextParticle
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+--- !u!4 &2571821866393583023 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+  m_PrefabInstance: {fileID: 3925162369214289470}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &2571821866393583016 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 1569513525494623126, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+  m_PrefabInstance: {fileID: 3925162369214289470}
+  m_PrefabAsset: {fileID: 0}

@@ -19,6 +19,8 @@ public class StatusCanvasMGR : MonoBehaviour
     [SerializeField] Image characterImage;
     [SerializeField] Image characterFullScreenImage;
     [SerializeField] Text characterIntroductionText;
+    [SerializeField] Text skillText;
+    [SerializeField] Image skillTriggerImage;
     
 
     [SerializeField] Text levelUpCostText; //インスペクター上でセットする
@@ -80,6 +82,8 @@ public class StatusCanvasMGR : MonoBehaviour
         attackIntervalText.text = "ATK Interval:"+characterMGRDisplayed.GetAtkInterval().ToString();
         attackRangeText.text = " ATK Range :"+characterMGRDisplayed.GetAtkRange().ToString();
         coolTimeText.text = "Cool Time:"+characterMGRDisplayed.GetCoolTime().ToString();
+        skillText.text = characterMGRDisplayed.GetCharacterSkillMGR().GetSkillSentence(characterMGRDisplayed.GetSkillNum());
+        skillTriggerImage.sprite = GameManager.instance.characterSkillsDataMGR.skillTriggerImages[characterMGRDisplayed.GetSkillNum()];
 
         if (characterMGRDisplayed.GetLevel()< characterMGRDisplayed.GetMaxLevel())
         {

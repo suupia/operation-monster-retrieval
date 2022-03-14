@@ -22,11 +22,15 @@ public class SelectCharacterButtonMGR : MonoBehaviour
     bool spawningCharacter;
     //以下、modeSwitchButtonの変数
     CharacterMGR.Mode mode = CharacterMGR.Mode.Auto; //デフォルトはAutoMode
+    [SerializeField] Color manualModeColor;
+    [SerializeField] Color autoModeColor;
 
     //以下、ManualRoute用の変数
    [SerializeField] bool isEditingManualRoute;
     [SerializeField] Color selectedColor;
     Color notSelectedColor;
+    [SerializeField] GameObject skillCanvas;
+    [SerializeField] Image skillTriggerRouteImage;
 
     //以下、CoolTime用の変数
     [SerializeField] Image emptyGauge;
@@ -38,6 +42,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
     public void InitiSelectCharacterButton() //GameManagerがState.PlayingGameになったときに呼ぶ
     {
         modeSwitchButtonText.text = "Auto"; //デフォルトはAutoMode
+        modeSwitchButtonImage.color = autoModeColor;
 
         isEditingManualRoute = false;
 
@@ -48,6 +53,9 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         notSelectedColor = Color.gray;
         emptyGauge.color = Color.clear;
         filledGauge.color = Color.clear;
+
+        skillTriggerRouteImage.sprite = GameManager.instance.characterSkillsDataMGR.skillTriggerImages[GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetSkillNum()] ;
+        ResetToNormalColor();
 
         //画像の初期化
         SetSelectCharacterImage(GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[buttonNum]).GetThumbnailSprite());
@@ -116,7 +124,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
             changeColorMask.SetActive(false);
         }
 
-        if(GameManager.instance.state == GameManager.State.ShowingResults && isEditingManualRoute)
+        if (GameManager.instance.state == GameManager.State.ShowingResults && isEditingManualRoute) //ShowingResults時にPointerTailを消す
         {
             ResetToNormalColor();
         }
@@ -156,11 +164,13 @@ public class SelectCharacterButtonMGR : MonoBehaviour
             case CharacterMGR.Mode.Auto:
                 mode = CharacterMGR.Mode.Manual;
                 modeSwitchButtonText.text = "Manual";
+                modeSwitchButtonImage.color = manualModeColor;
                 GameManager.instance.SetCharacterMode(buttonNum, CharacterMGR.Mode.Manual);
                 break;
             case CharacterMGR.Mode.Manual:
                 mode = CharacterMGR.Mode.Auto;
                 modeSwitchButtonText.text = "Auto";
+                modeSwitchButtonImage.color = autoModeColor;
                 GameManager.instance.SetCharacterMode(buttonNum, CharacterMGR.Mode.Auto);
                 break;
         }
@@ -172,7 +182,10 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         if (GameManager.instance.inputMGR.GetSelectedButtonMGR() != null) //他のbuttonを選択していたとき
         {
             GameManager.instance.inputMGR.GetSelectedButtonMGR().ResetToNormalColor(); //そのbuttonの色を戻す
+
+            GameManager.instance.inputMGR.GetSelectedButtonMGR().CloseSkillCanvas(); //そのbuttonのSkillCanvasを閉じる
         }
+        OpenSkillCanvas(); //SkillCanvasを開く(色の変更と同時なのでここに書く)
         isEditingManualRoute = true;
         changeColorImage.color = selectedColor;
         Debug.LogWarning($"changeColorImage.color:{changeColorImage.color}");
@@ -185,12 +198,23 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 
     public void ResetToNormalColor()
     {
+        CloseSkillCanvas(); //SkillCanvasを閉じる
         isEditingManualRoute = false;
         changeColorImage.color = notSelectedColor;
         Debug.LogWarning($"changeColorImage.color:{changeColorImage.color}");
 
         Debug.LogWarning($"ManualRouteのキャラクタ―選択を解除しました number={GameManager.instance.inputMGR.GetManualRouteNumber()}");
         GameManager.instance.inputMGR.SetManualRouteNumber(-1);       //InputMGRでのManualRouteの選択を外す
+    }
+
+    private void OpenSkillCanvas() //ManualMode編集時にそのキャラクターのスキルを表示する
+    {
+        skillCanvas.SetActive(true);
+    }
+
+    private void CloseSkillCanvas()
+    {
+        skillCanvas.SetActive(false);
     }
 
     public void RefreshGauge(float percentage)

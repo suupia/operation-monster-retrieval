@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 321704760512727932}
   - component: {fileID: -6257923328847350026}
   - component: {fileID: 321704760512727935}
+  - component: {fileID: -4412939502055063203}
   m_Layer: 0
   m_Name: Saru
   m_TagString: Untagged
@@ -29,7 +30,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 11.06287, y: 5.016679, z: -1.341372}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 4329749796588312829}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -121,6 +123,8 @@ MonoBehaviour:
   directionVectorToTarget: {x: 0, y: 0}
   targetFacility: {fileID: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
+  characterSkillMGR: {fileID: -4412939502055063203}
+  skillIconParticle: {fileID: 4329749796588312826}
   characterName: Saru
   characterTypeID: 5
   level: 0
@@ -135,10 +139,91 @@ MonoBehaviour:
   sprite: {fileID: -1653429110502446582, guid: 2c5546c048609c54799931ce8f62aa6e, type: 3}
   thumbnailSprite: {fileID: 21300000, guid: 0f66ea8b460ee4b4a8b6787278c094ef, type: 3}
   introduction: 
-  skillNum: 0
   hpGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   spdGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkIntervalGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkRangeGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   coolTimeGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
+--- !u!114 &-4412939502055063203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 321704760512727934}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eef209953fb88d340b0bc01bd498a8d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillNum: 0
+  duration: 3
+  amount: 3
+--- !u!1001 &3016941449853825900
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 321704760512727933}
+    m_Modifications:
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569513525494623124, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+      propertyPath: m_Name
+      value: SkillTextParticle
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+--- !u!4 &4329749796588312829 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+  m_PrefabInstance: {fileID: 3016941449853825900}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &4329749796588312826 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 1569513525494623126, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
+  m_PrefabInstance: {fileID: 3016941449853825900}
+  m_PrefabAsset: {fileID: 0}

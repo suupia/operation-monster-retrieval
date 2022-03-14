@@ -36,12 +36,45 @@ public class DebugMGR : MonoBehaviour
     private void Update()
     {
 
+
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            MakeEverythingTheWay();
+        }
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            if (!isDebuggingFacility)
+            {
+                isDebuggingFacility = true;
+                facilityTextParent.SetActive(true);
+                DebugFacility();
+            }
+            else
+            {
+                isDebuggingFacility = false;
+                facilityTextParent.SetActive(false);
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.F4))
+        {
+            if (!isDebuggingCharacterMGR)
+            {
+                isDebuggingCharacterMGR = true;
+                characterMGRTextParent.SetActive(true);
+                DebugCharacterMGR();
+            }
+            else
+            {
+                isDebuggingCharacterMGR = false;
+                characterMGRTextParent.SetActive(false);
+            }
+        }
         if (Input.GetKeyDown(KeyCode.F5))
         {
             if (!isDebuggingMap)
             {
                 isDebuggingMap = true;
-                mapValueTextParent.SetActive(true) ;
+                mapValueTextParent.SetActive(true);
                 DebugMap();
             }
             else
@@ -64,37 +97,11 @@ public class DebugMGR : MonoBehaviour
                 autoRouteTextParent.SetActive(false);
             }
         }
-        if (Input.GetKeyDown(KeyCode.F4))
+        if (Input.GetKeyDown(KeyCode.F7))
         {
-            if (!isDebuggingCharacterMGR)
-            {
-                isDebuggingCharacterMGR = true;
-                characterMGRTextParent.SetActive(true);
-                DebugCharacterMGR();
-            }
-            else
-            {
-                isDebuggingCharacterMGR = false;
-                characterMGRTextParent.SetActive(false);
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.F3))
-        {
-            if (!isDebuggingFacility)
-            {
-                isDebuggingFacility = true;
-                facilityTextParent.SetActive(true);
-                DebugFacility();
-            }
-            else
-            {
-                isDebuggingFacility = false;
-                facilityTextParent.SetActive(false);
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.F1))
-        {
-            MakeEverythingTheWay();
+            var shortestRoute = Function.SearchShortestRoute(GameManager.instance.mapMGR.GetMapWidth(), GameManager.instance.mapMGR.GetMapHeight(), new Vector2Int(1,3), new Vector2Int(3,3)) ;
+            Debug.LogWarning($" Function.SearchShortestRoute={string.Join(",", shortestRoute)}");
+
         }
 
         if (isDebuggingMap) DebugMap();

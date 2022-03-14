@@ -110,7 +110,7 @@ public class TowerMGR : Facility
 
         Destroy(this.gameObject);
 
-        Debug.LogWarning($"{gridPos}のタワーをDestroyしました。");
+        //Debug.Log($"{gridPos}のタワーをDestroyしました。");
 
     }
 }

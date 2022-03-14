@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 9212154694335707493}
   - component: {fileID: 9213731899227868462}
   - component: {fileID: 2840364881195636771}
+  - component: {fileID: -247813039187633162}
   m_Layer: 0
   m_Name: BlackBat
   m_TagString: Untagged
@@ -121,8 +122,10 @@ MonoBehaviour:
   directionVectorToTarget: {x: 0, y: 0}
   targetFacility: {fileID: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
+  characterSkillMGR: {fileID: -247813039187633162}
+  skillIconParticle: {fileID: 0}
   characterName: BlackBat
-  characterTypeID: 1
+  characterTypeID: 100
   level: 0
   maxHp: 6
   hp: 0
@@ -134,9 +137,25 @@ MonoBehaviour:
   cost: 200
   sprite: {fileID: 21300000, guid: b191e8e6070bb054691ee0b4ecf36399, type: 3}
   thumbnailSprite: {fileID: 21300000, guid: 54b310118173ce943a8dd7227e06cb6f, type: 3}
+  introduction: 
   hpGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   spdGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkIntervalGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   atkRangeGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
   coolTimeGrowthRate: 000000000000000000000000000000000000000000000000000000000000000000000000
+--- !u!114 &-247813039187633162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6960445815220418439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eef209953fb88d340b0bc01bd498a8d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillNum: 0
+  duration: 3
+  amount: 3

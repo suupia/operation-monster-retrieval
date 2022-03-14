@@ -7,6 +7,9 @@ using UnityEngine.UI;
 public class CharacterInReserveMGR : MonoBehaviour
 {
     [SerializeField] int dragNum; //CharacterInReverse(GameObject)の添え字をインスペクター上でセットしておく
+
+    [SerializeField] ButtonSizeMGR buttonSizeMGR; //インスペクター上でセットする
+
     [SerializeField] Image characterInReserveImage; //インスペクター上でセットする
 
     private void Start()
@@ -25,11 +28,12 @@ public class CharacterInReserveMGR : MonoBehaviour
         //Debug.Log($"UpdateCharacterInReserveを実行します\ndragNum:{dragNum}");
         if (dragNum < GameManager.instance.CharacterIDsThatCanBeUsed[GameManager.instance.StagesClearedNum] && dragNum <GameManager.instance.characterInReserveMGRs.Length /*今の実装ではdragNumは9まで(0～8)*/)
         {
-
+            buttonSizeMGR.SetIsActive(true);
             characterInReserveImage.color = Color.white;
         }
         else
         {
+            buttonSizeMGR.SetIsActive(false);
             characterInReserveImage.color = new Color(0.04f, 0.04f, 0.04f, 1);//黒に近い色にする
         }
     }
@@ -37,6 +41,7 @@ public class CharacterInReserveMGR : MonoBehaviour
     public void DragCharacter() //EventTriggerで呼ぶ
     {
         //Debug.Log($"{dragNum}がドラッグされました");
+
 
         if (!(dragNum < GameManager.instance.CharacterIDsThatCanBeUsed[GameManager.instance.StagesClearedNum]))
         {
@@ -62,6 +67,9 @@ public class CharacterInReserveMGR : MonoBehaviour
         {
             return;
         }
+
+        GameManager.instance.DragFlag = true; //CharacterInReserveでPointerDownのときはフラグを立てる
+
         GameManager.instance.inputMGR.GetDraggedCharacterThumbnail().ShowDraggedCharacterThumbnail(dragNum); //dragNumの場合はそのままIDになる
 
     }

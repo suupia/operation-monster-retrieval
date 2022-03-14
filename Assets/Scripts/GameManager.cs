@@ -20,7 +20,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] public EnergyMGR energyMGR;
     [SerializeField] public TowerPosDataMGR towerPosDataMGR;
     [SerializeField] public SaveMGR saveMGR;
-    public CharacterSkillsMGR charactercSkillsMGR; 
+    [SerializeField] public CharacterSkillsDataMGR characterSkillsDataMGR;
+    //[SerializeField] public CharacterSkillsMGR characterSkillsMGR; 
 
     [SerializeField] public GameObject selectStageCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
     [SerializeField] public GameObject menuCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
@@ -61,7 +62,7 @@ public class GameManager : MonoBehaviour
         get { return currentTowerNum; }
         set { 
             currentTowerNum = value;
-            Debug.LogWarning($"currentTowerNumを{currentTowerNum}にしました");
+            //Debug.Log($"currentTowerNumを{currentTowerNum}にしました");
         }
     }
 
@@ -86,7 +87,7 @@ public class GameManager : MonoBehaviour
             }
 
             //CharacterInReverseとCharacterInCombatを更新する
-            for (int i = 0; i<characterInReserveMGRs.Length;i++)
+            for (int i = 0; i<characterInReserveMGRs.Length; i++)  //CharacterInReserveの数は最大12
             {
                 characterInReserveMGRs[i].UpdateCharacterInReserve();
             }
@@ -109,6 +110,12 @@ public class GameManager : MonoBehaviour
     CharacterMGR[] characterDatabase; //上のchraracterPrefabsをCharacter型に直したもの。データベースとして使う。
 
     int dragNum; //ドラッグした番号を保持しておくために必要
+    bool dragFlag; //CharacterInReserveからCharacterInCombatへのドラッグのみを有効にするために必要
+    public bool DragFlag
+    {
+        get { return dragFlag; }
+        set { dragFlag = value; }
+    }
 
     int characterCounter =0; //キャラクターが何体スポーンしたかを数える
     float characterDisplacement= 0.03f; //キャラクターがスポーンしたときにどれくらいズレるかを決める(10回で一周するようにする)
@@ -408,12 +415,13 @@ public class GameManager : MonoBehaviour
     public void DragCharacterData(int dragNum)
     {
         this.dragNum = dragNum;
+        Debug.Log($"dragNum:{dragNum}");
     }
 
     public void DropCharacterData(int dropNum)
     {
         IDsOfCharactersInCombat[dropNum] = dragNum;
-        //Debug.Log($"IDsOfCharactersInCombat[{dropNum}]:{IDsOfCharactersInCombat[dropNum] }");
+        Debug.Log($"IDsOfCharactersInCombat[{dropNum}]:{IDsOfCharactersInCombat[dropNum] }");
     }
 
     public int[,] CalcSearchRangeArray(int advancingDistance, int lookingForValue, int notLookingForValue, int centerValue) //マス目に置ける円形の索敵範囲を計算して、2次元配列で返す

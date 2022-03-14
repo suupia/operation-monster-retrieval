@@ -30,6 +30,7 @@ public class MapMGR : MonoBehaviour
     [SerializeField] Vector2Int enemysCastlePos;
 
     [SerializeField] GameObject[] towerPrefabs;
+    int maxTowerNum; //PlaceTower()で決定する
 
     [SerializeField] int numOfFristRoad; //インスペクター上以外で値を代入してはいけない
     [SerializeField] int numOfFristRoadCounter; //SetUpMap()で numOfFristRoadCounter = numOfFristRoad; と初期化している  デバッグ用にSerializeFieldにしておく
@@ -78,7 +79,7 @@ public class MapMGR : MonoBehaviour
     }
     public int GetMaxTowerNum()
     {
-        return towerPrefabs.Length; //これは仮置きであることに注意 
+        return maxTowerNum;
     }
     public int GetNumOfFristRoad()
     {
@@ -199,6 +200,7 @@ public class MapMGR : MonoBehaviour
 
     private void PlaceTower()
     {
+        maxTowerNum = 0; //初期化
 
         for (int y = 0;y< mapHeight;y++)
         {
@@ -212,6 +214,8 @@ public class MapMGR : MonoBehaviour
                         Debug.LogError($"towerPosDataArrayにタワーの種類以上の値が入っています");
                         return;
                     }
+
+                    maxTowerNum++;
 
                     Vector2Int towerSpawnPos = new Vector2Int(x, y);
 
