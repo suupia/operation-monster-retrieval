@@ -553,7 +553,7 @@ public class CharacterMGR : MonoBehaviour
 
         while (remainingDistance > float.Epsilon)
         {
-            transform.position = Vector3.MoveTowards(transform.position, endPos, 1f / moveTime * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, endPos, 1f / moveTime * Time.deltaTime * GameManager.instance.gameSpeed);
             //3つ目の引数は"1フレームの最大移動距離"　単位は実質[m/s](コルーチンが1フレームずつ回っているからTime.deltaTimeが消える。moveTime経った時に1マス進む。)
 
             remainingDistance = (endPos - new Vector2(transform.position.x, transform.position.y)).sqrMagnitude;
@@ -734,7 +734,7 @@ public class CharacterMGR : MonoBehaviour
 
         while (timer < atkInterval)
         {
-            timer += Time.deltaTime;
+            timer += Time.deltaTime * GameManager.instance.gameSpeed;
 
             while (GameManager.instance.state == GameManager.State.PauseTheGame) { yield return null; } //ポーズ中は止める
 
@@ -746,13 +746,14 @@ public class CharacterMGR : MonoBehaviour
 
     public int CalcDamage(int atk)
     {
-        //return atk; //とりあえず、今は何もしないで攻撃力をそのまま返す
 
         int result =0;
 
         if(GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) is CastleMGR) //今ターゲットとしている施設が城であった場合、タワーの数を考慮した計算式に変える
         {
             result = (int)Mathf.Ceil(atk * Mathf.Pow((float)(GameManager.instance.MaxTowerNum-GameManager.instance.CurrentTowerNum)/GameManager.instance.MaxTowerNum,2)); //切り上げ 2乗して滑らかにする
+
+            if (result == 0) result = 1; //タワーを一つも破壊していない場合、計算結果が0になるが、1ダメージは入るようにする
 
             //Debug.Log($"CalcDamageのresult:{result}");
         }
@@ -781,6 +782,7 @@ public class CharacterMGR : MonoBehaviour
         Debug.Log($"HPが0以下になったので、キャラクターを消去します gridPos:{gridPos}のキャラクター");
 
         GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos, GameManager.instance.characterID); //数値データをを消去する
+        GameManager.instance.CurrentCharacterNum--;
         GameManager.instance.mapMGR.GetMap().RemoveCharacterMGR(gridPos, this);
         //GameManager.instance.mapMGR.GetMap().SetCharacterMGR(gridPos,null); //スクリプトをを消去する
 

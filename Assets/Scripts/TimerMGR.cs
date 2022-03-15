@@ -31,7 +31,7 @@ public class TimerMGR : MonoBehaviour
         if (GameManager.instance.state != GameManager.State.RunningGame) return; //ˆÈ‰º‚Ìˆ—‚ÍGameManager‚ªPlayingGame‚ÌŽž‚Ì‚ÝŽÀs‚³‚ê‚é
 
 
-        Timer += Time.deltaTime;
+        Timer += Time.deltaTime * GameManager.instance.gameSpeed;
         timerText.text = ConvertStringTime(timeLimit - Timer);
 
         if (Timer > timeLimit)

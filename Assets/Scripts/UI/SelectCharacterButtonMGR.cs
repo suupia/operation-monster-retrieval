@@ -71,19 +71,21 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.instance.energyMGR.CurrentEnergy >= GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetCost())
-        {
-            buttonSizeMGR.SetIsActive(true);
-        }
-        else
-        {
-            buttonSizeMGR.SetIsActive(false);
-        }
+        //if (GameManager.instance.energyMGR.CurrentEnergy >= GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetCost())
+        //{
+        //    buttonSizeMGR.SetIsActive(true);
+        //}
+        //else
+        //{
+        //    buttonSizeMGR.SetIsActive(false);
+        //}
 
 
         Color finalColor;
-        if (GameManager.instance.energyMGR.CurrentEnergy >= GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetCost() && !spawningCharacter)
+        if (GameManager.instance.energyMGR.CurrentEnergy >= GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetCost() && !spawningCharacter && GameManager.instance.CurrentCharacterNum <GameManager.instance.MaxCharacterNum)
         {
+            buttonSizeMGR.SetIsActive(true);
+
             if (isEditingManualRoute)
             {
                 finalColor = canSpawnCharacterColor * selectedColor; //æŽZ‚Åˆ—‚·‚é
@@ -97,6 +99,8 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         }
         else
         {
+            buttonSizeMGR.SetIsActive(false);
+
             if (isEditingManualRoute)
             {
                 finalColor = canNotSpawnCharacterColor * selectedColor;

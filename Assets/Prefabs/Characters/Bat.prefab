@@ -134,7 +134,7 @@ MonoBehaviour:
   atkInterval: 1
   atkRange: 1
   spd: 3
-  coolTime: 1
+  coolTime: 0.5
   cost: 10
   sprite: {fileID: 21300000, guid: 52ee45ee611995848adb3a2f7428820d, type: 3}
   thumbnailSprite: {fileID: 21300000, guid: 0b646e09ef6b39945b8ffe429182e509, type: 3}

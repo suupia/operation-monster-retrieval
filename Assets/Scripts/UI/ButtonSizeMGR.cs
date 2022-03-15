@@ -12,6 +12,8 @@ public class ButtonSizeMGR : MonoBehaviour
     //Setter
     public void SetIsActive(bool flag) //外部から変更する
     {
+        if(flag == false && gameObject.activeInHierarchy) RestoreSize();   //フラグがfalseの時は、サイズを戻してからfalseにする(初期化の時はこのスクリプトを付けているオブジェクトがfalseのときがあるので、それは飛ばす)
+
         isActive = flag;
     }
 

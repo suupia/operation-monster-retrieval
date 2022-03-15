@@ -169,7 +169,7 @@ public abstract class Facility : MonoBehaviour
         DrawDamage(damage);
 
         while (timer < attackInterval){
-            timer += Time.deltaTime;
+            timer += Time.deltaTime * GameManager.instance.gameSpeed;
 
             while (GameManager.instance.state == GameManager.State.PauseTheGame) { yield return null; } //ƒ|[ƒY’†‚ÍŽ~‚ß‚é
 

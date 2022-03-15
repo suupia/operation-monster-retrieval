@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject resultCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
     [SerializeField] Text resultText;
 
+    [SerializeField] public float gameSpeed=1; //デバッグ用　コルーチンの中とかで使い、ゲームスピードを速くする
 
     bool initializationFlag = false;
     public bool InitializationFlag
@@ -51,12 +52,28 @@ public class GameManager : MonoBehaviour
         get { return characterIDsThatCanBeUsed; }
     }
 
+
+    int maxCharacterNum=50; //フィールドに出せるキャラクターの最大数 characterIDが11の時は23体まで出せ、characterIDが2の時は50体出しても問題ない。　とりあえず、にゃんこ大戦争と同じように50にしておく
+    public int MaxCharacterNum //Getterのみ
+    {
+        get { return maxCharacterNum; }
+    }
+    [SerializeField] int currentCharacterNum = 0; //フィールド上にいるキャラクターの数 キャラクターをずらすのと、場に出せる上限を決めるために必要（デバッグ用にSerializeFieldにしている）
+    public int CurrentCharacterNum
+    {
+        get { return currentCharacterNum; }
+        set
+        {
+            currentCharacterNum = value;
+        }
+    }
+
     int maxTowerNum; //各ステージでのタワーの最大値(ステージごとに変わる)
     public int MaxTowerNum //Getterのみ
     {
         get { return maxTowerNum; }
     }
-    [SerializeField] int currentTowerNum; //生き残っているタワーの数　デバッグようにSerializeFieldにしている
+    [SerializeField] int currentTowerNum; //生き残っているタワーの数　デバッグ用にSerializeFieldにしている
     public int CurrentTowerNum
     {
         get { return currentTowerNum; }
@@ -102,9 +119,9 @@ public class GameManager : MonoBehaviour
 
 
     public readonly int wallID = 3;
-    public readonly int groundID = 2;
+    public readonly int groundID = 11;
     public readonly int facilityID = 5;
-    public readonly int characterID = 11;
+    public readonly int characterID = 2;
 
     public GameObject[] characterPrefabs; 
     CharacterMGR[] characterDatabase; //上のchraracterPrefabsをCharacter型に直したもの。データベースとして使う。
@@ -117,7 +134,6 @@ public class GameManager : MonoBehaviour
         set { dragFlag = value; }
     }
 
-    int characterCounter =0; //キャラクターが何体スポーンしたかを数える
     float characterDisplacement= 0.03f; //キャラクターがスポーンしたときにどれくらいズレるかを決める(10回で一周するようにする)
 
     public CharacterMGR.Mode[] characterMode; //キャラクターの種類ごとの操作モードを格納する
@@ -278,6 +294,7 @@ public class GameManager : MonoBehaviour
 
         mapMGR.SetupMap();
 
+        CurrentCharacterNum = 0;
         maxTowerNum = mapMGR.GetMaxTowerNum();
         CurrentTowerNum = maxTowerNum;
 
@@ -362,6 +379,11 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"Energyが足りないためモンスターをスポーンできません。（energyMGR.CurrentEnergy :{energyMGR.CurrentEnergy},Cost:{characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCost()}）");
                 return;
             }
+            if (currentCharacterNum >= maxCharacterNum)
+            {
+                Debug.Log($"currentCharacterNum:{currentCharacterNum}がmaxCharacterNum:{maxCharacterNum}以上であるため、スポーンできません");
+                return;
+            }
 
             Debug.Log("SpawnCharacterCoroutineを実行します");
             StartCoroutine(SpawnCharacterCoroutine(mapMGR.characterSpawnPoss[i], buttonNum));
@@ -375,7 +397,7 @@ public class GameManager : MonoBehaviour
 
         int characterTypeID = IDsOfCharactersInCombat[buttonNum];
 
-        Vector3 displacement = new Vector3(characterDisplacement * (characterCounter%7)-3*characterDisplacement, 0.5f*(characterDisplacement * (characterCounter % 7) - 3 * characterDisplacement), 0); //キャラクターを少しずらす y方向のズレはx方向のズレの0.5倍
+        Vector3 displacement = new Vector3(characterDisplacement * (currentCharacterNum%7)-3*characterDisplacement, 0.5f*(characterDisplacement * (currentCharacterNum % 7) - 3 * characterDisplacement), 0); //キャラクターを少しずらす y方向のズレはx方向のズレの0.5倍
         Debug.Log($"displacement:{displacement}");
 
         GameObject characterGO = Instantiate(characterPrefabs[characterTypeID], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0) + displacement, Quaternion.identity);
@@ -391,17 +413,16 @@ public class GameManager : MonoBehaviour
         mapMGR.MultiplySetMapValue(vector, characterID);
         mapMGR.GetMap().AddCharacterMGR(vector,characterMGR);
 
-        characterCounter++;
+        currentCharacterNum++;
 
         //キャラクターのモードを決める
         characterMGR.SetMode(characterMode[buttonNum]);
 
-        //yield return new WaitForSeconds(1f); //クールタイムは適当
 
         float time = 0;
-        while(time < characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCoolTime())
+        while(time < characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCoolTime()) //クールタイムの時間だけ止める
         {
-            time += Time.deltaTime;
+            time += Time.deltaTime * GameManager.instance.gameSpeed;
             selectCharacterButtonMGRs[buttonNum].RefreshGauge(time / characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCoolTime());
 
             while (GameManager.instance.state == GameManager.State.PauseTheGame){yield return null;} //ポーズ中は止める

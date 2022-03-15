@@ -110,7 +110,7 @@ public class EnergyMGR : MonoBehaviour
             buttonSizeMGR.SetIsActive(false);
         }
 
-        CurrentEnergy += energyGain * Time.deltaTime;
+        CurrentEnergy += energyGain * Time.deltaTime * GameManager.instance.gameSpeed;
 
         //デバッグモード
         if (isInDebugMode) CurrentEnergy = energyMax;

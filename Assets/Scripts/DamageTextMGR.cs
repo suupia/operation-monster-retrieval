@@ -20,7 +20,7 @@ public class DamageTextMGR : MonoBehaviour
 
     private void Update()
     {
-        timer += Time.deltaTime;
+        timer += Time.deltaTime * GameManager.instance.gameSpeed;
 
         if (timer > timeToDisplay) Destroy(this.gameObject);
     }
