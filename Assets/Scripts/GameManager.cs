@@ -518,7 +518,7 @@ public class GameManager : MonoBehaviour
 
             if (nearestTargetList.Count > 0)
             {
-                Debug.Log($"nearestTargetList[0]={nearestTargetList[0]}");
+                //Debug.Log($"nearestTargetList[0]={nearestTargetList[0]}");
                 break;
             }
         }

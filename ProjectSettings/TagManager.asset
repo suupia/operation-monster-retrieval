@@ -47,6 +47,9 @@ TagManager:
   - name: Buildings
     uniqueID: 4205573151
     locked: 0
+  - name: Cannonball
+    uniqueID: 3487405631
+    locked: 0
   - name: UI
     uniqueID: 4054307105
     locked: 0

@@ -35,15 +35,18 @@ public class CharacterMGR : MonoBehaviour
         get { return hp; }
         set
         {
-            if(value - hp < 0)
+            int beforeHp = hp;
+            hp = value;
+            if (hp <= 0 && isAlive)
+            {
+                isAlive = false; //すぐにfalseにして、Die()が2回以上呼ばれないようにする
+                Die();
+                return;
+            }
+            if (value - beforeHp < 0)
             {
                 Debug.Log("SetDamagedAnimationを呼びます");
-                SetDamageAnimation();
-            }
-            hp = value;
-            if (hp <= 0)
-            {
-                Die();
+                StartCoroutine(SetDamageAnimation());
             }
 
         }
@@ -68,6 +71,7 @@ public class CharacterMGR : MonoBehaviour
 
 
     //bool isMarching = false;  今は使っていないからコメントアウト
+    bool isAlive = true;  //HPが0になったときにDie()が2回以上呼ばれるのを防ぐために必要
     bool isAttacking = false;
     bool isMoving = false;
 
@@ -189,7 +193,10 @@ public class CharacterMGR : MonoBehaviour
     {
         return GameManager.instance.ToWorldPosition(gridPos);
     }
-    //Getter
+    public Vector2 GetTransformPos() //リアルタイムで更新されるtransformPosを返す
+    {
+        return transform.position;
+    }
     public string GetCharacterName()
     {
         return characterName;
@@ -353,8 +360,10 @@ public class CharacterMGR : MonoBehaviour
             animator.SetInteger("Vertical", 0);
         }
     }
-    public void SetDamageAnimation()
+    IEnumerator SetDamageAnimation()
     {
+        yield return new WaitForSeconds(Facility.GetTimeToImpact() * (1.0f/GameManager.instance.gameSpeed));
+
         switch (direction)
         {
             case Direction.Back:
@@ -779,7 +788,7 @@ public class CharacterMGR : MonoBehaviour
 
     public void Die()
     {
-        Debug.Log($"HPが0以下になったので、キャラクターを消去します gridPos:{gridPos}のキャラクター");
+        Debug.Log($"HPが0以下になったので、キャラクターを消去します gridPos:{gridPos},transform.pos{transform.position}のキャラクター");
 
         GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos, GameManager.instance.characterID); //数値データをを消去する
         GameManager.instance.CurrentCharacterNum--;

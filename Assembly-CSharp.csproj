@@ -59,6 +59,7 @@
     <Compile Include="Assets\Scripts\PointerMGR.cs" />
     <Compile Include="Assets\Scripts\TowerPosData.cs" />
     <Compile Include="Assets\Shapes2D\Demos\DragCamera.cs" />
+    <Compile Include="Assets\Scripts\Function.cs" />
     <Compile Include="Assets\Scripts\InputMGR.cs" />
     <Compile Include="Assets\Scripts\UI\OpenSelectStageButton.cs" />
     <Compile Include="Assets\Scripts\Facility.cs" />
@@ -105,7 +106,7 @@
     <Compile Include="Assets\Shapes2D\Demos\Flappy Shapes\Game.cs" />
     <Compile Include="Assets\Scripts\UI\CharacterInReserveMGR.cs" />
     <Compile Include="Assets\Shapes2D\Scripts\PolyMap.cs" />
-    <Compile Include="Assets\Scripts\Function.cs" />
+    <Compile Include="Assets\Scripts\CannonballMGR.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Shapes2D\Shaders\Triangle.cginc" />

@@ -100,6 +100,8 @@ MonoBehaviour:
   targetCharacter: {fileID: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
   heightToDisplayDamage: 0.6
+  cannonballPrefab: {fileID: 4461368950815944542, guid: b869ac0f063fc9f4ca073ecb40c3b232, type: 3}
+  timeToImpact: 0
   level: 0
   maxHp: 100
   hp: 0

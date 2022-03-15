@@ -17,6 +17,13 @@ public abstract class Facility : MonoBehaviour
     [SerializeField] GameObject damageTextPrefab; //インスペクター上でセットする
     [SerializeField] float heightToDisplayDamage; //ダメージテキストをどのくらい高く表示するかを決める
 
+    [SerializeField] GameObject cannonballPrefab; //弾丸のプレハブ　インスペクタ上でセットする
+    static float timeToImpact = 0.3f;     //着弾までの時間
+    public static float GetTimeToImpact() //被弾アニメーションにディレイを掛けるために必要
+    {
+        return timeToImpact;
+    }
+
     [SerializeField] protected int level;
     [SerializeField] protected int maxHp;
     [SerializeField] protected int hp;
@@ -164,9 +171,20 @@ public abstract class Facility : MonoBehaviour
         //キャラクターの方を向く
         SetDirection(targetCharacter.GetGridPos() - gridPos);
 
-        Debug.Log($"Character({targetCharacterPos})に{damage}のダメージを与えた");
+        //ダメージの表示や砲丸の表示を行う（targetCharacterの情報を使うため、先に処理する）
+        DrawCannonBall();
+
+        //yield return new WaitForSeconds(timeToImpact);
+        //DrawDamage(damage);
+        ////キャラクターにダメージを与える（データの処理が後）
+        //targetCharacter.HP -= damage;
+        //Debug.Log($"Character({targetCharacterPos})に{damage}のダメージを与えた");
+
         targetCharacter.HP -= damage;
-        DrawDamage(damage);
+
+        Debug.LogWarning("BeHitCoroutineを開始します");
+        StartCoroutine(BeHitCoroutine(damage));
+
 
         while (timer < attackInterval){
             timer += Time.deltaTime * GameManager.instance.gameSpeed;
@@ -178,18 +196,36 @@ public abstract class Facility : MonoBehaviour
 
         isAttacking = false;
     }
+    IEnumerator BeHitCoroutine(int damage)
+    {
+        yield return new WaitForSeconds(timeToImpact* (1.0f/ GameManager.instance.gameSpeed));
 
-    public void DrawDamage(int damage)
+        Debug.LogWarning("DrawDamageとtargetCharacter.HP -= damageを実行します");
+        DrawDamage(damage);
+        Debug.LogWarning($"Character({targetCharacterPos})に{damage}のダメージを与えた");
+    }
+     public void DrawDamage(int damage)
     {
         GameObject damageTextGO;
         Text damageText;
         Vector3 drawPos = this.transform.position + new Vector3(0, heightToDisplayDamage, 0);
+
+
         damageTextGO = Instantiate(damageTextPrefab, RectTransformUtility.WorldToScreenPoint(Camera.main, drawPos), Quaternion.identity, damageTextParent.transform);
         damageText = damageTextGO.GetComponent<Text>();
         damageText.text = damage.ToString();
     }
 
+    public void  DrawCannonBall()
+    {
+        Vector3 firingPos = this.transform.position + new Vector3(0, heightToDisplayDamage, 0); //砲弾の初期位置
 
+        //砲弾を生成
+        //Debug.Log("砲丸を生成します");
+        GameObject cannonballGO = Instantiate(cannonballPrefab, firingPos, Quaternion.identity);
+        cannonballGO.GetComponent<CannonballMGR>().FiringCannonball(gridPos,timeToImpact,targetCharacter);
+
+    }
     public abstract void Die(); //抽象メソッド
 
 }
