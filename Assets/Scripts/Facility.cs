@@ -18,7 +18,7 @@ public abstract class Facility : MonoBehaviour
     [SerializeField] float heightToDisplayDamage; //ダメージテキストをどのくらい高く表示するかを決める
 
     [SerializeField] GameObject cannonballPrefab; //弾丸のプレハブ　インスペクタ上でセットする
-    static float timeToImpact = 0.3f;     //着弾までの時間
+    static float timeToImpact = 0.2f;     //着弾までの時間
     public static float GetTimeToImpact() //被弾アニメーションにディレイを掛けるために必要
     {
         return timeToImpact;

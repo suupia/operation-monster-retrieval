@@ -72,7 +72,7 @@ SpriteRenderer:
   m_SortingLayerID: -89394145
   m_SortingLayer: 2
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 7f0167216ea29614a8493d281a7df90d, type: 3}
+  m_Sprite: {fileID: -5286902129712446624, guid: e2d07a2f2c1998940b67797fcdaffe92, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -101,7 +101,6 @@ MonoBehaviour:
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
   heightToDisplayDamage: 0.6
   cannonballPrefab: {fileID: 4461368950815944542, guid: b869ac0f063fc9f4ca073ecb40c3b232, type: 3}
-  timeToImpact: 0
   level: 0
   maxHp: 100
   hp: 0
@@ -109,8 +108,8 @@ MonoBehaviour:
   attackInterval: 1
   attackRange: 2
   towerSprites:
-  - {fileID: -7812420300860205258, guid: 6db4bd5cd27a22f48ad417afa18ef6ba, type: 3}
-  - {fileID: -5701706118770702649, guid: 6db4bd5cd27a22f48ad417afa18ef6ba, type: 3}
-  - {fileID: -6310894863755013269, guid: 6db4bd5cd27a22f48ad417afa18ef6ba, type: 3}
-  - {fileID: -1769059934553497142, guid: 6db4bd5cd27a22f48ad417afa18ef6ba, type: 3}
-  - {fileID: 5075149625241691385, guid: 6db4bd5cd27a22f48ad417afa18ef6ba, type: 3}
+  - {fileID: -7741434766302557343, guid: e2d07a2f2c1998940b67797fcdaffe92, type: 3}
+  - {fileID: -5286902129712446624, guid: e2d07a2f2c1998940b67797fcdaffe92, type: 3}
+  - {fileID: 6259650567325851665, guid: e2d07a2f2c1998940b67797fcdaffe92, type: 3}
+  - {fileID: 6432845762601783245, guid: e2d07a2f2c1998940b67797fcdaffe92, type: 3}
+  - {fileID: -7550886670452958385, guid: e2d07a2f2c1998940b67797fcdaffe92, type: 3}
