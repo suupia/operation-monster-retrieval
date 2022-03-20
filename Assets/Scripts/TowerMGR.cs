@@ -97,20 +97,57 @@ public class TowerMGR : Facility
         }
     }
 
+    //public override void Die()
+    //{
+    //    //Debug.Log($"HPが0以下になったので、タワーを破壊します gridPos:{gridPos}のタワー");
+
+    //    GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos,GameManager.instance.towerID); //先にデータを消去する
+
+    //    GameManager.instance.CurrentTowerNum--;
+
+    //    GameManager.instance.mapMGR.MakeRoadByTowerDead(gridPos.x,gridPos.y);
+
+
+    //    Destroy(this.gameObject);
+
+    //    //Debug.Log($"{gridPos}のタワーをDestroyしました。");
+
+    //}
+
     public override void Die()
     {
-        //Debug.Log($"HPが0以下になったので、タワーを破壊します gridPos:{gridPos}のタワー");
-        
-        GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos,GameManager.instance.towerID); //先にデータを消去する
+        Debug.LogWarning($"TowerMGRのDieを実行します　IsEnemySide:{IsEnemySide}");
+        if (IsEnemySide)
+        {
+            //制圧されたときの処理
+            GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos, GameManager.instance.towerID);
+            GameManager.instance.CurrentTowerNum--;
 
-        GameManager.instance.CurrentTowerNum--;
+            //リセットの処理（FacilityのStart関数を参考にする）
+            GameManager.instance.mapMGR.GetMap().MultiplySetValue(gridPos,GameManager.instance.allyTowerID);
+            GameManager.instance.CurrentAllyTowerNum++;
+            IsEnemySide = false;
+            hp = maxHp;
+            isAlive = true;
+            targetUnitID = GameManager.instance.robotID;
 
-        GameManager.instance.mapMGR.MakeRoadByTowerDead(gridPos.x,gridPos.y);
+        }
+        else
+        {
+            //制圧されたときの処理
+            GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos, GameManager.instance.allyTowerID);
+            GameManager.instance.CurrentAllyTowerNum--;
+
+            //リセットの処理
+            GameManager.instance.mapMGR.GetMap().MultiplySetValue(gridPos, GameManager.instance.towerID);
+            GameManager.instance.CurrentTowerNum++;
+            IsEnemySide = true;
+            hp = maxHp;
+            isAlive = true;
+            targetUnitID = GameManager.instance.characterID;
+        }
 
 
-        Destroy(this.gameObject);
-
-        //Debug.Log($"{gridPos}のタワーをDestroyしました。");
 
     }
 }

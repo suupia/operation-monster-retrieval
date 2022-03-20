@@ -82,7 +82,18 @@ public class GameManager : MonoBehaviour
     {
         get { return maxTowerNum; }
     }
-    [SerializeField] int currentTowerNum; //生き残っているタワーの数　デバッグ用にSerializeFieldにしている
+    [SerializeField] int currentAllyTowerNum; //敵のタワーの数　デバッグ用にSerializeFieldにしている
+    [SerializeField] int currentTowerNum; //敵のタワーの数　デバッグ用にSerializeFieldにしている
+
+    public int CurrentAllyTowerNum
+    {
+        get { return currentAllyTowerNum; }
+        set
+        {
+            currentAllyTowerNum = value;
+            //Debug.Log($"currentTowerNumを{currentTowerNum}にしました");
+        }
+    }
     public int CurrentTowerNum
     {
         get { return currentTowerNum; }
@@ -92,7 +103,6 @@ public class GameManager : MonoBehaviour
             //Debug.Log($"currentTowerNumを{currentTowerNum}にしました");
         }
     }
-
 
     int stagesClearedNum = 0;
     public int StagesClearedNum
@@ -132,9 +142,10 @@ public class GameManager : MonoBehaviour
 
     public readonly int wallID = 5;
     public readonly int groundID = 11;
+    public readonly int allyTowerID = 13;
     public readonly int towerID = 7;
-    public readonly int allyCastleID = 13;
-    public readonly int enemyCastleID = 17;
+    public readonly int allyCastleID = 17;
+    public readonly int enemyCastleID = 23;
     public readonly int characterID = 2;
     public readonly int robotID = 3;
 

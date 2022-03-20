@@ -12,8 +12,9 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] protected Vector2Int gridPos;
 
     [SerializeField] protected Vector2Int targetCastlePos;
-    protected int targetCastleID; //キャラクターとロボットで標的の城のIDが違う
     [SerializeField] protected Vector2Int targetFacilityPos;
+    protected int targetTowerID;  //キャラクターとロボットで標的のタワーのIDが違う
+    protected int targetCastleID; //キャラクターとロボットで標的の城のIDが違う
     [SerializeField] protected Vector2Int directionVectorToTarget;
     [SerializeField] protected Facility targetFacility;
 
@@ -265,11 +266,13 @@ public abstract class Unit : MonoBehaviour
 
         if (this is CharacterMGR)
         {
+            targetTowerID = GameManager.instance.towerID;
             targetCastlePos = GameManager.instance.mapMGR.GetEnemysCastlePos();
             targetCastleID = GameManager.instance.enemyCastleID;
         }
         else
         {
+            targetTowerID = GameManager.instance.allyTowerID;
             targetCastlePos = GameManager.instance.mapMGR.GetAllysCastlePos();
             targetCastleID = GameManager.instance.allyCastleID;
 
@@ -463,17 +466,12 @@ public abstract class Unit : MonoBehaviour
 
         CheckIfCauseSkill();
 
-        if (Function.isWithinTheAttackRange(gridPos, atkRange, GameManager.instance.towerID, out targetFacilityPos) || Function.isWithinTheAttackRange(gridPos, atkRange, targetCastleID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワー（城を除く）があるとき
+        if (Function.isWithinTheAttackRange(gridPos, atkRange, targetTowerID, out targetFacilityPos) || Function.isWithinTheAttackRange(gridPos, atkRange, targetCastleID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワー（城を除く）があるとき
         {
             Debug.Log($"攻撃範囲内にタワーがあるのでInBattleに切り替えます targetFacilityPos:{targetFacilityPos}");
             SetDirection(targetFacilityPos - gridPos);
             state = State.InBattle;
             return;
-        }
-
-        if (targetFacilityPos == Vector2Int.zero)
-        {
-            Debug.LogError($"targetFacilityPosが正しく求められていません");
         }
 
         if (moveAlongWithCounter == routeList.Count - 1)  //ルートの最終地点に到達したら城への攻撃を開始する
@@ -521,12 +519,35 @@ public abstract class Unit : MonoBehaviour
     {
         //Debug.Log($"Attackを実行します");
 
-        if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) == null)
-        { //towerMGRがないということはタワーを破壊したということなので、Marchingに切り替える
-            Debug.Log($"タワーを破壊したのでMarchingに切り替えます targetFacilityPos:{targetFacilityPos}");
-            state = State.Marching;
-            return;
+        //if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) == null)
+        //{ //towerMGRがないということはタワーを破壊したということなので、Marchingに切り替える
+        //    Debug.Log($"タワーを破壊したのでMarchingに切り替えます targetFacilityPos:{targetFacilityPos}");
+        //    state = State.Marching;
+        //    return;
+        //}
+        if (this is CharacterMGR)
+        {
+            //CharacterMGRのとき
+            if (!GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos).IsEnemySide)
+            {
+                //targetFacilityが味方ということは、制圧したということなので、Marchingに切り替える
+                Debug.Log($"敵のタワーを制圧したのでMarchingに切り替えます targetFacilityPos:{targetFacilityPos}");
+                state = State.Marching;
+                return;
+            }
         }
+        else
+        {
+            //RobotMGRのとき
+            if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos).IsEnemySide)
+            {
+                //targetFacilityが敵ということは、制圧したということなので、Marchingに切り替える
+                Debug.Log($"プレイヤーのタワーを制圧したのでMarchingに切り替えます targetFacilityPos:{targetFacilityPos}");
+                state = State.Marching;
+                return;
+            }
+        }
+
 
         if (!isAttacking) StartCoroutine(AttackCoroutine());
 
@@ -566,7 +587,14 @@ public abstract class Unit : MonoBehaviour
 
         if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) is CastleMGR) //今ターゲットとしている施設が城であった場合、タワーの数を考慮した計算式に変える
         {
-            result = (int)Mathf.Ceil(atk * Mathf.Pow((float)(GameManager.instance.MaxTowerNum - GameManager.instance.CurrentTowerNum) / GameManager.instance.MaxTowerNum, 2)); //切り上げ 2乗して滑らかにする
+            if (this is CharacterMGR)
+            {
+                result = (int)Mathf.Ceil(atk * Mathf.Pow((float)(GameManager.instance.MaxTowerNum - GameManager.instance.CurrentTowerNum) / GameManager.instance.MaxTowerNum, 2)); //切り上げ 2乗して滑らかにする
+            }
+            else
+            {
+                result = (int)Mathf.Ceil(atk * Mathf.Pow((float)(GameManager.instance.MaxTowerNum - GameManager.instance.CurrentAllyTowerNum) / GameManager.instance.MaxTowerNum, 2)); //切り上げ 2乗して滑らかにする
+            }
 
             if (result == 0) result = 1; //タワーを一つも破壊していない場合、計算結果が0になるが、1ダメージは入るようにする
 

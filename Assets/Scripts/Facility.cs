@@ -169,7 +169,7 @@ public abstract class Facility : MonoBehaviour
 
         if (!Function.isWithinTheAttackRange(gridPos, attackRange, targetUnitID, out targetCharacterPos))
         {
-            Debug.Log($"キャラクターが攻撃範囲外に出たのでIdleに切り替えます");
+            Debug.Log($"キャラクターが攻撃範囲外に出たのでIdleに切り替えます gridPos:{gridPos}の施設");
             state = State.Idle;
             return;
         }
@@ -234,9 +234,9 @@ public abstract class Facility : MonoBehaviour
     {
         yield return new WaitForSeconds(timeToImpact* (1.0f/ GameManager.instance.gameSpeed));
 
-        Debug.LogWarning("DrawDamageとtargetCharacter.HP -= damageを実行します");
+        Debug.Log("DrawDamageとtargetCharacter.HP -= damageを実行します");
         DrawDamage(damage);
-        Debug.LogWarning($"Character({targetCharacterPos})に{damage}のダメージを与えた");
+        Debug.Log($"Character({targetCharacterPos})に{damage}のダメージを与えた");
     }
      public void DrawDamage(int damage)
     {
