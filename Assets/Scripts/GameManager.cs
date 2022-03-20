@@ -122,7 +122,8 @@ public class GameManager : MonoBehaviour
 
     public readonly int wallID = 3;
     public readonly int groundID = 11;
-    public readonly int facilityID = 5;
+    public readonly int towerID = 5;
+    public readonly int castleID = 7;
     public readonly int characterID = 2;
 
     public GameObject[] characterPrefabs; 

@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class TowerMGR : Facility
 {
+
     SpriteRenderer spriteRenderer;
     [SerializeField] protected Sprite[] towerSprites; //下、左、上、左下、左上の順番でインスペクター上でセットする
 
@@ -97,11 +100,11 @@ public class TowerMGR : Facility
         }
     }
 
-    public override void Die()
+    public　override void Die()
     {
         //Debug.Log($"HPが0以下になったので、タワーを破壊します gridPos:{gridPos}のタワー");
         
-        GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos,GameManager.instance.facilityID); //先にデータを消去する
+        GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos,GameManager.instance.towerID); //先にデータを消去する
 
         GameManager.instance.CurrentTowerNum--;
 

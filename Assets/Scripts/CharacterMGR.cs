@@ -659,7 +659,7 @@ public class CharacterMGR : MonoBehaviour
         //    return;
         //}
 
-        if (GameManager.instance.CanAttackTarget(gridPos, atkRange, GameManager.instance.facilityID, out targetFacilityPos) && targetFacilityPos != GameManager.instance.mapMGR.GetEnemysCastlePos()) //ルートに沿って移動しているときに、攻撃範囲内にタワー（城を除く）があるとき
+        if (GameManager.instance.CanAttackTarget(gridPos, atkRange, GameManager.instance.towerID, out targetFacilityPos) || GameManager.instance.CanAttackTarget(gridPos, atkRange, GameManager.instance.castleID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内に　タワー または　城　があるとき
         {
             Debug.Log($"攻撃範囲内にタワーがあるのでInBattleに切り替えます targetFacilityPos:{targetFacilityPos}");
             SetDirection(targetFacilityPos - gridPos);
@@ -714,7 +714,18 @@ public class CharacterMGR : MonoBehaviour
         {
             isFristBattle = false;
 
-            targetFacility = GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos);
+            //targetFacility = GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos);
+
+            if (targetFacilityPos == GameManager.instance.mapMGR.GetEnemysCastlePos())
+            {
+                //城の場合
+                targetFacility = GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos);
+            }
+            else
+            {
+                //タワーの場合
+                targetFacility = GameManager.instance.mapMGR.GetMap().GetTowerMGR(targetFacilityPos);
+            }
         }
 
         Attack();
@@ -723,6 +734,13 @@ public class CharacterMGR : MonoBehaviour
     public void Attack()
     {
         //Debug.Log($"Attackを実行します");
+
+        //if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) == null)
+        //{ //towerMGRがないということはタワーを破壊したということなので、Marchingに切り替える
+        //    Debug.Log($"タワーを破壊したのでMarchingに切り替えます targetFacilityPos:{targetFacilityPos}");
+        //    state = State.Marching;
+        //    return;
+        //}
 
         if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) == null)
         { //towerMGRがないということはタワーを破壊したということなので、Marchingに切り替える
