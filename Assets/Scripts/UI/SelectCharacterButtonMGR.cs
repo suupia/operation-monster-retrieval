@@ -177,6 +177,8 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         GameManager.instance.copyingManualRoute = true;
         GameManager.instance.copyingSelectCharacterButtonNum = buttonNum;
         GameManager.instance.manualRouteDatas[buttonNum].ShowSelectedManualRoute(); //‚±‚ÌButton‚É‘Î‰‚·‚éManualRoute‚ğPointerTail‚Å•\¦‚·‚éˆ—‚ğ‘‚­
+        GameManager.instance.curveToMouseMGR.SetCircles(buttonNum);
+        GameManager.instance.curveToMouseMGR.StartIlluminatingPointersCroutine();
     }
 
     public void ShowLineBetweenButtonAndPointer() //EventTrigger Drag‚ÅŒÄ‚Ô

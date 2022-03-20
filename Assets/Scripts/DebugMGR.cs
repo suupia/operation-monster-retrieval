@@ -99,9 +99,6 @@ public class DebugMGR : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.F7))
         {
-            //var shortestRoute = Function.SearchShortestRouteToCastle(new Vector2Int(1,3)) ;
-            //Debug.LogWarning($" Function.SearchShortestRouteToCastle={string.Join(",", shortestRoute)}");
-            //DebugRoute(shortestRoute);
 
         }
 
@@ -201,7 +198,7 @@ public class DebugMGR : MonoBehaviour
 
                 textPosition = new Vector3(x + 0.5f, y + 0.5f, 0);
                 characterMGRTextArray[i] = Instantiate(characterMGRText, textPosition, Quaternion.identity, characterMGRTextParent.transform);
-                characterMGRTextArray[i].text = GameManager.instance.mapMGR.GetMap().GetCharacterMGRList(i).Count.ToString(); //そのマスに存在するcharacterMGRの個数を返す
+                characterMGRTextArray[i].text = GameManager.instance.mapMGR.GetMap().GetUnitList(i).Count.ToString(); //そのマスに存在するcharacterMGRの個数を返す
 
             }
 
@@ -213,7 +210,7 @@ public class DebugMGR : MonoBehaviour
             for (int i = 0; i < GameManager.instance.mapMGR.GetMapSize(); i++)
             {
 
-                characterMGRTextArray[i].text = GameManager.instance.mapMGR.GetMap().GetCharacterMGRList(i).Count.ToString(); //そのマスに存在するcharacterMGRの個数を返す
+                characterMGRTextArray[i].text = GameManager.instance.mapMGR.GetMap().GetUnitList(i).Count.ToString(); //そのマスに存在するcharacterMGRの個数を返す
 
 
             }

@@ -11,7 +11,7 @@ public abstract class Facility : MonoBehaviour
 
     [SerializeField] protected Vector2Int targetCharacterPos;
 
-    [SerializeField] CharacterMGR targetCharacter;
+    [SerializeField] Unit targetCharacter;
 
     GameObject damageTextParent; //Findで取得する
     [SerializeField] GameObject damageTextPrefab; //インスペクター上でセットする
@@ -117,10 +117,10 @@ public abstract class Facility : MonoBehaviour
     {
         //Debug.Log("FacilityのIdleを実行します");
 
-        if (GameManager.instance.CanAttackTarget(gridPos,attackRange,GameManager.instance.characterID,out targetCharacterPos))
+        if (Function.isWithinTheAttackRange(gridPos,attackRange,GameManager.instance.characterID,out targetCharacterPos))
         {
             Debug.Log("攻撃範囲内にキャラクターがいるのでInBatteleに切り替えます");
-            targetCharacter = GameManager.instance.mapMGR.GetMap().GetCharacterMGRList(targetCharacterPos)[0]; //とりあえず単体攻撃
+            targetCharacter = GameManager.instance.mapMGR.GetMap().GetUnitList(targetCharacterPos)[0]; //とりあえず単体攻撃
             Debug.Log($"targetCharacter:{targetCharacter}");
             state = State.InBattle;
             return;
@@ -136,7 +136,7 @@ public abstract class Facility : MonoBehaviour
 
         }
 
-        if (!GameManager.instance.CanAttackTarget(gridPos, attackRange, GameManager.instance.characterID, out targetCharacterPos))
+        if (!Function.isWithinTheAttackRange(gridPos, attackRange, GameManager.instance.characterID, out targetCharacterPos))
         {
             Debug.Log($"キャラクターが攻撃範囲外に出たのでIdleに切り替えます");
             state = State.Idle;

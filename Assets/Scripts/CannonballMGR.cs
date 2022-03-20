@@ -5,12 +5,12 @@ using UnityEngine;
 public class CannonballMGR : MonoBehaviour
 {
 
-    public void FiringCannonball(Vector2Int towerGridPos,float timeToImpact,CharacterMGR targetCharacter)
+    public void FiringCannonball(Vector2Int towerGridPos,float timeToImpact,Unit targetCharacter)
     {
         StartCoroutine(FiringCannonballCoroutine(towerGridPos,timeToImpact,targetCharacter));
     }
 
-    IEnumerator FiringCannonballCoroutine(Vector2Int towerGridPos,float timeToImpact, CharacterMGR targetCharacter)
+    IEnumerator FiringCannonballCoroutine(Vector2Int towerGridPos,float timeToImpact, Unit targetCharacter)
     {
         Vector2 startPos = GameManager.instance.ToWorldPosition(towerGridPos);
         Vector2 endPos = targetCharacter.GetTransformPos(); //FiringCannonballを呼び出した後にダメージを与えるため、少なくとも最初の一回は確実にendPosを更新できる

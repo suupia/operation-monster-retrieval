@@ -19,7 +19,7 @@ public class TowerMGR : Facility
         DiagRightBack,
         DiagLeftBack
     }
-    new void Start() //オーバーライド
+    new void Start() //newで同じシグネチャのメソッドを実装
     {
         base.Start();
         spriteRenderer = GetComponent<SpriteRenderer>();

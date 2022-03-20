@@ -8,7 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{81BBD384-99F5-149F-C688-9D155E0F8D6A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -58,6 +59,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\PointerMGR.cs" />
     <Compile Include="Assets\Scripts\TowerPosData.cs" />
+    <Compile Include="Assets\Scripts\RobotMGR.cs" />
     <Compile Include="Assets\Shapes2D\Demos\DragCamera.cs" />
     <Compile Include="Assets\Scripts\Function.cs" />
     <Compile Include="Assets\Scripts\InputMGR.cs" />
@@ -97,6 +99,7 @@
     <Compile Include="Assets\Scripts\UI\LevelUpButton.cs" />
     <Compile Include="Assets\Shapes2D\Demos\Stress Test\Spawner.cs" />
     <Compile Include="Assets\Scripts\CastleMGR.cs" />
+    <Compile Include="Assets\Scripts\Unit.cs" />
     <Compile Include="Assets\Scripts\TimerMGR.cs" />
     <Compile Include="Assets\Scripts\EnergyMGR.cs" />
     <Compile Include="Assets\Shapes2D\Demos\Simple Effect\EffectDemo.cs" />
@@ -111,20 +114,20 @@
     <Compile Include="Assets\Shapes2D\Scripts\PolyMap.cs" />
   </ItemGroup>
   <ItemGroup>
-     <None Include="Assets\Shapes2D\Shaders\Triangle.cginc" />
-     <None Include="Assets\Art\Shaders\UI-Add.shader" />
-     <None Include="Assets\Art\Shaders\UI-ColorAdditive.shader" />
-     <None Include="Assets\Shapes2D\Shaders\Common.cginc" />
-     <None Include="Assets\Shapes2D\Shaders\Ellipse.cginc" />
-     <None Include="Assets\Shapes2D\Shaders\Shape.shader" />
-     <None Include="Assets\Art\Font\Reggae_One\OFL.txt" />
-     <None Include="Assets\Shapes2D\Shaders\Rectangle.cginc" />
-     <None Include="Assets\Shapes2D\Shaders\Polygon.cginc" />
-     <None Include="Assets\Art\Font\Stick\OFL.txt" />
-     <None Include="Assets\Art\Font\Best10-FONT\Best10-FONT\ReadMe.txt" />
-     <None Include="Assets\Shapes2D\changelog.txt" />
-     <None Include="Assets\Shapes2D\Shaders\Path.cginc" />
-     <None Include="Assets\Shapes2D\readme.txt" />
+    <None Include="Assets\Shapes2D\Shaders\Triangle.cginc" />
+    <None Include="Assets\Art\Shaders\UI-Add.shader" />
+    <None Include="Assets\Art\Shaders\UI-ColorAdditive.shader" />
+    <None Include="Assets\Shapes2D\Shaders\Common.cginc" />
+    <None Include="Assets\Shapes2D\Shaders\Ellipse.cginc" />
+    <None Include="Assets\Shapes2D\Shaders\Shape.shader" />
+    <None Include="Assets\Art\Font\Reggae_One\OFL.txt" />
+    <None Include="Assets\Shapes2D\Shaders\Rectangle.cginc" />
+    <None Include="Assets\Shapes2D\Shaders\Polygon.cginc" />
+    <None Include="Assets\Art\Font\Stick\OFL.txt" />
+    <None Include="Assets\Art\Font\Best10-FONT\Best10-FONT\ReadMe.txt" />
+    <None Include="Assets\Shapes2D\changelog.txt" />
+    <None Include="Assets\Shapes2D\Shaders\Path.cginc" />
+    <None Include="Assets\Shapes2D\readme.txt" />
     <Reference Include="UnityEngine">
       <HintPath>D:\Program Files\Unity\Hub\Editor\2020.3.2f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>

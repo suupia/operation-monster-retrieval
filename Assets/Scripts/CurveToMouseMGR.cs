@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CurveToMouseMGR : MonoBehaviour
 {
@@ -8,9 +9,16 @@ public class CurveToMouseMGR : MonoBehaviour
     [SerializeField] GameObject curvePointer;
 
     [SerializeField] List<GameObject> curvePointers;
+    [SerializeField] List<Image> curvePointerImages;
     private int divisionNum;
 
     private bool isEditingCurvePointers;
+
+    [SerializeField] private Color pointerColor;
+    private bool isIlluminating;
+    private Coroutine illuminatingPointerCroutine; //StopCoroutineの引数にする 
+
+    private Quaternion pointerAngle; //Curve()内で、与えられたx座標における接線の傾きを代入する
 
     private void Start()
     {
@@ -39,10 +47,12 @@ public class CurveToMouseMGR : MonoBehaviour
             if (i < curvePointers.Count)
             {
                 curvePointers[i].transform.position = PointerPosInCurve((float)i / (float)divisionNum, startPos, endPos);
+                curvePointers[i].transform.rotation = pointerAngle;
             }
             else
             {
-                curvePointers.Add(Instantiate(curvePointer, PointerPosInCurve((float)i / (float)divisionNum, startPos, endPos), curvePointer.transform.rotation, curveToMouseCanvas.transform));
+                curvePointers.Add(Instantiate(curvePointer, PointerPosInCurve((float)i / (float)divisionNum, startPos, endPos), pointerAngle, curveToMouseCanvas.transform));
+                curvePointerImages.Add(curvePointers[curvePointers.Count - 1].GetComponent<Image>());
             }
         }
 
@@ -50,6 +60,7 @@ public class CurveToMouseMGR : MonoBehaviour
         {
             Destroy(curvePointers[curvePointers.Count - 1]);
             curvePointers.RemoveAt(curvePointers.Count - 1);
+            curvePointerImages.RemoveAt(curvePointerImages.Count - 1);
         }
 
         isEditingCurvePointers = false;
@@ -74,7 +85,7 @@ public class CurveToMouseMGR : MonoBehaviour
         float endPosTan = Mathf.Atan(endPos.y / endPos.x);
         float deltaAngle = Mathf.PI / 4 / (Mathf.Abs(endPosTan) * Mathf.Abs(endPosTan) + 1); //原点における接線とendPosベクトルの為す角 接線の傾きが過大にならないように、徐々に小さくしていく
 
-        if (x < 0)
+        if (endPos.x < 0)
         {
             deltaAngle *= -1; //常に上に凸にするため
         }
@@ -102,6 +113,15 @@ public class CurveToMouseMGR : MonoBehaviour
         float y = a * x * x + b * x;
         //Debug.LogWarning($"a={a}, b={b}, x={x}, endPos={endPos}, y={y}");
 
+        if (endPos.x < 0)
+        {
+            pointerAngle = Quaternion.Euler(0, 0, Mathf.Atan(2 * a * x + b) * 180 / Mathf.PI + 180); //endPos.x < 0のときの傾きは始点に向かっているので、180度足す
+        }
+        else
+        {
+            pointerAngle = Quaternion.Euler(0, 0, Mathf.Atan(2 * a * x + b) * 180 / Mathf.PI);
+        }
+
         return new Vector2(x, y);
     }
     public void DestroyLineBetweenButtonAndPointer()
@@ -109,16 +129,23 @@ public class CurveToMouseMGR : MonoBehaviour
         if (isEditingCurvePointers) return;
         isEditingCurvePointers = true;
 
+        if(illuminatingPointerCroutine != null)
+        {
+            StopCoroutine(illuminatingPointerCroutine);
+            illuminatingPointerCroutine = null;
+        }
+
         while (curvePointers.Count != 0)
         {
             Destroy(curvePointers[curvePointers.Count - 1]);
             curvePointers.RemoveAt(curvePointers.Count - 1);
+            curvePointerImages.RemoveAt(curvePointerImages.Count - 1);
         }
 
         isEditingCurvePointers = false;
     }
 
-    public void ResetCopyingManualRoue() //どこに書くべきかわからん～～
+    public void ResetCopyingManualRoue()
     {
         DestroyLineBetweenButtonAndPointer();
         if (GameManager.instance.copyingSelectCharacterButtonNum != -1)
@@ -130,5 +157,55 @@ public class CurveToMouseMGR : MonoBehaviour
         GameManager.instance.mouseEnteredSelectCharacterButtonNum = -1;
     }
 
+    public void StartIlluminatingPointersCroutine()
+    {
+        illuminatingPointerCroutine = StartCoroutine(IlluminatePointers());
+    }
 
+    private IEnumerator IlluminatePointers()
+    {
+        while(curvePointerImages.Count != 0)
+        {
+            StartCoroutine(CallIlluminateImage());
+            yield return new WaitForSeconds(2f);
+        }
+    }
+
+    private IEnumerator CallIlluminateImage()
+    {
+        for (int i = 0; i < curvePointerImages.Count; i++)
+        {
+            StartCoroutine(IlluminateImage(curvePointerImages[i]));
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    private IEnumerator IlluminateImage(Image image)
+    {
+        if (image == null) yield break;
+
+        while (CompareColors(image.color, Color.white))
+        {
+            image.color += Color.white / 20;
+            yield return new WaitForSeconds(0.02f);
+            if (image == null) yield break;
+        }
+
+        while (CompareColors(pointerColor, image.color))
+        {
+            image.color -= Color.white / 20;
+            yield return new WaitForSeconds(0.02f);
+            if (image == null) yield break;
+        }
+
+        image.color = pointerColor;
+    }
+
+    private bool CompareColors(Color c1, Color c2) //c1のrgbが全てc2のrgbより小さいときtrue
+    {
+        if (c1 == null || c2 == null) return false; //参照が外れているとき
+
+        if (c1.r < c2.r || c1.g < c2.g || c1.b < c2.b) return true;
+        else return false;
+    }
 }

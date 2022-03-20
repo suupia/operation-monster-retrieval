@@ -120,7 +120,7 @@ public class MapMGR : MonoBehaviour
     {
         //初期化
         map = null;
-        map = new MapData(mapWidth, mapHeight); //mapは1つしかないのでとりあえず、numberは0としておく
+        map = new MapData(mapWidth, mapHeight); //コンストラクタですべてのマスをwallIDにしている
 
         numOfFristRoadCounter = GetNumOfFristRoad();
 
@@ -130,11 +130,13 @@ public class MapMGR : MonoBehaviour
 
         //Debug.Log($"numOfFristRoadCounterを{GetNumOfFristRoad()}に初期化しました");
 
-        RenderMap();
 
         PlaceCastle();
 
         PlaceTower();
+
+        RenderMap();
+
     }
     private void ReSetupMap() //MakeTheFirstRoadで失敗したときに呼ばれる
     {
@@ -183,10 +185,24 @@ public class MapMGR : MonoBehaviour
             isFristTimePlaceAllyCastle = false;
             Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x, allysCastlePos.y + 1, 0), Quaternion.identity); //画像の中心が格子点にくるように、+1していることに注意
         }
+
+        //プレイヤーの城を配置
+        GameObject allyCastleGO = Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x, allysCastlePos.y+1, 0), Quaternion.identity);//画像の中心が格子点にくるように、+1していることに注意
+        CastleMGR allyCastleMGR = allyCastleGO.GetComponent<CastleMGR>();
+
+        map.DivisionalSetValue(allysCastlePos, GameManager.instance.wallID); //城のマスの壁は取り除き、
+        map.MultiplySetValue(allysCastlePos, GameManager.instance.groundID); //地面にする
+        map.MultiplySetValue(allysCastlePos, GameManager.instance.allyCastleID); //城の数値データをセット
+        map.SetFacility(allysCastlePos, allyCastleMGR); //スクリプトをセット
+
+
+        //敵の城を配置
         GameObject enemyCastleGO = Instantiate(enemysCastlePrefab, new Vector3(enemysCastlePos.x + 1, enemysCastlePos.y, 0), Quaternion.identity);
         CastleMGR enemyCastleMGR = enemyCastleGO.GetComponent<CastleMGR>();
 
-        map.MultiplySetValue(enemysCastlePos, GameManager.instance.castleID); //数値データをセット
+        map.DivisionalSetValue(enemysCastlePos, GameManager.instance.wallID); //城のマスの壁は取り除き、
+        map.MultiplySetValue(enemysCastlePos, GameManager.instance.groundID); //地面にする
+        map.MultiplySetValue(enemysCastlePos, GameManager.instance.castleID); //城の数値データをセット
         map.SetFacility(enemysCastlePos, enemyCastleMGR); //スクリプトをセット
 
         characterSpawnPoss = new Vector2Int[characterSpawnPossFromCastle.Length];
@@ -508,7 +524,7 @@ public class MapMGR : MonoBehaviour
             if (numOfFristRoadCounter <= 0)
             {
                 //Debug.Log("numOfFristRoadCounterが0以下になりました");
-                if (IsReachable2())
+                if (IsReachable())
                 {
                     //Debug.Log($"GameManagerのStateをRunningGameにします");
                     GameManager.instance.RunningGame();
@@ -612,219 +628,8 @@ public class MapMGR : MonoBehaviour
         isDisplayMakefristRoadAgainCoroutine = false;
     }
 
+
     bool IsReachable()
-    {
-        int initiValue = -10; //PlaceNumAroundで重複して数字を置かないようにするために必要
-        //int roadValue = 1; //roadのマス
-        int wallValue = -1; //wallのマス
-        int _errorValue = -88;
-        int[,] cell = new int[mapHeight,mapWidth]; //到達できるかどうかを判定する用の2次元配列
-        Vector2Int startPos = allysCastlePos;
-        Vector2Int targetPos = enemysCastlePos;
-
-        Queue<Vector2Int> searchQue = new Queue<Vector2Int>();
-        int i = 1; //1から始まることに注意
-        bool isComplete = false;
-        int maxDistance = 0;
-
-        //初期化
-        for (int y = 0; y < mapHeight; y++)
-        {
-            for (int x = 0; x < mapWidth; x++)
-            {
-                    cell[y, x] = initiValue;  
-            }
-        }
-
-        //mapの壁のマスをwallValueにする。
-        for (int y = 0; y < mapHeight; y++)
-        {
-            for (int x = 0; x < mapWidth; x++)
-            {
-                if (map.GetValue(x, y) % GameManager.instance.wallID == 0)
-                {
-                    cell[y,x] = wallValue;  //実質これがinitiValueみたいな役割を持つ
-                }
-            }
-        }
-
-        //動けるマスに数字を順番に振っていく
-        Debug.Log($"WaveletSearchを実行します startPos:{startPos}");
-        WaveletSearch();
-
-        //デバッグ用
-        string debugCell = "";
-        for (int y = 0; y < mapHeight; y++)
-        {
-            for (int x = 0; x < mapWidth; x++)
-            {
-                //debugCell += $"({x},{mapHeight - y-1}){GetValue(mapHeight - y-1, x)}".PadRight(3) + ",";
-                debugCell += $"{GetValue(x,mapHeight - y-1)}".PadRight(3) + ",";
-            }
-            debugCell += "\n";
-        }
-        //Debug.Log($"cellの中身は\n{debugCell}");
-
-        
-
-        if (CanGetCloseToTheCastle())
-        {
-            Debug.Log("IsReachableはtrueです");
-            return true;
-        }
-        else
-        {
-            Debug.Log("IsReachableはfalseです");
-            return false; 
-        }
-
-
-        ////////////////////////////////////////////////////////////////////
-
-        //以下ローカル関数
-        int GetValue(int x, int y)
-        {
-            if (IsOutRangeOfMap(x, y))
-            {
-                Debug.LogError($"領域外に値を取得しようとしました (x,y):({x},{y})");
-                return _errorValue;
-            }
-            if (x == 0 || y == 0 || x == map.Width - 1 || y == map.Height - 1)
-            {
-                return wallValue; //端は壁扱いにする
-            }
-            return cell[y,x];
-        }
-
-        void SetValue(int x, int y, int value)
-        {
-            if (IsOutRangeOfMap(x, y))
-            {
-                Debug.LogError($"領域外に値を設定しようとしました (x,y):({x},{y})");
-                return;
-            }
-            cell[y, x] = value; 
-        }
-
-        void WaveletSearch()
-        {
-            SetValue(startPos.x,startPos.y,0); //startPosの部分だけ周囲の判定を行わないため、ここで個別に設定する 0としているのは0番目のマスだから
-            searchQue.Enqueue(startPos);
-
-            while (!isComplete)
-            {
-                int loopNum = searchQue.Count; //前のループでキューに追加された個数を数える
-                Debug.Log($"i:{i}のときloopNum:{loopNum}");
-                for (int k = 0; k < loopNum; k++)
-                {
-                    Debug.Log($"PlaceNumAround({searchQue.Peek()})を実行します");
-                    if (isComplete) break;
-                    PlaceNumAround(searchQue.Dequeue());
-                }
-                i++; //前のループでキューに追加された文を処理しきれたら、インデックスを増やして次のループに移る
-
-                if (i > 100) //無限ループを防ぐ用   100まで探索して道が見つからないのならば、処理を中断する
-                {
-                    isComplete = true;
-                    Debug.Log("SearchShortestRouteのwhile文でループが100回行われたため処理を終了します");
-                }
-
-            }
-        }
-
-        void PlaceNumAround(Vector2Int centerPos)
-        {
-            Vector2Int inspectPos;
-
-            //8マス判定する（真ん中のマスの判定は必要ない）
-            for (int y = -1; y < 2; y++)
-            {
-                for (int x = -1; x < 2; x++)
-                {
-                    if (x == 0 && y == 0) continue; //真ん中のマスは飛ばす
-
-                    inspectPos = centerPos + new Vector2Int(x, y);
-
-                    if (IsOutRangeOfMap(inspectPos.x, inspectPos.y)) continue; //map外のマスの判定は飛ばす
-
-                    //Debug.Log($"centerPos:{centerPos},inspectPos:{inspectPos}のとき、CanMove(centerPos, inspectPos):{CanMove(centerPos, inspectPos)}");
-                    if (GetValue(inspectPos.x, inspectPos.y) == initiValue && CanMoveDiagonally(centerPos, inspectPos))
-                    {
-                        SetValue(inspectPos.x,inspectPos.y,i);
-                        if(GetValue(inspectPos.x, inspectPos.y)==0) Debug.LogError($"GetValue({inspectPos.x}, {inspectPos.y})が0です");
-
-                        searchQue.Enqueue(inspectPos);
-                        Debug.Log($"({inspectPos})を{i}にし、探索用キューに追加しました。");
-                    }
-                    if (inspectPos == targetPos)
-                    {
-                        isComplete = true;
-                        maxDistance = i - 1;
-                        Debug.Log($"isCompleteをtrueにしました。maxDistance:{maxDistance}");
-                        break; //探索終了
-                    }
-                }
-            }
-        }
-
-        bool CanMoveDiagonally(Vector2Int prePos, Vector2Int afterPos)
-        {
-            Vector2Int directionVector = afterPos - prePos;
-
-            //斜め移動の時にブロックの角を移動することはできない
-            if (directionVector.x != 0 && directionVector.y != 0)
-            {
-                //水平方向の判定
-                if (GetValue(prePos.x + directionVector.x, prePos.y) == wallValue)
-                {
-                    return false;
-                }
-
-                //垂直方向の判定
-                if (GetValue(prePos.x,prePos.y + directionVector.y) == wallValue)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        bool CanGetCloseToTheCastle()
-        {
-            Vector2Int inspectPos;
-            bool result = false;
-
-            //8マス判定する（真ん中のマスの判定は必要ない）
-            for (int y = -1; y < 2; y++)
-            {
-                for (int x = -1; x < 2; x++)
-                {
-                    if (x == 0 && y == 0) continue; //真ん中のマスは飛ばす
-
-                    inspectPos = targetPos + new Vector2Int(x, y);
-
-                    if (IsOutRangeOfMap(inspectPos.x, inspectPos.y)) continue; //map外のマスの判定は飛ばす
-
-                    if (GetValue(inspectPos.x, inspectPos.y) != initiValue && GetValue(inspectPos.x, inspectPos.y) != wallValue && CanMoveDiagonally(targetPos, inspectPos))
-                     //初期の値でもない　かつ　壁の値でもない　かつ　targetPosからinspectPosへ移動することができる
-                    {
-                        result = true;
-                    }
-                }
-            }
-
-            if (map.GetValue(allysCastlePos.x,allysCastlePos.y) % GameManager.instance.wallID == 0) //ここは本当のmapを参照して調べる
-            {
-                Debug.LogWarning("キャラクターのスポーン地点に道がないためfalseです");
-                result = false;
-            }
-
-            return result;
-        }
-    }
-
-    bool IsReachable2()
     {
         bool result = false;
         Vector2Int startPos = allysCastlePos;
@@ -889,7 +694,7 @@ public class MapData
     int _width;
     int _height;
     long[] _values = null;
-    List<CharacterMGR>[] _characterMGRs = null;
+    List<Unit>[] _Units = null;
     Facility[] _facilities = null;
     int _edgeValue;
     int _outOfRangeValue = -1;
@@ -905,10 +710,10 @@ public class MapData
         _width = width;
         _height = height;
         _values = new long [width * height];
-        _characterMGRs = new List<CharacterMGR>[width * height];
+        _Units = new List<Unit>[width * height];
         for(int i= 0; i < width * height; i++)
         {
-            _characterMGRs[i] = new List<CharacterMGR>();
+            _Units[i] = new List<Unit>();
         }
         _facilities = new Facility[width * height];
 
@@ -952,27 +757,49 @@ public class MapData
         return _values[index];
     }
 
-    public List<CharacterMGR> GetCharacterMGRList(int x,int y)
+    //public List<CharacterMGR> GetCharacterMGRList(int x,int y)
+    //{
+    //    if (IsOutOfDataRange(x, y))
+    //    {
+    //        Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
+    //        return null; //例外用の数字を設定できないため、nullを返す
+    //    }
+    //    return _Units[ToSubscript(x,y)];
+    //}
+    //public List<CharacterMGR> GetCharacterMGRList(Vector2Int vector)
+    //{
+    //    return GetCharacterMGRList(vector.x,vector.y);
+    //}
+    //public List<CharacterMGR> GetCharacterMGRList(int index)
+    //{
+    //    if(index < 0 || index > _values.Length)
+    //    {
+    //        Debug.LogError("領域外の値を習得しようとしました");
+    //        return null; //例外用の数字を設定できないため、nullを返す
+    //    }
+    //    return _Units[index];
+    //}
+    public List<Unit> GetUnitList(int x, int y)
     {
         if (IsOutOfDataRange(x, y))
         {
             Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
             return null; //例外用の数字を設定できないため、nullを返す
         }
-        return _characterMGRs[ToSubscript(x,y)];
+        return _Units[ToSubscript(x, y)];
     }
-    public List<CharacterMGR> GetCharacterMGRList(Vector2Int vector)
+    public List<Unit> GetUnitList(Vector2Int vector)
     {
-        return GetCharacterMGRList(vector.x,vector.y);
+        return GetUnitList(vector.x, vector.y);
     }
-    public List<CharacterMGR> GetCharacterMGRList(int index)
+    public List<Unit> GetUnitList(int index)
     {
-        if(index < 0 || index > _values.Length)
+        if (index < 0 || index > _values.Length)
         {
             Debug.LogError("領域外の値を習得しようとしました");
             return null; //例外用の数字を設定できないため、nullを返す
         }
-        return _characterMGRs[index];
+        return _Units[index];
     }
     public Facility GetFacility(int x,int y)
     {
@@ -1012,31 +839,57 @@ public class MapData
         SetValue(vector.x, vector.y, value);
     }
 
-    public void AddCharacterMGR(int x,int y, CharacterMGR characterMGR)
+    //public void AddCharacterMGR(int x,int y, CharacterMGR characterMGR)
+    //{
+    //    if (IsOutOfDataRange(x, y))
+    //    {
+    //        Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
+    //        return;
+    //    }
+    //    _Units[ToSubscript(x, y)].Add(characterMGR);
+    //}
+    //public void AddCharacterMGR(Vector2Int vector,CharacterMGR characterMGR)
+    //{
+    //    AddCharacterMGR(vector.x,vector.y,characterMGR);
+    //}
+    //public void RemoveCharacterMGR(int x,int y ,CharacterMGR characterMGR)
+    //{
+    //    if (IsOutOfDataRange(x, y))
+    //    {
+    //        Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
+    //        return;
+    //    }
+    //    _Units[ToSubscript(x, y)].Remove(characterMGR);
+    //}
+    //public void RemoveCharacterMGR(Vector2Int vector,CharacterMGR characterMGR)
+    //{
+    //    RemoveCharacterMGR(vector.x, vector.y, characterMGR);
+    //}
+    public void AddUnitMGR(int x, int y, Unit unit)
     {
         if (IsOutOfDataRange(x, y))
         {
             Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
             return;
         }
-        _characterMGRs[ToSubscript(x, y)].Add(characterMGR);
+        _Units[ToSubscript(x, y)].Add(unit);
     }
-    public void AddCharacterMGR(Vector2Int vector,CharacterMGR characterMGR)
+    public void AddUnit(Vector2Int vector, Unit unit)
     {
-        AddCharacterMGR(vector.x,vector.y,characterMGR);
+        AddUnitMGR(vector.x, vector.y, unit);
     }
-    public void RemoveCharacterMGR(int x,int y ,CharacterMGR characterMGR)
+    public void RemoveUnit(int x, int y, Unit unit)
     {
         if (IsOutOfDataRange(x, y))
         {
             Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
             return;
         }
-        _characterMGRs[ToSubscript(x, y)].Remove(characterMGR);
+        _Units[ToSubscript(x, y)].Remove(unit);
     }
-    public void RemoveCharacterMGR(Vector2Int vector,CharacterMGR characterMGR)
+    public void RemoveUnit(Vector2Int vector, Unit unit)
     {
-        RemoveCharacterMGR(vector.x, vector.y, characterMGR);
+        RemoveUnit(vector.x, vector.y, unit);
     }
     public void SetFacility(int x, int y ,Facility facility)
     {
