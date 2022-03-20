@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject resultCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
     [SerializeField] Text resultText;
 
-    [SerializeField] public float gameSpeed=1; //デバッグ用　コルーチンの中とかで使い、ゲームスピードを速くする
+    [SerializeField] public float gameSpeed = 1; //デバッグ用　コルーチンの中とかで使い、ゲームスピードを速くする
 
     bool initializationFlag = false;
     public bool InitializationFlag
@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    int maxCharacterNum=50; //フィールドに出せるキャラクターの最大数 characterIDが11の時は23体まで出せ、characterIDが2の時は50体出しても問題ない。　とりあえず、にゃんこ大戦争と同じように50にしておく
+    int maxCharacterNum = 50; //フィールドに出せるキャラクターの最大数 characterIDが11の時は23体まで出せ、characterIDが2の時は50体出しても問題ない。　とりあえず、にゃんこ大戦争と同じように50にしておく
     int maxRobotNum = 30;   //30は適当な数字
     public int MaxCharacterNum //Getterのみ
     {
@@ -72,7 +72,11 @@ public class GameManager : MonoBehaviour
             currentCharacterNum = value;
         }
     }
-
+    public int CurrentRobotNum
+    {
+        get { return currentRobotNum; }
+        set { currentRobotNum = value; }
+    }
     int maxTowerNum; //各ステージでのタワーの最大値(ステージごとに変わる)
     public int MaxTowerNum //Getterのみ
     {
@@ -82,15 +86,17 @@ public class GameManager : MonoBehaviour
     public int CurrentTowerNum
     {
         get { return currentTowerNum; }
-        set { 
+        set
+        {
             currentTowerNum = value;
             //Debug.Log($"currentTowerNumを{currentTowerNum}にしました");
         }
     }
 
 
-    int stagesClearedNum =0;
-    public int StagesClearedNum { //プロパティ　どこのステージまでクリアしたかを記録しておく
+    int stagesClearedNum = 0;
+    public int StagesClearedNum
+    { //プロパティ　どこのステージまでクリアしたかを記録しておく
         get { return stagesClearedNum; }
         set
         {
@@ -103,13 +109,13 @@ public class GameManager : MonoBehaviour
                 return;
             }
             stagesClearedNum = value;
-            for (int i = 0;i<selectStageButtonMGRs.Length;i++)
+            for (int i = 0; i < selectStageButtonMGRs.Length; i++)
             {
                 selectStageButtonMGRs[i].UpdateSelectStageButtonMGR();
             }
 
             //CharacterInReverseとCharacterInCombatを更新する
-            for (int i = 0; i<characterInReserveMGRs.Length; i++)  //CharacterInReserveの数は最大12
+            for (int i = 0; i < characterInReserveMGRs.Length; i++)  //CharacterInReserveの数は最大12
             {
                 characterInReserveMGRs[i].UpdateCharacterInReserve();
             }
@@ -146,9 +152,9 @@ public class GameManager : MonoBehaviour
 
     public int copyingSelectCharacterButtonNum = -1; //ManualRouteをコピーするとき、ドラッグした番号を保持しておくために必要
     public bool copyingManualRoute; //ManualRouteをコピーするとき、SelectCharacterButtonを選択している間trueにする
-    public int mouseEnteredSelectCharacterButtonNum  = -1;
+    public int mouseEnteredSelectCharacterButtonNum = -1;
 
-    float characterDisplacement= 0.03f; //キャラクターがスポーンしたときにどれくらいズレるかを決める(10回で一周するようにする)
+    float characterDisplacement = 0.03f; //キャラクターがスポーンしたときにどれくらいズレるかを決める(10回で一周するようにする)
 
     public CharacterMGR.Mode[] characterMode; //キャラクターの種類ごとの操作モードを格納する
 
@@ -200,9 +206,9 @@ public class GameManager : MonoBehaviour
         return characterDatabase[IDsOfCharactersInCombat[buttonNum]];
     }
     //Setter
-    public void SetCharacterMode(int characterTypeNum,CharacterMGR.Mode mode)
+    public void SetCharacterMode(int characterTypeNum, CharacterMGR.Mode mode)
     {
-        if(characterTypeNum<0 || this.numOfCharacterInCombat < characterTypeNum)
+        if (characterTypeNum < 0 || this.numOfCharacterInCombat < characterTypeNum)
         {
             Debug.LogError($"SetCharacterModeの引数characterTypeNumが{characterTypeNum}になっています");
             return;
@@ -227,7 +233,7 @@ public class GameManager : MonoBehaviour
     {
         if (InitializationFlag == false) Initialization();
     }
-    
+
     public void Initialization() //Start関数の変わり。他の関数の初期化で参照したいため、InitializationFlag(bool)を用意し、他から呼ぶときに初期化されていなければ初期化するようにする
     {
         initializationFlag = true;
@@ -249,7 +255,7 @@ public class GameManager : MonoBehaviour
             characterAutoRouteDatas[i] = new AutoRouteData(mapMGR.GetMapWidth(), mapMGR.GetMapHeight());
             characterManualRouteDatas[i] = new ManualRouteData(); //今はmanualRouteDataがない
         }
-        for (int i = 0; i< robotPrefabs.Length; i++)
+        for (int i = 0; i < robotPrefabs.Length; i++)
         {
             robotAutoRouteDatas[i] = new AutoRouteData(mapMGR.GetMapWidth(), mapMGR.GetMapHeight());
         }
@@ -277,7 +283,7 @@ public class GameManager : MonoBehaviour
 
         statusCanvasMGR.InitiStatusCanvasMGR();
 
-        for (int i = 0; i< IDsOfCharactersInCombat.Length;i++) //CharacterInCombatの順番をファイルから読み込む
+        for (int i = 0; i < IDsOfCharactersInCombat.Length; i++) //CharacterInCombatの順番をファイルから読み込む
         {
             IDsOfCharactersInCombat[i] = saveMGR.GetCharacterInCombatID(i);
         }
@@ -299,12 +305,12 @@ public class GameManager : MonoBehaviour
         frameCanvas.SetActive(true);      //SelectStageCanvasとMenuCanvasではFrameCanvasを表示する
     }
 
-    public  void SetupGame()
+    public void SetupGame()
     {
         state = State.SetupGame;
         selectStageCanvas.SetActive(false);
 
-        foreach(SelectCharacterButtonMGR MGR in selectCharacterButtonMGRs)
+        foreach (SelectCharacterButtonMGR MGR in selectCharacterButtonMGRs)
         {
             MGR.InitiSelectCharacterButton();
         }
@@ -319,6 +325,7 @@ public class GameManager : MonoBehaviour
         musicMGR.StartStageBGM(mapMGR.GetStageNum());
 
         CurrentCharacterNum = 0;
+        CurrentRobotNum = 0;
         maxTowerNum = mapMGR.GetMaxTowerNum();
         CurrentTowerNum = maxTowerNum;
 
@@ -341,7 +348,7 @@ public class GameManager : MonoBehaviour
     {
         state = State.PauseTheGame;
     }
-    public void StartShowingResults( bool isWin)
+    public void StartShowingResults(bool isWin)
     {
         state = State.ShowingResults;
 
@@ -350,7 +357,7 @@ public class GameManager : MonoBehaviour
 
         if (isWin)
         {
-            int EXPGained = mapMGR.GetEXPOfTheStage() ;
+            int EXPGained = mapMGR.GetEXPOfTheStage();
 
             //経験値を与える
             statusCanvasMGR.EXPRetained += EXPGained;
@@ -368,9 +375,9 @@ public class GameManager : MonoBehaviour
 
         Debug.LogWarning($"StagesClearedNum:{StagesClearedNum}");
         //StagesClearedNumを更新する
-        if (StagesClearedNum < mapMGR.GetStageNum()+1)
+        if (StagesClearedNum < mapMGR.GetStageNum() + 1)
         {
-            StagesClearedNum = mapMGR.GetStageNum()+1;
+            StagesClearedNum = mapMGR.GetStageNum() + 1;
             Debug.LogWarning($"StagesClearedNumを更新して:{StagesClearedNum}　にしました");
 
         }
@@ -421,7 +428,7 @@ public class GameManager : MonoBehaviour
 
         int characterTypeID = IDsOfCharactersInCombat[buttonNum];
 
-        Vector3 displacement = new Vector3(characterDisplacement * (currentCharacterNum%7)-3*characterDisplacement, 0.5f*(characterDisplacement * (currentCharacterNum % 7) - 3 * characterDisplacement), 0); //キャラクターを少しずらす y方向のズレはx方向のズレの0.5倍
+        Vector3 displacement = new Vector3(characterDisplacement * (currentCharacterNum % 7) - 3 * characterDisplacement, 0.5f * (characterDisplacement * (currentCharacterNum % 7) - 3 * characterDisplacement), 0); //キャラクターを少しずらす y方向のズレはx方向のズレの0.5倍
         Debug.Log($"displacement:{displacement}");
 
         GameObject characterGO = Instantiate(characterPrefabs[characterTypeID], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0) + displacement, Quaternion.identity);
@@ -432,10 +439,10 @@ public class GameManager : MonoBehaviour
         energyMGR.CurrentEnergy -= characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCost();
 
         //キャラクターのデータをここで渡す
-        characterMGR.SetCharacterData(buttonNum,characterTypeID);
+        characterMGR.SetCharacterData(buttonNum, characterTypeID);
 
         mapMGR.MultiplySetMapValue(vector, characterID);
-        mapMGR.GetMap().AddUnit(vector,characterMGR);
+        mapMGR.GetMap().AddUnit(vector, characterMGR);
 
         currentCharacterNum++;
 
@@ -444,12 +451,12 @@ public class GameManager : MonoBehaviour
 
 
         float time = 0;
-        while(time < characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCoolTime()) //クールタイムの時間だけ止める
+        while (time < characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCoolTime()) //クールタイムの時間だけ止める
         {
             time += Time.deltaTime * GameManager.instance.gameSpeed;
             selectCharacterButtonMGRs[buttonNum].RefreshGauge(time / characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCoolTime());
 
-            while (GameManager.instance.state == GameManager.State.PauseTheGame){yield return null;} //ポーズ中は止める
+            while (GameManager.instance.state == GameManager.State.PauseTheGame) { yield return null; } //ポーズ中は止める
 
             yield return null;
         }
@@ -471,7 +478,7 @@ public class GameManager : MonoBehaviour
         }
 
         Debug.Log("SpawnRobotCoroutineを実行します");
-        StartCoroutine(SpawnRobotCoroutine(mapMGR.robotSpawnPoss,0));
+        StartCoroutine(SpawnRobotCoroutine(mapMGR.robotSpawnPoss, 0));
 
     }
     private IEnumerator SpawnRobotCoroutine(Vector2Int vector, int robotTypeID)
@@ -527,7 +534,7 @@ public class GameManager : MonoBehaviour
 
     public void InitiManualRouteData()
     {
-        foreach(ManualRouteData m in characterManualRouteDatas)
+        foreach (ManualRouteData m in characterManualRouteDatas)
         {
             m.ResetManualRouteData();
         }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RobotMGR : Unit
 {
-    public void SetCharacterData(int robotTypeID)  
+    public void SetCharacterData(int robotTypeID)
     {
         autoRoute = GameManager.instance.robotAutoRouteDatas[robotTypeID];
         Debug.LogWarning($"autoRoute:{autoRoute}");
@@ -18,6 +18,14 @@ public class RobotMGR : Unit
 
     public override void Die()
     {
-        Debug.Log("Robotがやられました");
+        Debug.Log($"HPが0以下になったので、ロボットを消去します gridPos:{gridPos},transform.pos{transform.position}のロボット");
+
+        GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos, GameManager.instance.robotID); //数値データをを消去する
+        GameManager.instance.CurrentRobotNum--;
+        GameManager.instance.mapMGR.GetMap().RemoveUnit(gridPos, this);
+        //GameManager.instance.mapMGR.GetMap().SetCharacterMGR(gridPos,null); //スクリプトをを消去する
+
+
+        Destroy(this.gameObject);
     }
 }

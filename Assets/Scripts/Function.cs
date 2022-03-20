@@ -314,13 +314,13 @@ public static class Function
             return null;
         }
 
-        return SearchShortestDiagonalRoute(startPos,endPos);
+        return SearchShortestDiagonalRoute(startPos, endPos);
     }
 
     private static List<Vector2Int> ConvertToDiagonalRoute(List<Vector2Int> nonDiagonalRoute)
     {
 
-        for (int i = 0; i<nonDiagonalRoute.Count;i++)
+        for (int i = 0; i < nonDiagonalRoute.Count; i++)
         {
             if (i >= nonDiagonalRoute.Count - 2) break; //nonDiagonalRoute.Count - 3まで判定をする
 
@@ -328,13 +328,13 @@ public static class Function
             Vector2Int nextPos = nonDiagonalRoute[i + 1];
             Vector2Int nextNextPos = nonDiagonalRoute[i + 2];
 
-            if ((((nextPos - gridPos).x == 0 && (nextNextPos - nextPos).y == 0) || ((nextPos - gridPos).y == 0 && (nextNextPos - nextPos).x == 0)) && CanMoveDiagonally(gridPos,nextNextPos))
+            if ((((nextPos - gridPos).x == 0 && (nextNextPos - nextPos).y == 0) || ((nextPos - gridPos).y == 0 && (nextNextPos - nextPos).x == 0)) && CanMoveDiagonally(gridPos, nextNextPos))
             {
                 Debug.Log($"斜め移動が可能なため、nextPos:{nextPos}をnextNextPos:{nextNextPos}で置き換えます gridPos:{gridPos}");
 
                 // nextPos = nextNextPosに対応する
                 nonDiagonalRoute[i + 1] = nonDiagonalRoute[i + 2];
-                nonDiagonalRoute.RemoveAt(i+1);
+                nonDiagonalRoute.RemoveAt(i + 1);
                 i++;
             }
         }
@@ -369,8 +369,8 @@ public static class Function
 
 
 
-    public static bool isWithinTheAttackRange(Vector2Int gridPos, int attackRange, int targetID,out Vector2Int targetPos) //最も近い攻撃対象の座標を返す （存在しないときはVector2Int.zeroを返す）
-    { 
+    public static bool isWithinTheAttackRange(Vector2Int gridPos, int attackRange, int targetID, out Vector2Int targetPos) //最も近い攻撃対象の座標を返す （存在しないときはVector2Int.zeroを返す）
+    {
         //攻撃できるかどうかでもう一度ループを回す必要があるため、攻撃できるかどうかと、最も近いターゲットの座標を取得するのを同時に行っている
 
         int lookingForValue = 1; //索敵範囲の値

@@ -6,13 +6,13 @@ using UnityEngine.UI;
 
 public class MapMGR : MonoBehaviour
 {
-[System.Serializable]
+    [System.Serializable]
     class StageTileArray //インスペクター上でセットできるようにするためにクラスを作る
     {
         [SerializeField] public TileBase[] stageTileArray;
     }
     [SerializeField] Tilemap tilemap;
-    [SerializeField] StageTileArray[]  tileArray;
+    [SerializeField] StageTileArray[] tileArray;
     [SerializeField] int stageNum; //ステージの番号によって使うタイルマップを決める（0からスタート）あと経験値の決定にも使う
 
     MapData map;
@@ -89,7 +89,7 @@ public class MapMGR : MonoBehaviour
     {
         return stageNum;
     }
-    public int GetEXPOfTheStage() 
+    public int GetEXPOfTheStage()
     {
         return EXPOfTheStage[stageNum];
     }
@@ -140,13 +140,13 @@ public class MapMGR : MonoBehaviour
     }
     private void ReSetupMap() //MakeTheFirstRoadで失敗したときに呼ばれる
     {
-        for (int x =0;x<map.Width;x++)
+        for (int x = 0; x < map.Width; x++)
         {
-            for(int y = 0; y < map.Height; y++)
+            for (int y = 0; y < map.Height; y++)
             {
-                if(map.GetValue(x,y) % GameManager.instance.groundID == 0) //MakeTheFirstRoadで作った道を壁に戻す
+                if (map.GetValue(x, y) % GameManager.instance.groundID == 0) //MakeTheFirstRoadで作った道を壁に戻す
                 {
-                    map.SetValue(x, y,GameManager.instance.wallID); //直接値を代入していることに注意
+                    map.SetValue(x, y, GameManager.instance.wallID); //直接値を代入していることに注意
                 }
             }
         }
@@ -180,15 +180,16 @@ public class MapMGR : MonoBehaviour
 
     private void PlaceCastle()
     {
-        if (isFristTimePlaceAllyCastle)
-        {
-            isFristTimePlaceAllyCastle = false;
-            Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x, allysCastlePos.y + 1, 0), Quaternion.identity); //画像の中心が格子点にくるように、+1していることに注意
-        }
+        //if (isFristTimePlaceAllyCastle)
+        //{
+        //    isFristTimePlaceAllyCastle = false;
+        //    Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x, allysCastlePos.y + 1, 0), Quaternion.identity); //画像の中心が格子点にくるように、+1していることに注意
+        //}
 
         //プレイヤーの城を配置
-        GameObject allyCastleGO = Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x, allysCastlePos.y+1, 0), Quaternion.identity);//画像の中心が格子点にくるように、+1していることに注意
+        GameObject allyCastleGO = Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x, allysCastlePos.y + 1, 0), Quaternion.identity);//画像の中心が格子点にくるように、+1していることに注意
         CastleMGR allyCastleMGR = allyCastleGO.GetComponent<CastleMGR>();
+        Debug.LogWarning("allyCastleMGRのIsEnemySideをfalseにします");
 
         map.DivisionalSetValue(allysCastlePos, GameManager.instance.wallID); //城のマスの壁は取り除き、
         map.MultiplySetValue(allysCastlePos, GameManager.instance.groundID); //地面にする
@@ -199,6 +200,7 @@ public class MapMGR : MonoBehaviour
         //敵の城を配置
         GameObject enemyCastleGO = Instantiate(enemysCastlePrefab, new Vector3(enemysCastlePos.x + 1, enemysCastlePos.y, 0), Quaternion.identity);
         CastleMGR enemyCastleMGR = enemyCastleGO.GetComponent<CastleMGR>();
+
 
         map.DivisionalSetValue(enemysCastlePos, GameManager.instance.wallID); //城のマスの壁は取り除き、
         map.MultiplySetValue(enemysCastlePos, GameManager.instance.groundID); //地面にする
@@ -213,7 +215,7 @@ public class MapMGR : MonoBehaviour
     {
         maxTowerNum = 0; //初期化
 
-        for (int y = 0;y< mapHeight;y++)
+        for (int y = 0; y < mapHeight; y++)
         {
             for (int x = 0; x < mapWidth; x++)
             {
@@ -499,7 +501,7 @@ public class MapMGR : MonoBehaviour
             //Debug.Log("エネルギーが足りないので道を作れません");
             return;
         }
-        if(GetMapValue(x,y) / GameManager.instance.wallID != 1) //普通の割り算をしていることに注意
+        if (GetMapValue(x, y) / GameManager.instance.wallID != 1) //普通の割り算をしていることに注意
         {
             //Debug.Log("壁のみのマスでないのでMakeROadByPointerを中断します");
             return;
@@ -508,7 +510,7 @@ public class MapMGR : MonoBehaviour
         {
             GameManager.instance.energyMGR.CurrentEnergy -= GameManager.instance.energyMGR.EnergyToMakeRoad;
         }
-        if (GameManager.instance.state == GameManager.State.MakeTheFirstRoad && map.GetValue(x,y) == GameManager.instance.wallID) //MakeTheFirstRoadの処理
+        if (GameManager.instance.state == GameManager.State.MakeTheFirstRoad && map.GetValue(x, y) == GameManager.instance.wallID) //MakeTheFirstRoadの処理
         {
             numOfFristRoadCounter--;
             //Debug.Log($"numOfFristRoadCounterが{numOfFristRoadCounter}になりました");
@@ -534,7 +536,7 @@ public class MapMGR : MonoBehaviour
             }
         }
 
-        MakeRoad(x,y);
+        MakeRoad(x, y);
 
     }
     public void MakeRoadByTowerDead(int x, int y) //タワーが破壊されたときに呼ぶ
@@ -545,9 +547,9 @@ public class MapMGR : MonoBehaviour
             return;
         }
 
-        MakeRoad(x,y);
+        MakeRoad(x, y);
     }
-    public void MakeRoad(int x , int y)
+    public void MakeRoad(int x, int y)
     {
         Vector2Int vector = new Vector2Int(x, y);
 
@@ -644,14 +646,14 @@ public class MapMGR : MonoBehaviour
 
                 if (IsOutRangeOfMap(inspectPos.x, inspectPos.y)) continue; //map外のマスの判定は飛ばす
 
-                if (map.GetValue(inspectPos.x, inspectPos.y) % GameManager.instance.wallID !=0)
+                if (map.GetValue(inspectPos.x, inspectPos.y) % GameManager.instance.wallID != 0)
                 {
                     adjacentPosList.Add(inspectPos);
                 }
             }
         }
 
-        if(adjacentPosList.Count == 0)
+        if (adjacentPosList.Count == 0)
         {
             Debug.Log("敵の城の周辺に壁のマスしかないためIsReachableはfalseです");
             return false;
@@ -671,7 +673,7 @@ public class MapMGR : MonoBehaviour
                 continue;
             }
 
-            if (Function.SearchShortestNonDiagonalRoute(startPos ,adjacentPos).Count >=(mapWidth-3)+(mapHeight-3)-1) //少なくとも最短場合よりルートが長くなる (-3は城があるところは壁が確定していることに注意)
+            if (Function.SearchShortestNonDiagonalRoute(startPos, adjacentPos).Count >= (mapWidth - 3) + (mapHeight - 3) - 1) //少なくとも最短場合よりルートが長くなる (-3は城があるところは壁が確定していることに注意)
             {
                 result = true;
             }
@@ -704,9 +706,9 @@ public class MapData
         }
         _width = width;
         _height = height;
-        _values = new long [width * height];
+        _values = new long[width * height];
         _Units = new List<Unit>[width * height];
-        for(int i= 0; i < width * height; i++)
+        for (int i = 0; i < width * height; i++)
         {
             _Units[i] = new List<Unit>();
         }
@@ -731,7 +733,7 @@ public class MapData
             Debug.LogError($"IsOutOfRange({x},{y})がtrueです");
             return _outOfRangeValue;
         }
-        if (IsOnTheEdge(x,y))
+        if (IsOnTheEdge(x, y))
         {
             //Debug.Log($"IsOnTheEdge({x},{y})がtrueです");
             return _edgeValue;
@@ -796,7 +798,7 @@ public class MapData
         }
         return _Units[index];
     }
-    public Facility GetFacility(int x,int y)
+    public Facility GetFacility(int x, int y)
     {
         if (IsOutOfDataRange(x, y))
         {
@@ -807,7 +809,7 @@ public class MapData
     }
     public Facility GetFacility(Vector2Int vector)
     {
-        return GetFacility(vector.x,vector.y);
+        return GetFacility(vector.x, vector.y);
     }
     public Facility GetFacility(int index)
     {
@@ -886,7 +888,7 @@ public class MapData
     {
         RemoveUnit(vector.x, vector.y, unit);
     }
-    public void SetFacility(int x, int y ,Facility facility)
+    public void SetFacility(int x, int y, Facility facility)
     {
         if (IsOutOfDataRange(x, y))
         {
@@ -897,7 +899,7 @@ public class MapData
     }
     public void SetFacility(Vector2Int vector, Facility facility)
     {
-        SetFacility(vector.x,vector.y,facility);
+        SetFacility(vector.x, vector.y, facility);
     }
     public void MultiplySetValue(Vector2Int vector, int value)
     {
@@ -923,7 +925,7 @@ public class MapData
             Debug.LogError($"DivisionalSetValue({x},{y})で領域外に値{value}を設定しようとしました");
             return;
         }
-        if (GetValue(x,y)% value !=0)
+        if (GetValue(x, y) % value != 0)
         {
             Debug.LogError($"DivisionalSetValue(vector:{vector},value:{value})で余りが出たため実行できません");
             return;
@@ -963,7 +965,7 @@ public class MapData
         return false;
     }
 
-    bool IsOutOfDataRange(int x,int y) //座標(0,0)～(mapWidht-1,mapHeight-1)のデータが存在する領域の外側
+    bool IsOutOfDataRange(int x, int y) //座標(0,0)～(mapWidht-1,mapHeight-1)のデータが存在する領域の外側
     {
         if (x < 0 || x > _width - 1) { return true; }
         if (y < 0 || y > _height - 1) { return true; }

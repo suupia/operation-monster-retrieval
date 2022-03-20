@@ -12,7 +12,7 @@ public class CurveToMouseMGR : MonoBehaviour
     [SerializeField] List<Image> curvePointerImages;
     private int divisionNum;
 
-    private bool isEditingCurvePointers;
+    private bool isEditingCurvePointers; //CurvePointers‚ğQÆ‚µ‚Ä‚¢‚éŠÔ‚ÍA‘¼‚Ì‚Æ‚±‚ë‚©‚ç‚ÍQÆ‚µ‚È‚¢‚æ‚¤‚É‚·‚é
 
     [SerializeField] private Color pointerColor;
     private bool isIlluminating;

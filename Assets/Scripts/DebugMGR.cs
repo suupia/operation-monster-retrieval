@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class DebugMGR : MonoBehaviour
 {
-    bool isFirstDebugMap=true;
+    bool isFirstDebugMap = true;
     bool isDebuggingMap = false;
 
-    bool isFirstDebugAutoRoute=true;
+    bool isFirstDebugAutoRoute = true;
     bool isDebuggingAutoRoute = false;
 
     bool isFirstDebugCharacterMGR = true;
@@ -152,7 +152,7 @@ public class DebugMGR : MonoBehaviour
         {
             Vector3 textPosition;
 
-           autoRouteTextArray = new Text[GameManager.instance.mapMGR.GetMapSize()];
+            autoRouteTextArray = new Text[GameManager.instance.mapMGR.GetMapSize()];
 
             for (int i = 0; i < GameManager.instance.mapMGR.GetMapSize(); i++)
             {
@@ -161,7 +161,7 @@ public class DebugMGR : MonoBehaviour
                 y = (i - x) / GameManager.instance.mapMGR.GetMapWidth();
 
                 textPosition = new Vector3(x + 0.5f, y + 0.5f, 0);
-                autoRouteTextArray[i] = Instantiate(autoRouteText, textPosition, Quaternion.identity,autoRouteTextParent.transform);
+                autoRouteTextArray[i] = Instantiate(autoRouteText, textPosition, Quaternion.identity, autoRouteTextParent.transform);
                 autoRouteTextArray[i].text = GameManager.instance.characterAutoRouteDatas[0].GetValue(i).ToString();
 
             }
@@ -242,7 +242,7 @@ public class DebugMGR : MonoBehaviour
                 {
                     facilityTextArray[i].text = ""; //null‚Ì‘ã‚í‚è
                 }
-               
+
 
             }
 
@@ -308,9 +308,9 @@ public class DebugMGR : MonoBehaviour
 
     public void MakeEverythingTheWay()
     {
-        for(int y = 0; y < GameManager.instance.mapMGR.GetMapHeight(); y++)
+        for (int y = 0; y < GameManager.instance.mapMGR.GetMapHeight(); y++)
         {
-            for(int x = 0; x < GameManager.instance.mapMGR.GetMapWidth(); x++)
+            for (int x = 0; x < GameManager.instance.mapMGR.GetMapWidth(); x++)
             {
                 GameManager.instance.mapMGR.MakeRoadByPointer(x, y);
             }

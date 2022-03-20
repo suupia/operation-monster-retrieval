@@ -301,6 +301,10 @@ public abstract class Unit : MonoBehaviour
                 March();
                 break;
             case State.InBattle:
+                if (GameManager.instance.state == GameManager.State.ShowingResults) //戦闘が終わったら、攻撃はしない
+                {
+                    return;
+                }
                 Battle();
                 break;
         }
@@ -459,12 +463,17 @@ public abstract class Unit : MonoBehaviour
 
         CheckIfCauseSkill();
 
-        if (Function.isWithinTheAttackRange(gridPos, atkRange, GameManager.instance.towerID, out targetFacilityPos) || Function.isWithinTheAttackRange(gridPos, atkRange, GameManager.instance.enemyCastleID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワー（城を除く）があるとき
+        if (Function.isWithinTheAttackRange(gridPos, atkRange, GameManager.instance.towerID, out targetFacilityPos) || Function.isWithinTheAttackRange(gridPos, atkRange, targetCastleID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワー（城を除く）があるとき
         {
             Debug.Log($"攻撃範囲内にタワーがあるのでInBattleに切り替えます targetFacilityPos:{targetFacilityPos}");
             SetDirection(targetFacilityPos - gridPos);
             state = State.InBattle;
             return;
+        }
+
+        if (targetFacilityPos == Vector2Int.zero)
+        {
+            Debug.LogError($"targetFacilityPosが正しく求められていません");
         }
 
         if (moveAlongWithCounter == routeList.Count - 1)  //ルートの最終地点に到達したら城への攻撃を開始する
@@ -626,5 +635,5 @@ public abstract class Unit : MonoBehaviour
 
 
     public abstract void Die();
-    
+
 }

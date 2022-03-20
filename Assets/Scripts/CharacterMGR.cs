@@ -8,12 +8,12 @@ public class CharacterMGR : Unit
 {
     [SerializeField] CharacterSkillMGR characterSkillMGR;
     [SerializeField] ParticleSystem skillIconParticle;
-    Material skillAuraMaterial; 
+    Material skillAuraMaterial;
 
     [SerializeField] string characterName;
     [SerializeField] int characterTypeID; //キャラクターの種類を識別するために必要
     [SerializeField] int level; //0からスタートすることに注意
-    int maxLevel=9; //最大レベルは10
+    int maxLevel = 9; //最大レベルは10
 
 
     [SerializeField] float coolTime;
@@ -163,7 +163,7 @@ public class CharacterMGR : Unit
         atkRange += atkRangeGrowthRate[level];
         coolTime += coolTimeGrowthRate[level];
 
-        level++;   
+        level++;
 
     }
     new void Start()
@@ -228,4 +228,3 @@ public class CharacterMGR : Unit
         Destroy(this.gameObject);
     }
 }
-

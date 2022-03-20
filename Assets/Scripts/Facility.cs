@@ -7,6 +7,21 @@ public abstract class Facility : MonoBehaviour
 {
     Animator animator;
 
+    [SerializeField]private bool isEnemySide = true; //敵側の施設かどうかを判定するために必要 初期値はインスペクター上で決めておく
+    public bool IsEnemySide //プロパティ
+    {
+        get { return isEnemySide; }
+        set { isEnemySide = value;
+            if (isEnemySide)
+            {
+                targetUnitID = GameManager.instance.characterID;
+            }
+            else
+            {
+                targetUnitID = GameManager.instance.robotID;
+            }
+        }
+    }
     [SerializeField] protected Vector2Int gridPos;
 
     [SerializeField] protected Vector2Int targetCharacterPos;
@@ -30,6 +45,8 @@ public abstract class Facility : MonoBehaviour
     [SerializeField] protected int atk;
     [SerializeField] protected float attackInterval;
     [SerializeField] protected int attackRange;
+
+    protected int targetUnitID; //isEnemySideをもとにして、キャラクターを攻撃するかロボットを攻撃するかどうかを決める
 
     protected bool isAttacking = false;
 
@@ -89,6 +106,15 @@ public abstract class Facility : MonoBehaviour
 
         gridPos = GameManager.instance.ToGridPosition(transform.position);
 
+        if (isEnemySide)
+        {
+            targetUnitID = GameManager.instance.characterID;
+        }
+        else
+        {
+            targetUnitID = GameManager.instance.robotID;
+        }
+
     }
 
     private void Update()
@@ -102,12 +128,17 @@ public abstract class Facility : MonoBehaviour
         {
             return;
         }
+
         switch (state)
         {
             case State.Idle:
                 Idle();
                 break;
             case State.InBattle:
+                if (GameManager.instance.state == GameManager.State.ShowingResults) //戦闘が終わったら、攻撃はしない
+                {
+                    return;
+                }
                 Battle();
                 break;
         }
@@ -117,7 +148,7 @@ public abstract class Facility : MonoBehaviour
     {
         //Debug.Log("FacilityのIdleを実行します");
 
-        if (Function.isWithinTheAttackRange(gridPos,attackRange,GameManager.instance.characterID,out targetCharacterPos))
+        if (Function.isWithinTheAttackRange(gridPos,attackRange,targetUnitID,out targetCharacterPos))
         {
             Debug.Log("攻撃範囲内にキャラクターがいるのでInBatteleに切り替えます");
             targetCharacter = GameManager.instance.mapMGR.GetMap().GetUnitList(targetCharacterPos)[0]; //とりあえず単体攻撃
@@ -136,7 +167,7 @@ public abstract class Facility : MonoBehaviour
 
         }
 
-        if (!Function.isWithinTheAttackRange(gridPos, attackRange, GameManager.instance.characterID, out targetCharacterPos))
+        if (!Function.isWithinTheAttackRange(gridPos, attackRange, targetUnitID, out targetCharacterPos))
         {
             Debug.Log($"キャラクターが攻撃範囲外に出たのでIdleに切り替えます");
             state = State.Idle;
@@ -229,6 +260,7 @@ public abstract class Facility : MonoBehaviour
         cannonballGO.GetComponent<CannonballMGR>().FiringCannonball(gridPos,timeToImpact,targetCharacter);
 
     }
+
     public abstract void Die(); //抽象メソッド
 
 }
