@@ -24,8 +24,8 @@ public class MapMGR : MonoBehaviour
     [SerializeField] GameObject allysCastlePrefab;
     [SerializeField] Vector2Int allysCastlePos;
     [SerializeField] bool isFristTimePlaceAllyCastle = true; //自分の城にはスクリプトがついていないため、Destroyできない　そのため、boolで一回だけ配置されるようにする
-    [SerializeField] Vector2Int[] characterSpawnPossFromCastle;
-    [System.NonSerialized] public Vector2Int[] characterSpawnPoss;
+    [System.NonSerialized] public Vector2Int characterSpawnPoss;
+    [System.NonSerialized] public Vector2Int robotSpawnPoss;
     [SerializeField] GameObject enemysCastlePrefab;
     [SerializeField] Vector2Int enemysCastlePos;
 
@@ -202,16 +202,11 @@ public class MapMGR : MonoBehaviour
 
         map.DivisionalSetValue(enemysCastlePos, GameManager.instance.wallID); //城のマスの壁は取り除き、
         map.MultiplySetValue(enemysCastlePos, GameManager.instance.groundID); //地面にする
-        map.MultiplySetValue(enemysCastlePos, GameManager.instance.castleID); //城の数値データをセット
+        map.MultiplySetValue(enemysCastlePos, GameManager.instance.enemyCastleID); //城の数値データをセット
         map.SetFacility(enemysCastlePos, enemyCastleMGR); //スクリプトをセット
 
-        characterSpawnPoss = new Vector2Int[characterSpawnPossFromCastle.Length];
-        Debug.Log($"characterSpawnPossFromCastle.Length={characterSpawnPossFromCastle.Length}");
-        for (int i = 0; i < characterSpawnPossFromCastle.Length; i++)
-        {
-            characterSpawnPoss[i] = allysCastlePos + characterSpawnPossFromCastle[i];
-            Debug.Log($"characterSpawnPoss[{i}]={allysCastlePos + characterSpawnPossFromCastle[i]}");
-        }
+        characterSpawnPoss = allysCastlePos;
+        robotSpawnPoss = enemysCastlePos;
     }
 
     private void PlaceTower()

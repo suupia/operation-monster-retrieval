@@ -4,6 +4,15 @@ using UnityEngine;
 
 public class RobotMGR : Unit
 {
+    public void SetCharacterData(int robotTypeID)  
+    {
+        autoRoute = GameManager.instance.robotAutoRouteDatas[robotTypeID];
+        Debug.LogWarning($"autoRoute:{autoRoute}");
+    }
+
+
+
+
     protected override void CheckIfCauseSkill() { } //‰½‚àŽÀ‘•‚µ‚È‚¢
 
 

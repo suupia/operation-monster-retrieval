@@ -157,20 +157,20 @@ public class InputMGR : MonoBehaviour
             {
                 isEditingManualRoute = true;
 
-                GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].DestroyPointerTails();
+                GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].DestroyPointerTails();
                 GameManager.instance.curveToMouseMGR.DestroyLineBetweenButtonAndPointer();
             }
             else if (GameManager.instance.pointerMGR.GetIsOnCastle())      //Castleに到達していた場合、そのままRouteを確定する。ここでManualRouteDataにリストを渡す
             {
                 GameManager.instance.pointerMGR.SetFinalManualRoute();
-                GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetManualRoute(GameManager.instance.pointerMGR.GetFinalManualRoute());
-                GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetNonDiagonalManualRoute(GameManager.instance.pointerMGR.GetManualRoute());
-                GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetNonDiagonalPoints(GameManager.instance.pointerMGR.GetNonDiagonalPoints());
+                GameManager.instance.characterManualRouteDatas[GetManualRouteNumber()].SetManualRoute(GameManager.instance.pointerMGR.GetFinalManualRoute());
+                GameManager.instance.characterManualRouteDatas[GetManualRouteNumber()].SetNonDiagonalManualRoute(GameManager.instance.pointerMGR.GetManualRoute());
+                GameManager.instance.characterManualRouteDatas[GetManualRouteNumber()].SetNonDiagonalPoints(GameManager.instance.pointerMGR.GetNonDiagonalPoints());
 
                 Debug.Log($"ルートを決定しました。 \n" +
-                    $"ManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[GetManualRouteNumber()].GetManualRoute())} \n" +
-                    $"NonDiagonalManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[GetManualRouteNumber()].GetNonDiagonalManualRoute())} \n" +
-                    $"NonDiagonalPoints:{string.Join(",", GameManager.instance.manualRouteDatas[GetManualRouteNumber()].GetNonDiagonalPoints())}");
+                    $"ManualRoute:{string.Join(",", GameManager.instance.characterManualRouteDatas[GetManualRouteNumber()].GetManualRoute())} \n" +
+                    $"NonDiagonalManualRoute:{string.Join(",", GameManager.instance.characterManualRouteDatas[GetManualRouteNumber()].GetNonDiagonalManualRoute())} \n" +
+                    $"NonDiagonalPoints:{string.Join(",", GameManager.instance.characterManualRouteDatas[GetManualRouteNumber()].GetNonDiagonalPoints())}");
 
                 manualRouteNumber = -1; //Reset
                 selectedButtonMGR.ResetToNormalColor(); //ButtonのRest

@@ -116,8 +116,8 @@ public class CharacterMGR : Unit
     }
     public void SetCharacterData(int buttonNum, int characterTypeID)  //hpやatkなどの情報もここでセットする。
     {
-        autoRoute = GameManager.instance.autoRouteDatas[buttonNum];
-        manualRoute = GameManager.instance.manualRouteDatas[buttonNum];
+        autoRoute = GameManager.instance.characterAutoRouteDatas[buttonNum];
+        manualRoute = GameManager.instance.characterManualRouteDatas[buttonNum];
 
         level = GameManager.instance.GetCharacterDatabase(characterTypeID).GetLevel();
         maxHp = GameManager.instance.GetCharacterDatabase(characterTypeID).GetMaxHp();

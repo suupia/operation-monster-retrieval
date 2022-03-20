@@ -176,7 +176,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         yield return null;
         GameManager.instance.copyingManualRoute = true;
         GameManager.instance.copyingSelectCharacterButtonNum = buttonNum;
-        GameManager.instance.manualRouteDatas[buttonNum].ShowSelectedManualRoute(); //このButtonに対応するManualRouteをPointerTailで表示する処理を書く
+        GameManager.instance.characterManualRouteDatas[buttonNum].ShowSelectedManualRoute(); //このButtonに対応するManualRouteをPointerTailで表示する処理を書く
         GameManager.instance.curveToMouseMGR.SetCircles(buttonNum);
         GameManager.instance.curveToMouseMGR.StartIlluminatingPointersCroutine();
     }
@@ -197,15 +197,15 @@ public class SelectCharacterButtonMGR : MonoBehaviour
             return;
         }
         //ManualRouteをコピー
-        GameManager.instance.manualRouteDatas[buttonNum].SetManualRoute(GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetManualRoute());
-        GameManager.instance.manualRouteDatas[buttonNum].SetNonDiagonalManualRoute(GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalManualRoute());
-        GameManager.instance.manualRouteDatas[buttonNum].SetNonDiagonalPoints(GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalPoints());
-        Debug.LogWarning($"ManualRouteを{GameManager.instance.copyingSelectCharacterButtonNum}から{buttonNum}へコピーしました\nManualRoute[{buttonNum}]={string.Join(",", GameManager.instance.manualRouteDatas[buttonNum].GetManualRoute())}");
+        GameManager.instance.characterManualRouteDatas[buttonNum].SetManualRoute(GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetManualRoute());
+        GameManager.instance.characterManualRouteDatas[buttonNum].SetNonDiagonalManualRoute(GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalManualRoute());
+        GameManager.instance.characterManualRouteDatas[buttonNum].SetNonDiagonalPoints(GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalPoints());
+        Debug.LogWarning($"ManualRouteを{GameManager.instance.copyingSelectCharacterButtonNum}から{buttonNum}へコピーしました\nManualRoute[{buttonNum}]={string.Join(",", GameManager.instance.characterManualRouteDatas[buttonNum].GetManualRoute())}");
 
         //Paste時にコピー元の選択を外す
         GameManager.instance.selectCharacterButtonMGRs[GameManager.instance.copyingSelectCharacterButtonNum].ResetToNormalColor();
         //pointerTailを消す
-        GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].DestroyPointerTails();
+        GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].DestroyPointerTails();
         //CurvePointerを消す
         GameManager.instance.curveToMouseMGR.DestroyLineBetweenButtonAndPointer();
     }

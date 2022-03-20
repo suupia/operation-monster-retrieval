@@ -63,9 +63,9 @@ public class PointerTailMGR : MonoBehaviour
         }
         else　if (GameManager.instance.copyingManualRoute) //ManualRouteコピー中に呼ばれたとき
         {
-            pointerTails = GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetPointerTails();
+            pointerTails = GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetPointerTails();
             pointerTailIndex = pointerTails.IndexOf(gameObject);    //pointerTailsにPointeTailが順番に仕舞われているので、Indexを取得しておく
-            subjectRoute = GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalManualRoute();
+            subjectRoute = GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalManualRoute();
 
             //色を少し透明にする
             noChangedColor.a *= 0.5f;
@@ -124,7 +124,7 @@ public class PointerTailMGR : MonoBehaviour
         }
         else if (GameManager.instance.copyingManualRoute)
         {
-            if (subjectRoute.Count >= pointerTailIndex + 2 && GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetPointerTails().Count > pointerTailIndex + 1) pointerTailExistAfterThis = true;
+            if (subjectRoute.Count >= pointerTailIndex + 2 && GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetPointerTails().Count > pointerTailIndex + 1) pointerTailExistAfterThis = true;
         }
 
         if (pointerTailExistAfterThis)       //pointerTailがこれ自身の後ろに存在する場合の処理

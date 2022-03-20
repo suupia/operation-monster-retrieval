@@ -287,7 +287,7 @@ public static class Function
         Vector2Int castlePos = GameManager.instance.mapMGR.GetEnemysCastlePos();
         Vector2Int endPos = Vector2Int.zero;
 
-        if (GameManager.instance.mapMGR.GetMapValue(castlePos) % GameManager.instance.castleID != 0)
+        if (GameManager.instance.mapMGR.GetMapValue(castlePos) % GameManager.instance.enemyCastleID != 0)
         {
             Debug.LogWarning("SearchShortestRouteToCastle‚ÌendPos‚Éfacility‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚¹‚ñ");
             return null;

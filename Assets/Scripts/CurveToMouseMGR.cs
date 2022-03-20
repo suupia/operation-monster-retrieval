@@ -16,8 +16,7 @@ public class CurveToMouseMGR : MonoBehaviour
 
     [SerializeField] private Color pointerColor;
     private bool isIlluminating;
-    private Coroutine illuminatingPointerCroutine; //StopCoroutine‚Ìˆø”‚É‚·‚é 
-
+    private Coroutine illuminatingPointerCroutine; //StopCoroutine‚Ìˆø”‚É‚·‚é Pointer‚ğÁ‚·‚Æ‚«‚ÉIlluminatePointersCoroutine‚ğStop‚·‚é
     private Quaternion pointerAngle; //Curve()“à‚ÅA—^‚¦‚ç‚ê‚½xÀ•W‚É‚¨‚¯‚éÚü‚ÌŒX‚«‚ğ‘ã“ü‚·‚é
 
     private void Start()
@@ -150,7 +149,7 @@ public class CurveToMouseMGR : MonoBehaviour
         DestroyLineBetweenButtonAndPointer();
         if (GameManager.instance.copyingSelectCharacterButtonNum != -1)
         {
-            GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].DestroyPointerTails();
+            GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].DestroyPointerTails();
             GameManager.instance.copyingManualRoute = false;
             GameManager.instance.copyingSelectCharacterButtonNum = -1;
         }

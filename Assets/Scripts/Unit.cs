@@ -12,6 +12,7 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] protected Vector2Int gridPos;
 
     [SerializeField] protected Vector2Int targetCastlePos;
+    protected int targetCastleID; //キャラクターとロボットで標的の城のIDが違う
     [SerializeField] protected Vector2Int targetFacilityPos;
     [SerializeField] protected Vector2Int directionVectorToTarget;
     [SerializeField] protected Facility targetFacility;
@@ -262,7 +263,17 @@ public abstract class Unit : MonoBehaviour
         gridPos = GameManager.instance.ToGridPosition(transform.position);
         state = State.Marching;
 
-        targetCastlePos = GameManager.instance.mapMGR.GetEnemysCastlePos();
+        if (this is CharacterMGR)
+        {
+            targetCastlePos = GameManager.instance.mapMGR.GetEnemysCastlePos();
+            targetCastleID = GameManager.instance.enemyCastleID;
+        }
+        else
+        {
+            targetCastlePos = GameManager.instance.mapMGR.GetAllysCastlePos();
+            targetCastleID = GameManager.instance.allyCastleID;
+
+        }
 
         //敵のタイプに分けてrouteListの初期化を変える(とりあえず、SetAutoRouteだけにしておく)
         SetAutoRoute();
@@ -400,21 +411,40 @@ public abstract class Unit : MonoBehaviour
     private void MoveData(Vector2Int directionVector)
     {
 
-        if (!(GameManager.instance.mapMGR.GetMapValue(gridPos) % GameManager.instance.characterID == 0))
+        if (this is CharacterMGR)
         {
-            Debug.LogError("MoveDateで移動前のmapValueにcharacterIDが含まれていません");
-            return;
+            //CharacterMGRのとき
+            if (!(GameManager.instance.mapMGR.GetMapValue(gridPos) % GameManager.instance.characterID == 0))
+            {
+                Debug.LogError("MoveDateで移動前のmapValueにcharacterIDが含まれていません");
+                return;
+            }
+
+            //数値データの移動
+            GameManager.instance.mapMGR.DivisionalSetMapValue(gridPos, GameManager.instance.characterID);
+            GameManager.instance.mapMGR.MultiplySetMapValue(gridPos + directionVector, GameManager.instance.characterID);
+
+            //スクリプトの移動
+            GameManager.instance.mapMGR.GetMap().RemoveUnit(gridPos, this);
+            GameManager.instance.mapMGR.GetMap().AddUnit(gridPos + directionVector, this.gameObject.GetComponent<CharacterMGR>());
         }
+        else
+        {
+            //RobotMGRのとき
+            if (!(GameManager.instance.mapMGR.GetMapValue(gridPos) % GameManager.instance.robotID == 0))
+            {
+                Debug.LogError("MoveDateで移動前のmapValueにrobotIDが含まれていません");
+                return;
+            }
 
-        //数値データの移動
-        GameManager.instance.mapMGR.DivisionalSetMapValue(gridPos, GameManager.instance.characterID);
-        GameManager.instance.mapMGR.MultiplySetMapValue(gridPos + directionVector, GameManager.instance.characterID);
+            //数値データの移動
+            GameManager.instance.mapMGR.DivisionalSetMapValue(gridPos, GameManager.instance.robotID);
+            GameManager.instance.mapMGR.MultiplySetMapValue(gridPos + directionVector, GameManager.instance.robotID);
 
-        //スクリプトの移動
-        GameManager.instance.mapMGR.GetMap().RemoveUnit(gridPos, this);
-        GameManager.instance.mapMGR.GetMap().AddUnit(gridPos + directionVector, this.gameObject.GetComponent<CharacterMGR>());
-
-
+            //スクリプトの移動
+            GameManager.instance.mapMGR.GetMap().RemoveUnit(gridPos, this);
+            GameManager.instance.mapMGR.GetMap().AddUnit(gridPos + directionVector, this.gameObject.GetComponent<RobotMGR>());
+        }
 
         //gridPosを移動させる。これは最後に行うことに注意！
         gridPos += directionVector;
@@ -429,7 +459,7 @@ public abstract class Unit : MonoBehaviour
 
         CheckIfCauseSkill();
 
-        if (Function.isWithinTheAttackRange(gridPos, atkRange, GameManager.instance.towerID, out targetFacilityPos) || Function.isWithinTheAttackRange(gridPos, atkRange, GameManager.instance.castleID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワー（城を除く）があるとき
+        if (Function.isWithinTheAttackRange(gridPos, atkRange, GameManager.instance.towerID, out targetFacilityPos) || Function.isWithinTheAttackRange(gridPos, atkRange, GameManager.instance.enemyCastleID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワー（城を除く）があるとき
         {
             Debug.Log($"攻撃範囲内にタワーがあるのでInBattleに切り替えます targetFacilityPos:{targetFacilityPos}");
             SetDirection(targetFacilityPos - gridPos);

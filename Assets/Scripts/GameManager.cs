@@ -56,11 +56,14 @@ public class GameManager : MonoBehaviour
 
 
     int maxCharacterNum=50; //フィールドに出せるキャラクターの最大数 characterIDが11の時は23体まで出せ、characterIDが2の時は50体出しても問題ない。　とりあえず、にゃんこ大戦争と同じように50にしておく
+    int maxRobotNum = 30;   //30は適当な数字
     public int MaxCharacterNum //Getterのみ
     {
         get { return maxCharacterNum; }
     }
     [SerializeField] int currentCharacterNum = 0; //フィールド上にいるキャラクターの数 キャラクターをずらすのと、場に出せる上限を決めるために必要（デバッグ用にSerializeFieldにしている）
+    [SerializeField] int currentRobotNum = 0; //フィールド上にいるロボットの数 ロボットをずらすのと、場に出せる上限を決めるために必要（デバッグ用にSerializeFieldにしている）
+
     public int CurrentCharacterNum
     {
         get { return currentCharacterNum; }
@@ -116,18 +119,21 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] AutoRouteData autoRouteData; //インスペクター上でセットする
     [SerializeField] ManualRouteData manualRouteData; //インスペクター上でセットする
-    public AutoRouteData[] autoRouteDatas;
-    public ManualRouteData[] manualRouteDatas;
+    public AutoRouteData[] characterAutoRouteDatas;
+    public ManualRouteData[] characterManualRouteDatas;
+    public AutoRouteData[] robotAutoRouteDatas;
 
 
-    public readonly int wallID = 3;
+    public readonly int wallID = 5;
     public readonly int groundID = 11;
-    public readonly int towerID = 5;
+    public readonly int towerID = 7;
     public readonly int allyCastleID = 13;
-    public readonly int castleID = 7;
+    public readonly int enemyCastleID = 17;
     public readonly int characterID = 2;
+    public readonly int robotID = 3;
 
-    public GameObject[] characterPrefabs; 
+    public GameObject[] characterPrefabs;
+    public GameObject[] robotPrefabs;
     CharacterMGR[] characterDatabase; //上のchraracterPrefabsをCharacter型に直したもの。データベースとして使う。
 
     int dragNum; //ドラッグした番号を保持しておくために必要
@@ -234,8 +240,19 @@ public class GameManager : MonoBehaviour
             isSpawnCharacterArray[i] = false;
         }
 
-        autoRouteDatas = new AutoRouteData[numOfCharacterInCombat];
-        manualRouteDatas = new ManualRouteData[numOfCharacterInCombat];
+        characterAutoRouteDatas = new AutoRouteData[numOfCharacterInCombat];
+        characterManualRouteDatas = new ManualRouteData[numOfCharacterInCombat];
+        robotAutoRouteDatas = new AutoRouteData[robotPrefabs.Length];
+
+        for (int i = 0; i < numOfCharacterInCombat; i++)
+        {
+            characterAutoRouteDatas[i] = new AutoRouteData(mapMGR.GetMapWidth(), mapMGR.GetMapHeight());
+            characterManualRouteDatas[i] = new ManualRouteData(); //今はmanualRouteDataがない
+        }
+        for (int i = 0; i< robotPrefabs.Length; i++)
+        {
+            robotAutoRouteDatas[i] = new AutoRouteData(mapMGR.GetMapWidth(), mapMGR.GetMapHeight());
+        }
 
         characterDatabase = new CharacterMGR[characterPrefabs.Length];
         for (int i = 0; i < characterPrefabs.Length; i++)
@@ -254,11 +271,7 @@ public class GameManager : MonoBehaviour
             characterMode[i] = CharacterMGR.Mode.Auto; //デフォルトはAutoMode
         }
 
-        for (int i = 0; i < numOfCharacterInCombat; i++)
-        {
-            autoRouteDatas[i] = new AutoRouteData(mapMGR.GetMapWidth(), mapMGR.GetMapHeight());
-            manualRouteDatas[i] = new ManualRouteData(); //今はmanualRouteDataがない
-        }
+
 
         StagesClearedNum = saveMGR.GetStagesCleardNum();
 
@@ -378,30 +391,29 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
-        for (int i = 0; i < mapMGR.characterSpawnPoss.Length; i++) //characterSpawnPossが1つしかないので、forループに意味はない
+
+        if (mapMGR.GetMapValue(mapMGR.characterSpawnPoss) % GameManager.instance.groundID != 0)
         {
-
-            if (mapMGR.GetMapValue(mapMGR.characterSpawnPoss[i]) % GameManager.instance.groundID != 0)
-            {
-                Debug.Log($"{mapMGR.characterSpawnPoss[i]}のmapValueにgroundIDが含まれないため、モンスターをスポーンできません。");
-                return;
-            }
-            if (energyMGR.CurrentEnergy < characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCost())
-            {
-                Debug.Log($"Energyが足りないためモンスターをスポーンできません。（energyMGR.CurrentEnergy :{energyMGR.CurrentEnergy},Cost:{characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCost()}）");
-                return;
-            }
-            if (currentCharacterNum >= maxCharacterNum)
-            {
-                Debug.Log($"currentCharacterNum:{currentCharacterNum}がmaxCharacterNum:{maxCharacterNum}以上であるため、スポーンできません");
-                return;
-            }
-
-            Debug.Log("SpawnCharacterCoroutineを実行します");
-            StartCoroutine(SpawnCharacterCoroutine(mapMGR.characterSpawnPoss[i], buttonNum));
-
+            Debug.Log($"{mapMGR.characterSpawnPoss}のmapValueにgroundIDが含まれないため、モンスターをスポーンできません。");
+            return;
         }
+        if (energyMGR.CurrentEnergy < characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCost())
+        {
+            Debug.Log($"Energyが足りないためモンスターをスポーンできません。（energyMGR.CurrentEnergy :{energyMGR.CurrentEnergy},Cost:{characterDatabase[IDsOfCharactersInCombat[buttonNum]].GetCost()}）");
+            return;
+        }
+        if (currentCharacterNum >= maxCharacterNum)
+        {
+            Debug.Log($"currentCharacterNum:{currentCharacterNum}がmaxCharacterNum:{maxCharacterNum}以上であるため、スポーンできません");
+            return;
+        }
+
+        Debug.Log("SpawnCharacterCoroutineを実行します");
+        StartCoroutine(SpawnCharacterCoroutine(mapMGR.characterSpawnPoss, buttonNum));
+
+
     }
+
 
     private IEnumerator SpawnCharacterCoroutine(Vector2Int vector, int buttonNum)
     {
@@ -444,7 +456,59 @@ public class GameManager : MonoBehaviour
 
         isSpawnCharacterArray[buttonNum] = false;
     }
+    public void SpawnRobot()
+    {
+        if (mapMGR.GetMapValue(mapMGR.robotSpawnPoss) % GameManager.instance.groundID != 0)
+        {
+            Debug.Log($"{mapMGR.robotSpawnPoss}のmapValueにgroundIDが含まれないため、ロボットをスポーンできません。");
+            return;
+        }
 
+        if (currentRobotNum >= maxRobotNum)
+        {
+            Debug.Log($"currentRobotNum:{currentRobotNum}がmaxRobotNum:{maxRobotNum}以上であるため、スポーンできません");
+            return;
+        }
+
+        Debug.Log("SpawnRobotCoroutineを実行します");
+        StartCoroutine(SpawnRobotCoroutine(mapMGR.robotSpawnPoss,0));
+
+    }
+    private IEnumerator SpawnRobotCoroutine(Vector2Int vector, int robotTypeID)
+    {
+
+        Vector3 displacement = new Vector3(characterDisplacement * (currentRobotNum % 7) - 3 * characterDisplacement, 0.5f * (characterDisplacement * (currentRobotNum % 7) - 3 * characterDisplacement), 0); //ロボットを少しずらす y方向のズレはx方向のズレの0.5倍
+        Debug.Log($"displacement:{displacement}");
+
+        GameObject robotGO = Instantiate(robotPrefabs[robotTypeID], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0) + displacement, Quaternion.identity);
+
+        RobotMGR robotMGR = robotGO.GetComponent<RobotMGR>();
+
+
+
+        //ロボットのautoRoteを初期化する
+        robotMGR.SetCharacterData(robotTypeID);
+
+        mapMGR.MultiplySetMapValue(vector, robotID);
+        mapMGR.GetMap().AddUnit(vector, robotMGR);
+
+        currentRobotNum++;
+
+        //クールタイムの処理はとりあえずコメントアウト
+        //float time = 0;
+        //while (time < characterDatabase[IDsOfCharactersInCombat[robotTypeNum]].GetCoolTime()) //クールタイムの時間だけ止める
+        //{
+        //    time += Time.deltaTime * GameManager.instance.gameSpeed;
+        //    selectCharacterButtonMGRs[robotTypeNum].RefreshGauge(time / characterDatabase[IDsOfCharactersInCombat[robotTypeNum]].GetCoolTime());
+
+        //    while (GameManager.instance.state == GameManager.State.PauseTheGame) { yield return null; } //ポーズ中は止める
+
+        //    yield return null;
+        //}
+
+        yield return new WaitForSeconds(0); ; //何も返さないとまずいので適当な戻り値を返す
+
+    }
     public void DragCharacterData(int dragNum)
     {
         this.dragNum = dragNum;
@@ -463,7 +527,7 @@ public class GameManager : MonoBehaviour
 
     public void InitiManualRouteData()
     {
-        foreach(ManualRouteData m in manualRouteDatas)
+        foreach(ManualRouteData m in characterManualRouteDatas)
         {
             m.ResetManualRouteData();
         }
