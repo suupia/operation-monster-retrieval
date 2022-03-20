@@ -62,23 +62,23 @@ public class MusicMGR : MonoBehaviour
 
     public void StartStageBGM(int index)
     {
-        if (atomExPlayer == null)
-        {
-            Debug.LogError($"atomExPlayerがインスタンス化されていません");
-            return;
-        }
+        //if (atomExPlayer == null)
+        //{
+        //    Debug.LogError($"atomExPlayerがインスタンス化されていません");
+        //    return;
+        //}
 
-        if (atomExPlayer.GetStatus() == CriAtomExPlayer.Status.Stop)
-        {
-            //プレイヤーにStageBGMシートのキューを設定
-            atomExPlayer.SetCue(atomExStageBGMAcb, stageBGMCueInfoList[index].name);
-            //再生
-            atomExPlayer.Start();
-        }
-        else
-        {
-            Debug.LogError($"atomExPlayer.GetStatus()の状態が[Stop]でありません　atomExPlayer.GetStatus():{atomExPlayer.GetStatus()}");
-        }
+        //if (atomExPlayer.GetStatus() == CriAtomExPlayer.Status.Stop)
+        //{
+        //    //プレイヤーにStageBGMシートのキューを設定
+        //    atomExPlayer.SetCue(atomExStageBGMAcb, stageBGMCueInfoList[index].name);
+        //    //再生
+        //    atomExPlayer.Start();
+        //}
+        //else
+        //{
+        //    Debug.LogError($"atomExPlayer.GetStatus()の状態が[Stop]でありません　atomExPlayer.GetStatus():{atomExPlayer.GetStatus()}");
+        //}
 
     }
 

@@ -73,7 +73,7 @@ public abstract class Facility : MonoBehaviour
             if (hp <=0 && isAlive)
             {
                 isAlive = false; //すぐにfalseにして、Die()が2回以上呼ばれないようにする
-                Die();
+                Defeated();
             }
 
         }
@@ -231,6 +231,6 @@ public abstract class Facility : MonoBehaviour
         cannonballGO.GetComponent<CannonballMGR>().FiringCannonball(gridPos,timeToImpact,targetCharacter);
 
     }
-    public abstract void Die(); //抽象メソッド
+    public abstract void Defeated(); //抽象メソッド
 
 }

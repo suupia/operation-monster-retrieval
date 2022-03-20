@@ -22,6 +22,12 @@ public class TowerMGR : Facility
         DiagRightBack,
         DiagLeftBack
     }
+    private enum State
+    {
+        neutral,
+        allay,
+        enemy
+    }
     new void Start() //オーバーライド
     {
         base.Start();
@@ -100,7 +106,7 @@ public class TowerMGR : Facility
         }
     }
 
-    public　override void Die()
+    public　override void Defeated()
     {
         //Debug.Log($"HPが0以下になったので、タワーを破壊します gridPos:{gridPos}のタワー");
         

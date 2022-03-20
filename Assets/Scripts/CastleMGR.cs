@@ -24,7 +24,7 @@ public class CastleMGR : Facility
 
             if (hp <= 0)
             {
-                Die();
+                Defeated();
             }
 
         }
@@ -34,7 +34,7 @@ public class CastleMGR : Facility
     {
         //Castle‚ÍŒü‚«‚ð•Ï‚¦‚é‚±‚Æ‚Í‚È‚¢
     }
-    public override void Die()
+    public override void Defeated()
     {
 
         Debug.Log($"HP‚ª0ˆÈ‰º‚É‚È‚Á‚½‚Ì‚ÅAé‚ð”j‰ó‚µ‚Ü‚· gridPos:{gridPos}‚Ìé");
