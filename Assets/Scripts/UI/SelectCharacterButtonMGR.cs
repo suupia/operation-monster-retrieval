@@ -26,7 +26,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
     [SerializeField] Color autoModeColor;
 
     //以下、ManualRoute用の変数
-   [SerializeField] bool isEditingManualRoute;
+    [SerializeField] bool isEditingManualRoute;
     [SerializeField] Color selectedColor;
     Color notSelectedColor;
     [SerializeField] GameObject skillCanvas;
@@ -149,6 +149,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
             {
                 //Debug.Log("SetToSelectedColorを実行します");
                 SetToSelectedColor();
+                StartCopyingManualRoute();
             }
             else //このbuttonが選択されている状態で、このbuttonがクリックされたとき
             {
@@ -159,6 +160,64 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         }
 
     }
+
+    public void StartCopyingManualRoute() //PointerDownで呼ぶ
+    {
+        if (!Input.GetMouseButtonDown(1)) return; //右クリックのときだけ処理を行う
+
+        Debug.LogWarning($"ManualRouteのコピーを開始しました buttonNum={buttonNum}");
+        GameManager.instance.copyingSelectCharacterButtonNum = buttonNum; //DropしたButtonにこのbuttonNumを渡す必要があるので、GameManagerを経由する
+        GameManager.instance.copyingManualRoute = true;
+        StartCoroutine(LateStartCoyingManualRoute());
+    }
+
+    private IEnumerator LateStartCoyingManualRoute() //InputMGRとの兼ね合いで、一フレーム遅らせる
+    {
+        yield return null;
+        GameManager.instance.copyingManualRoute = true;
+        GameManager.instance.copyingSelectCharacterButtonNum = buttonNum;
+        GameManager.instance.manualRouteDatas[buttonNum].ShowSelectedManualRoute(); //このButtonに対応するManualRouteをPointerTailで表示する処理を書く
+    }
+
+    public void ShowLineBetweenButtonAndPointer() //EventTrigger Dragで呼ぶ
+    {
+        if (!GameManager.instance.copyingManualRoute) return;
+
+        GameManager.instance.curveToMouseMGR.SetCircles(buttonNum);
+    }
+
+    
+    public void PasteManualRoute()
+    {
+        if (GameManager.instance.copyingSelectCharacterButtonNum == buttonNum) return;
+        if(GameManager.instance.copyingSelectCharacterButtonNum < 0 || GameManager.instance.copyingSelectCharacterButtonNum > 3) //IndexOutOfRange
+        {
+            return;
+        }
+        //ManualRouteをコピー
+        GameManager.instance.manualRouteDatas[buttonNum].SetManualRoute(GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetManualRoute());
+        GameManager.instance.manualRouteDatas[buttonNum].SetNonDiagonalManualRoute(GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalManualRoute());
+        GameManager.instance.manualRouteDatas[buttonNum].SetNonDiagonalPoints(GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalPoints());
+        Debug.LogWarning($"ManualRouteを{GameManager.instance.copyingSelectCharacterButtonNum}から{buttonNum}へコピーしました\nManualRoute[{buttonNum}]={string.Join(",", GameManager.instance.manualRouteDatas[buttonNum].GetManualRoute())}");
+
+        //Paste時にコピー元の選択を外す
+        GameManager.instance.selectCharacterButtonMGRs[GameManager.instance.copyingSelectCharacterButtonNum].ResetToNormalColor();
+        //pointerTailを消す
+        GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].DestroyPointerTails();
+        //CurvePointerを消す
+        GameManager.instance.curveToMouseMGR.DestroyLineBetweenButtonAndPointer();
+    }
+
+    public void PointerEnter()
+    {
+        GameManager.instance.mouseEnteredSelectCharacterButtonNum = buttonNum;
+    }
+
+    public void PointerExit()
+    {
+        GameManager.instance.mouseEnteredSelectCharacterButtonNum = -1;
+    }
+
 
     public void SwitchMode() //ModeSwitchButtonのEventTriggerで呼ぶ
     {
@@ -209,6 +268,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
 
         Debug.Log($"ManualRouteのキャラクタ―選択を解除しました number={GameManager.instance.inputMGR.GetManualRouteNumber()}");
         GameManager.instance.inputMGR.SetManualRouteNumber(-1);       //InputMGRでのManualRouteの選択を外す
+        GameManager.instance.inputMGR.isEditingManualRoute = false; 
     }
 
     private void OpenSkillCanvas() //ManualMode編集時にそのキャラクターのスキルを表示する

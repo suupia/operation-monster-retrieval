@@ -19,10 +19,11 @@ public class InputMGR : MonoBehaviour
 
     [SerializeField] DraggedCharacterThumbnail draggedCharacterThumbnail; //インスペクター上でセットする（SetActiveをfalseにしているため、ここで参照を保持しておく）
 
+    public bool isEditingManualRoute;
     Vector2 mousePos;
     Vector2Int mouseGridPos;
 
-    private int manualRouteNumber = -1; //何も選択していないときは-1にしておく
+    [SerializeField] private int manualRouteNumber = -1; //何も選択していないときは-1にしておく
     private SelectCharacterButtonMGR selectedButtonMGR; //Buttonが選択されたときにそのButtonのスクリプトのインスタンスを受け取る
 
 
@@ -49,6 +50,7 @@ public class InputMGR : MonoBehaviour
     {
         return selectedButtonMGR;
     }
+
     void Update()
     {
         if (GameManager.instance.state == GameManager.State.MakeTheFirstRoad) //MakeTheFirstRoadのとき、プレイヤーが指定された個数だけ道を作る
@@ -141,20 +143,54 @@ public class InputMGR : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             rightTouchFlag = true;
+
+            GameManager.instance.copyingManualRoute = false; //PointerDownしたときは常にリセットする
+            GameManager.instance.copyingSelectCharacterButtonNum = -1; //PointerDownしたときは常にリセットする
         }
         if (Input.GetMouseButtonUp(1))     //Pointerの初期化
         {
+            if (manualRouteNumber == -1)
+            {
+                Debug.Log($"Characterを選択してください manualRouteNumber={manualRouteNumber}");
+            }
+            else if(!isEditingManualRoute) //Buttonを選択して最初にPointerUpするまではPointerを動かせないようにしておく
+            {
+                isEditingManualRoute = true;
 
-            if (GameManager.instance.pointerMGR.GetIsOnCastle())      //Castleに到達していた場合、Routeを確定する。ここでManualRouteDataにリストを渡す
+                GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].DestroyPointerTails();
+                GameManager.instance.curveToMouseMGR.DestroyLineBetweenButtonAndPointer();
+            }
+            else if (GameManager.instance.pointerMGR.GetIsOnCastle())      //Castleに到達していた場合、そのままRouteを確定する。ここでManualRouteDataにリストを渡す
             {
                 GameManager.instance.pointerMGR.SetFinalManualRoute();
                 GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetManualRoute(GameManager.instance.pointerMGR.GetFinalManualRoute());
-                GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetNonDiaonalPoints(GameManager.instance.pointerMGR.GetNonDiagonalPoints());
-                Debug.LogWarning($"ルートを決定しました。 \n" +
+                GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetNonDiagonalManualRoute(GameManager.instance.pointerMGR.GetManualRoute());
+                GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetNonDiagonalPoints(GameManager.instance.pointerMGR.GetNonDiagonalPoints());
+
+                Debug.Log($"ルートを決定しました。 \n" +
                     $"ManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[GetManualRouteNumber()].GetManualRoute())} \n" +
+                    $"NonDiagonalManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[GetManualRouteNumber()].GetNonDiagonalManualRoute())} \n" +
                     $"NonDiagonalPoints:{string.Join(",", GameManager.instance.manualRouteDatas[GetManualRouteNumber()].GetNonDiagonalPoints())}");
+
                 manualRouteNumber = -1; //Reset
                 selectedButtonMGR.ResetToNormalColor(); //ButtonのRest
+            }
+            else //Castleに到達していない場合、Routeを補完してからRouteを確定する
+            {
+                //GameManager.instance.pointerMGR.ComplementManualRoute(GameManager.instance.mapMGR.GetEnemysCastlePos());
+                //GameManager.instance.pointerMGR.SetFinalManualRoute();
+                //GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetManualRoute(GameManager.instance.pointerMGR.GetFinalManualRoute());
+                //GameManager.instance.manualRouteDatas[GetManualRouteNumber()].SetNonDiaonalPoints(GameManager.instance.pointerMGR.GetNonDiagonalPoints());
+                //Debug.LogWarning($"ルートを決定しました。 \n" +
+                //    $"ManualRoute:{string.Join(",", GameManager.instance.manualRouteDatas[GetManualRouteNumber()].GetManualRoute())} \n" +
+                //    $"NonDiagonalPoints:{string.Join(",", GameManager.instance.manualRouteDatas[GetManualRouteNumber()].GetNonDiagonalPoints())}");
+                //manualRouteNumber = -1; //Reset
+                //selectedButtonMGR.ResetToNormalColor(); //ButtonのRest
+            }
+
+            if (GameManager.instance.copyingManualRoute) //ManualRouteのコピー中にPointerUpした時の処理
+            {
+                GameManager.instance.copyingManualRoute = false;
             }
             rightTouchFlag = false;
             GameManager.instance.pointerMGR.ResetPointer();
@@ -176,16 +212,18 @@ public class InputMGR : MonoBehaviour
         {
             if (manualRouteNumber == -1)
             {
-                Debug.LogWarning($"Characterを選択してください manualRouteNumber={manualRouteNumber}");
+                //Debug.LogWarning($"Characterを選択してください manualRouteNumber={manualRouteNumber}");
             }
-            else
+            else if (isEditingManualRoute)
             {
-                mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-                mouseGridPos = GameManager.instance.ToGridPosition(mousePos);
-                //Debug.Log($"mousePosは{mousePos}");
-                Debug.Log($"mouseGridPosは{mouseGridPos}");
+                if (!GameManager.instance.pointerMGR.inComplementingManualRoute) 
+                {
+                    mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                    mouseGridPos = GameManager.instance.ToGridPosition(mousePos);
+                    //Debug.Log($"mouseGridPosは{mouseGridPos}");
 
-                GameManager.instance.pointerMGR.MoveByMouse(mouseGridPos);
+                    GameManager.instance.pointerMGR.MoveByMouse(mouseGridPos);
+                }
             }
         }
 

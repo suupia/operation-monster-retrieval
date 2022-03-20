@@ -99,8 +99,9 @@ public class DebugMGR : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.F7))
         {
-            var shortestRoute = Function.SearchShortestRoute(GameManager.instance.mapMGR.GetMapWidth(), GameManager.instance.mapMGR.GetMapHeight(), new Vector2Int(1,3), new Vector2Int(3,3)) ;
-            Debug.LogWarning($" Function.SearchShortestRoute={string.Join(",", shortestRoute)}");
+            //var shortestRoute = Function.SearchShortestRouteToCastle(new Vector2Int(1,3)) ;
+            //Debug.LogWarning($" Function.SearchShortestRouteToCastle={string.Join(",", shortestRoute)}");
+            //DebugRoute(shortestRoute);
 
         }
 
@@ -264,6 +265,46 @@ public class DebugMGR : MonoBehaviour
                     facilityTextArray[i].text = ""; //nullの代わり
                 }
             }
+        }
+    }
+    public void DebugRoute(List<Vector2Int> routeList)
+    {
+        int width = GameManager.instance.mapMGR.GetMapWidth();
+        int height = GameManager.instance.mapMGR.GetMapHeight();
+        string debugresultRouteCell = "";
+        int routeLength = routeList.Count;
+        int[] values = new int[width * height];
+
+        //-1で初期化
+        for (int i = 0; i < values.Length; i++)
+        {
+            values[i] = -1;
+        }
+
+        //ルートの順番どおりにvaluesに数字を入れていく
+        for (int i = 0; i < routeList.Count; i++)
+        {
+            values[ToSubscript(routeList[i].x, routeList[i].y)] = i;
+        }
+
+        //valuesを表のように出力する
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                debugresultRouteCell += $"{values[ToSubscript(x, height - y - 1)]}".PadRight(3) + ",";
+            }
+            debugresultRouteCell += "\n";
+        }
+        Debug.Log($"DebugRouteの結果は\n{debugresultRouteCell}");
+
+
+        //以下ローカル関数
+
+        //添え字を変換する
+        int ToSubscript(int x, int y)
+        {
+            return x + (y * width);
         }
     }
 

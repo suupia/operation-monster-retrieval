@@ -5,14 +5,14 @@ using UnityEngine;
 public class PointerTailMGR : MonoBehaviour
 {
     [SerializeField] int pointerTailIndex;
-    private List<Vector2Int> manualRoute;
+    private List<Vector2Int> subjectRoute;
     private List<GameObject> pointerTails;
     private MapData map;
     private int numOfChildren;
     private GameObject[] children;
-    private SpriteRenderer[] childRenderers;
+    private SpriteRenderer[] childSprites;
     private Vector2[] defaultPointerTailSizes;
-    private Color noChangedColor;
+    [SerializeField] private Color noChangedColor;
     [SerializeField] Color changedColor;
     [SerializeField] Sprite[] firstTailSprites;
     [SerializeField] bool isCrossing;             //これがtrueのときは終点のSpriteをchangedColorにする
@@ -24,6 +24,7 @@ public class PointerTailMGR : MonoBehaviour
 
     [SerializeField] bool nonDiagonal;     //これがtrueのとき、PointerTailは斜めを向けないようにする（最小の回転用）
     [SerializeField] bool isDiagonal;      //斜めを向いてるとき、true
+    //[SerializeField] public bool forComplement;      //このPoitnerTailが補完用のときtrue
 
     //プロパティ
     public bool NonDiagonal
@@ -53,40 +54,61 @@ public class PointerTailMGR : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        pointerTails = GameManager.instance.pointerMGR.GetPoinerTails();
-        pointerTailIndex = pointerTails.IndexOf(gameObject);    //pointerTailsにPointeTailが順番に仕舞われているので、Indexを取得しておく
-        manualRoute = GameManager.instance.pointerMGR.GetManualRoute();
+
+        if (GameManager.instance.inputMGR.isEditingManualRoute) //ManualRoute編集中
+        {
+            pointerTails = GameManager.instance.pointerMGR.GetPointerTails();
+            pointerTailIndex = pointerTails.IndexOf(gameObject);    //pointerTailsにPointeTailが順番に仕舞われているので、Indexを取得しておく
+            subjectRoute = GameManager.instance.pointerMGR.GetManualRoute();
+        }
+        else　if (GameManager.instance.copyingManualRoute) //ManualRouteコピー中に呼ばれたとき
+        {
+            pointerTails = GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetPointerTails();
+            pointerTailIndex = pointerTails.IndexOf(gameObject);    //pointerTailsにPointeTailが順番に仕舞われているので、Indexを取得しておく
+            subjectRoute = GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalManualRoute();
+
+            //色を少し透明にする
+            noChangedColor.a *= 0.5f;
+            changedColor.a *= 0.5f;
+        }
+
         map = GameManager.instance.mapMGR.GetMap();
 
         numOfChildren = 4;
         children = new GameObject[numOfChildren];
-        childRenderers = new SpriteRenderer[numOfChildren];
+        childSprites = new SpriteRenderer[numOfChildren];
         defaultPointerTailSizes = new Vector2[numOfChildren];
         for (int i = 0; i < numOfChildren; i++)
         {
             children[i] = transform.GetChild(i).gameObject;
-            childRenderers[i] = children[i].GetComponent<SpriteRenderer>();
-            defaultPointerTailSizes[i] = childRenderers[i].size;
-            childRenderers[i].sortingOrder = pointerTailIndex;
+            childSprites[i] = children[i].GetComponent<SpriteRenderer>();
+            defaultPointerTailSizes[i] = childSprites[i].size;
+            childSprites[i].sortingOrder = pointerTailIndex;
         }
-        noChangedColor = childRenderers[0].color;      //Inspectorの方で全子オブジェクトの色を統一して置く
 
         if(pointerTailIndex == 0)        //一番最初のPointerTailは始点を表示するのでSpriteを変える
         {
-            childRenderers[horizontal1Index].sprite = firstTailSprites[0];
-            childRenderers[diagonal1Index].sprite = firstTailSprites[1];
+            childSprites[horizontal1Index].sprite = firstTailSprites[0];
+            childSprites[diagonal1Index].sprite = firstTailSprites[1];
             children[horizontal2Index].SetActive(false);
             children[diagonal2Index].SetActive(false);
+        }
+
+        foreach(SpriteRenderer sr in childSprites) //色を初期化
+        {
+            sr.color = noChangedColor;
         }
     }
 
     private void LateUpdate()
     {
         ChangeColor();
-        if (pointerTailIndex < GameManager.instance.pointerMGR.GetPoinerTails().Count - 4)      //このPointerTailがある程度前のものだった場合、処理は行わない
-        {
-            return;
-        }
+
+        //if (pointerTailIndex < GameManager.instance.pointerMGR.GetPoinerTails().Count - 4)      //このPointerTailがある程度前のものだった場合、処理は行わない→一瞬でたくさんPointerTailが生成されたときに困るのでなし
+        //{
+        //    return;
+        //}
+
         RotatePointerTail();
     }
     private void RotatePointerTail()
@@ -95,31 +117,41 @@ public class PointerTailMGR : MonoBehaviour
 
         ManageNonDiagonal();
 
-        if (manualRoute.Count >= pointerTailIndex + 2 && GameManager.instance.pointerMGR.GetPoinerTails().Count > pointerTailIndex + 1)       //pointerTailがこれ自身の後ろに存在する場合の処理
+        bool pointerTailExistAfterThis = false;
+        if (GameManager.instance.inputMGR.isEditingManualRoute)
+        {
+            if (subjectRoute.Count >= pointerTailIndex + 2 && GameManager.instance.pointerMGR.GetPointerTails().Count > pointerTailIndex + 1) pointerTailExistAfterThis = true;
+        }
+        else if (GameManager.instance.copyingManualRoute)
+        {
+            if (subjectRoute.Count >= pointerTailIndex + 2 && GameManager.instance.manualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetPointerTails().Count > pointerTailIndex + 1) pointerTailExistAfterThis = true;
+        }
+
+        if (pointerTailExistAfterThis)       //pointerTailがこれ自身の後ろに存在する場合の処理
         {
             if (!nonDiagonal)
             {
-                if (manualRoute[pointerTailIndex] + Vector2Int.up + Vector2Int.right == manualRoute[pointerTailIndex + 2] &&
-                    map.GetValue(manualRoute[pointerTailIndex] + Vector2Int.up) % GameManager.instance.groundID == 0 &&
-                    map.GetValue(manualRoute[pointerTailIndex] + Vector2Int.right) % GameManager.instance.groundID == 0)
+                if (subjectRoute[pointerTailIndex] + Vector2Int.up + Vector2Int.right == subjectRoute[pointerTailIndex + 2] &&
+                    map.GetValue(subjectRoute[pointerTailIndex] + Vector2Int.up) % GameManager.instance.groundID == 0 &&
+                    map.GetValue(subjectRoute[pointerTailIndex] + Vector2Int.right) % GameManager.instance.groundID == 0)
                 {
                     angle = 45;
                 }
-                else if (manualRoute[pointerTailIndex] + Vector2Int.up + Vector2Int.left == manualRoute[pointerTailIndex + 2] &&
-                         map.GetValue(manualRoute[pointerTailIndex] + Vector2Int.up) % GameManager.instance.groundID == 0 &&
-                         map.GetValue(manualRoute[pointerTailIndex] + Vector2Int.left) % GameManager.instance.groundID == 0)
+                else if (subjectRoute[pointerTailIndex] + Vector2Int.up + Vector2Int.left == subjectRoute[pointerTailIndex + 2] &&
+                         map.GetValue(subjectRoute[pointerTailIndex] + Vector2Int.up) % GameManager.instance.groundID == 0 &&
+                         map.GetValue(subjectRoute[pointerTailIndex] + Vector2Int.left) % GameManager.instance.groundID == 0)
                 {
                     angle = 135;
                 }
-                else if (manualRoute[pointerTailIndex] + Vector2Int.down + Vector2Int.right == manualRoute[pointerTailIndex + 2] &&
-                         map.GetValue(manualRoute[pointerTailIndex] + Vector2Int.down) % GameManager.instance.groundID == 0 &&
-                         map.GetValue(manualRoute[pointerTailIndex] + Vector2Int.right) % GameManager.instance.groundID == 0)
+                else if (subjectRoute[pointerTailIndex] + Vector2Int.down + Vector2Int.right == subjectRoute[pointerTailIndex + 2] &&
+                         map.GetValue(subjectRoute[pointerTailIndex] + Vector2Int.down) % GameManager.instance.groundID == 0 &&
+                         map.GetValue(subjectRoute[pointerTailIndex] + Vector2Int.right) % GameManager.instance.groundID == 0)
                 {
                     angle = -45;
                 }
-                else if (manualRoute[pointerTailIndex] + Vector2Int.down + Vector2Int.left == manualRoute[pointerTailIndex + 2] &&
-                         map.GetValue(manualRoute[pointerTailIndex] + Vector2Int.down) % GameManager.instance.groundID == 0 &&
-                         map.GetValue(manualRoute[pointerTailIndex] + Vector2Int.left) % GameManager.instance.groundID == 0)
+                else if (subjectRoute[pointerTailIndex] + Vector2Int.down + Vector2Int.left == subjectRoute[pointerTailIndex + 2] &&
+                         map.GetValue(subjectRoute[pointerTailIndex] + Vector2Int.down) % GameManager.instance.groundID == 0 &&
+                         map.GetValue(subjectRoute[pointerTailIndex] + Vector2Int.left) % GameManager.instance.groundID == 0)
                 {
                     angle = -135;
                 }
@@ -143,9 +175,9 @@ public class PointerTailMGR : MonoBehaviour
 
          SetIsDiagonal(false);        //これ以降の処理は斜めを向かないときに行われるため、ここでisDiagonalをfalseに
 
-        if (manualRoute[pointerTailIndex].x == manualRoute[pointerTailIndex + 1].x)      //以下、縦横を向かせる
+        if (subjectRoute[pointerTailIndex].x == subjectRoute[pointerTailIndex + 1].x)      //以下、縦横を向かせる
         {
-            if (manualRoute[pointerTailIndex].y < manualRoute[pointerTailIndex + 1].y)
+            if (subjectRoute[pointerTailIndex].y < subjectRoute[pointerTailIndex + 1].y)
             {
                 angle = 90;
             }
@@ -155,9 +187,9 @@ public class PointerTailMGR : MonoBehaviour
 
             }
         }
-        else if(manualRoute[pointerTailIndex].y == manualRoute[pointerTailIndex + 1].y)
+        else if(subjectRoute[pointerTailIndex].y == subjectRoute[pointerTailIndex + 1].y)
         {
-            if(manualRoute[pointerTailIndex].x < manualRoute[pointerTailIndex + 1].x)
+            if(subjectRoute[pointerTailIndex].x < subjectRoute[pointerTailIndex + 1].x)
             {
                 angle = 0;
             }
@@ -174,9 +206,9 @@ public class PointerTailMGR : MonoBehaviour
     private void ManageNonDiagonal()
     {
 
-        if (pointerTailIndex >= 2 && manualRoute.Count >= pointerTailIndex + 3)           //最小の回転を含むときの処理　このPointerTailが回転に含まれる5点のうち3点目のときに処理を行う
+        if (pointerTailIndex >= 2 && subjectRoute.Count >= pointerTailIndex + 3)           //最小の回転を含むときの処理　このPointerTailが回転に含まれる5点のうち3点目のときに処理を行う
         {
-            if (manualRoute[pointerTailIndex + 2] == manualRoute[pointerTailIndex - 2])
+            if (subjectRoute[pointerTailIndex + 2] == subjectRoute[pointerTailIndex - 2])
             {
                 for (int i = 0; i < 3; i++)
                 {
@@ -186,7 +218,7 @@ public class PointerTailMGR : MonoBehaviour
                 }
             }
         }
-        else if (pointerTailIndex >= 2 && manualRoute.Count == pointerTailIndex + 2 && NonDiagonal &&
+        else if (pointerTailIndex >= 2 && subjectRoute.Count == pointerTailIndex + 2 && NonDiagonal &&
                  pointerTails[pointerTailIndex - 1].GetComponent<PointerTailMGR>().NonDiagonal &&
                  pointerTails[pointerTailIndex - 2].GetComponent<PointerTailMGR>().NonDiagonal)        //このPointerTailが最小の回転に含まれる3点目かつ、PointerがこのPointerTailの次のマスにあるとき(回転になっていないとき)
         {
@@ -231,16 +263,16 @@ public class PointerTailMGR : MonoBehaviour
     private void ChangeColor()
     {
         ManageIsCrossing();
-        for (int i = 0; i < manualRoute.Count; i++)
+        for (int i = 0; i < subjectRoute.Count; i++)
         {
-            Vector2Int m = manualRoute[i];
-            if(m.x == manualRoute[pointerTailIndex].x && m.y == manualRoute[pointerTailIndex].y && i < pointerTailIndex && pointerTails[i].activeSelf)       //PointerTailが交差したとき
+            Vector2Int m = subjectRoute[i];
+            if(m.x == subjectRoute[pointerTailIndex].x && m.y == subjectRoute[pointerTailIndex].y && i < pointerTailIndex && pointerTails[i].activeInHierarchy)       //PointerTailが交差したとき
             {
                 if ((pointerTails[i].transform.rotation.eulerAngles.z - transform.rotation.eulerAngles.z) % 360 == 0
                     && pointerTails[i].GetComponent<PointerTailMGR>().GetIsDiagonal() == GetIsDiagonal())    //PointerTailが同じ向きで重なったとき
                 {
                     //Debug.LogWarning("Index:"+pointerTailIndex+",manualIndex:"+ i +",Angle:"+ Vector3.Angle(pointerTails[i].transform.rotation.eulerAngles, transform.rotation.eulerAngles));
-                    foreach (SpriteRenderer sr in childRenderers)        //自分自身が重なっているときは全子オブジェクトをchangedColorにする
+                    foreach (SpriteRenderer sr in childSprites)        //自分自身が重なっているときは全子オブジェクトをchangedColorにする
                     {
                         sr.color = changedColor;
                     }
@@ -249,32 +281,32 @@ public class PointerTailMGR : MonoBehaviour
             }
         }
 
-        childRenderers[horizontal1Index].color = noChangedColor;            //isCrossingのときはHorizotal2, Diagonal2はchangedColorにしたいので、ここではいじらない
-        childRenderers[diagonal1Index].color = noChangedColor;
+        childSprites[horizontal1Index].color = noChangedColor;            //isCrossingのときはHorizotal2, Diagonal2はchangedColorにしたいので、ここではいじらない
+        childSprites[diagonal1Index].color = noChangedColor;
     }
 
     private void ManageIsCrossing()
     {
         if (GetIsCrossing())
         {
-            childRenderers[horizontal2Index].color = changedColor;
-            childRenderers[diagonal2Index].color = changedColor;
+            childSprites[horizontal2Index].color = changedColor;
+            childSprites[diagonal2Index].color = changedColor;
         }
         else          //Horizontal2, Diagonal2をnoChangedColorにするのはここだけ
         {
-            childRenderers[horizontal2Index].color = noChangedColor;
-            childRenderers[diagonal2Index].color = noChangedColor;
+            childSprites[horizontal2Index].color = noChangedColor;
+            childSprites[diagonal2Index].color = noChangedColor;
         }
 
-        for (int i = 0; i < manualRoute.Count; i++)
+        for (int i = 0; i < subjectRoute.Count; i++)
         {
             if (i >= pointerTailIndex) break;    //Thisより手前のPointerTailと重なっているかが知りたいので
 
-            Vector2Int m = manualRoute[i];
-            if (m.x == manualRoute[pointerTailIndex].x && m.y == manualRoute[pointerTailIndex].y && pointerTails[i].activeSelf)       //PointerTailが交差したとき
+            Vector2Int m = subjectRoute[i];
+            if (m.x == subjectRoute[pointerTailIndex].x && m.y == subjectRoute[pointerTailIndex].y && pointerTails[i].activeInHierarchy)       //PointerTailが交差したとき
             {
                 //Debug.LogWarning("isCrossing:" + transform.position);
-                if (pointerTails[pointerTailIndex - 1].activeSelf)       //一つ前のPointerTailがactiveのとき
+                if (pointerTails[pointerTailIndex - 1].activeInHierarchy)       //一つ前のPointerTailがactiveのとき
                 {
                     pointerTails[pointerTailIndex - 1].GetComponent<PointerTailMGR>().SetIsCrossing(true);
                 }
@@ -294,18 +326,18 @@ public class PointerTailMGR : MonoBehaviour
 
     private void IsOverlapWith(Vector2Int manualPoint, int index)       //与えられた座標のPointerTailと、このPointerTailが重なっているかどうか判定する
     {
-        if (manualPoint.x == manualRoute[pointerTailIndex].x && manualPoint.y == manualRoute[pointerTailIndex].y)      //与えられた点と自身の点の座標が等しいとき
+        if (manualPoint.x == subjectRoute[pointerTailIndex].x && manualPoint.y == subjectRoute[pointerTailIndex].y)      //与えられた点と自身の点の座標が等しいとき
         {
             if (pointerTails[index].GetComponent<PointerTailMGR>().GetIsDiagonal())        //与えられた座標のPointerTailが斜めのとき
             {
-                if (GetIsDiagonal() && manualRoute[index + 2].x == manualRoute[pointerTailIndex + 2].x && manualRoute[index + 2].y == manualRoute[pointerTailIndex + 2].y)      //同じ向きで重なるとき
+                if (GetIsDiagonal() && subjectRoute[index + 2].x == subjectRoute[pointerTailIndex + 2].x && subjectRoute[index + 2].y == subjectRoute[pointerTailIndex + 2].y)      //同じ向きで重なるとき
                 {
                     SetIsCrossing(true);
                     return;
                 }
                 else if (pointerTails[pointerTailIndex - 2].GetComponent<PointerTailMGR>().GetIsDiagonal() && 
-                    manualRoute[index + 2].x == manualRoute[pointerTailIndex - 2].x && 
-                    manualRoute[index + 2].y == manualRoute[pointerTailIndex - 2].y)         //逆向きで重なるとき(逆向きなので、一つ前のPointerTailをisCrossingにする)
+                    subjectRoute[index + 2].x == subjectRoute[pointerTailIndex - 2].x && 
+                    subjectRoute[index + 2].y == subjectRoute[pointerTailIndex - 2].y)         //逆向きで重なるとき(逆向きなので、一つ前のPointerTailをisCrossingにする)
                 {
                     pointerTails[pointerTailIndex - 2].GetComponent<PointerTailMGR>().SetIsCrossing(true);
                     return;
@@ -313,12 +345,12 @@ public class PointerTailMGR : MonoBehaviour
             }
             else        //与えられた座標のPointerTailが縦or横のとき
             {
-                if (manualRoute[index + 1].x == manualRoute[pointerTailIndex + 1].x && manualRoute[index + 1].y == manualRoute[pointerTailIndex + 1].y)             //同じ向きで重なるとき
+                if (subjectRoute[index + 1].x == subjectRoute[pointerTailIndex + 1].x && subjectRoute[index + 1].y == subjectRoute[pointerTailIndex + 1].y)             //同じ向きで重なるとき
                 {
                     SetIsCrossing(true);
                     return;
                 }
-                else if (manualRoute[index + 1].x == manualRoute[pointerTailIndex - 1].x && manualRoute[index + 1].y == manualRoute[pointerTailIndex - 1].y)     //逆向きで重なるとき(ないけど、一応)
+                else if (subjectRoute[index + 1].x == subjectRoute[pointerTailIndex - 1].x && subjectRoute[index + 1].y == subjectRoute[pointerTailIndex - 1].y)     //逆向きで重なるとき(ないけど、一応)
                 {
                     pointerTails[pointerTailIndex - 1].GetComponent<PointerTailMGR>().SetIsCrossing(true);
                     return;

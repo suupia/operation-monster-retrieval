@@ -5,10 +5,10 @@ using UnityEngine;
 public static class Function
 {
 
-
-
-    public static List<Vector2Int> SearchShortestRoute(int width,int height,Vector2Int startPos, Vector2Int endPos)  //startPosからendPosへの最短経路を返す（startPos、endPosどちらも含む）
+    public static List<Vector2Int> SearchShortestNonDiagonalRoute(Vector2Int startPos, Vector2Int endPos)  //startPosからendPosへの斜め移動なしの最短経路を返す（startPos、endPosどちらも含む）
     {
+        int width = GameManager.instance.mapMGR.GetMapWidth();
+        int height = GameManager.instance.mapMGR.GetMapHeight();
         int[] _values = null;  //2次元配列のように扱う
         int _initiValue = -10; //PlaceNumAroundで重複して数字を置かないようにするために必要
         int _wallValue = -1;   //wallのマス
@@ -68,12 +68,11 @@ public static class Function
         {
             for (int x = 0; x < width; x++)
             {
-                //debugCell += $"({x},{height - y-1}){GetValue(height - y-1, x)}".PadRight(3) + ",";
                 debugCell += $"{GetValue(x, height - y - 1)}".PadRight(3) + ",";
             }
             debugCell += "\n";
         }
-        Debug.Log($"cellの中身は\n{debugCell}");
+        Debug.Log($"WaveletSearchの結果は\n{debugCell}");
 
 
 
@@ -81,15 +80,19 @@ public static class Function
         Debug.Log($"StoreRouteAround({endPos},{maxDistance})を実行します");
         StoreShortestRoute(endPos, maxDistance);
 
-        Debug.Log($"resultRouteList:{string.Join(",", shortestRouteList)}");
-
         shortestRouteList.Reverse(); //リストを反転させる
+
+
+        //デバッグ
+        //Debug.Log($"shortestRouteList:{string.Join(",", shortestRouteList)}");
+        GameManager.instance.debugMGR.DebugRoute(shortestRouteList);
+
         return shortestRouteList;
 
         ////////////////////////////////////////////////////////////////////
 
         //以下ローカル関数
-       
+
 
         void WaveletSearch()
         {
@@ -99,11 +102,11 @@ public static class Function
             while (!isComplete)
             {
                 int loopNum = searchQue.Count; //前のループでキューに追加された個数を数える
-                Debug.Log($"i:{n}のときloopNum:{loopNum}");
+                //Debug.Log($"i:{n}のときloopNum:{loopNum}");
                 for (int k = 0; k < loopNum; k++)
                 {
                     if (isComplete) break;
-                    Debug.Log($"PlaceNumAround({searchQue.Peek()})を実行します");
+                    //Debug.Log($"PlaceNumAround({searchQue.Peek()})を実行します");
                     PlaceNumAround(searchQue.Dequeue());
                 }
                 n++; //前のループでキューに追加された文を処理しきれたら、インデックスを増やして次のループに移る
@@ -121,17 +124,18 @@ public static class Function
 
             if (distance < 0) return; //0までQueに入れれば十分
 
-            Debug.Log($"GetValue({centerPos})は{GetValueFromVector(centerPos)}、distance:{distance}");
+            //Debug.Log($"GetValue({centerPos})は{GetValueFromVector(centerPos)}、distance:{distance}");
 
-            // 5 7 8
-            // 3 * 6
-            // 1 2 4 の優先順位で判定していく
+            // 1 3 5
+            // 2 * 7
+            // 4 6 8 の優先順位で判定していく
 
-            Vector2Int[] orderInDirectionArray = new Vector2Int[] { Vector2Int.left + Vector2Int.down, Vector2Int.down, Vector2Int.left, Vector2Int.right + Vector2Int.down, Vector2Int.left + Vector2Int.up, Vector2Int.right, Vector2Int.up, Vector2Int.right + Vector2Int.up };
+            Vector2Int[] orderInDirectionArray = new Vector2Int[] { Vector2Int.left + Vector2Int.up, Vector2Int.left, Vector2Int.up, Vector2Int.left + Vector2Int.down, Vector2Int.right + Vector2Int.up, Vector2Int.down, Vector2Int.right, Vector2Int.right + Vector2Int.down };
+
 
             foreach (Vector2Int direction in orderInDirectionArray)
             {
-                if (GetValueFromVector(centerPos + direction) == distance-1 && CanMoveDiagonally(centerPos, centerPos + direction))
+                if (GetValueFromVector(centerPos + direction) == distance - 1 && CanMoveDiagonally(centerPos, centerPos + direction))
                 {
                     shortestRouteList.Add(centerPos);
                     StoreShortestRoute(centerPos + direction, distance - 1);
@@ -152,25 +156,21 @@ public static class Function
                 {
                     if (x == 0 && y == 0) continue; //真ん中のマスは飛ばす
 
+                    if (x != 0 && y != 0) continue; //斜めのマスの判定は飛ばす
+
                     inspectPos = centerPos + new Vector2Int(x, y);
                     //Debug.Log($"centerPos:{centerPos},inspectPos:{inspectPos}のとき、CanMove(centerPos, inspectPos):{CanMove(centerPos, inspectPos)}");
                     if (GetValueFromVector(inspectPos) == _initiValue && CanMoveDiagonally(centerPos, inspectPos))
                     {
                         SetValueByVector(inspectPos, n);
                         searchQue.Enqueue(inspectPos);
-                        Debug.Log($"({inspectPos})を{n}にし、探索用キューに追加しました。");
+                        //Debug.Log($"({inspectPos})を{n}にし、探索用キューに追加しました。");
                     }
-                    else  //以下デバッグ用
+                    else  //このelseはデバッグ用
                     {
-                        Debug.Log($"{inspectPos}は初期値が入っていない　または　斜め移動でいけません\nGetValueFromVector({inspectPos}):{GetValueFromVector(inspectPos)}, CanMoveDiagonally({centerPos}, {inspectPos}):{CanMoveDiagonally(centerPos, inspectPos)}"); 
+                        //Debug.Log($"{inspectPos}は初期値が入っていない　または　斜め移動でいけません\nGetValueFromVector({inspectPos}):{GetValueFromVector(inspectPos)}, CanMoveDiagonally({centerPos}, {inspectPos}):{CanMoveDiagonally(centerPos, inspectPos)}");
                     }
-                    //if (inspectPos == targetPos)
-                    //{
-                    //    isComplete = true;
-                    //    maxDistance = i - 1;
-                    //    Debug.Log($"isCompleteをtrueにしました。maxDistance:{maxDistance}");
-                    //    break; //探索終了
-                    //}
+
                     if (inspectPos == endPos && CanMoveDiagonally(centerPos, inspectPos))
                     {
                         isComplete = true;
@@ -275,6 +275,96 @@ public static class Function
             }
         }
 
+    }
+
+    public static List<Vector2Int> SearchShortestDiagonalRoute(Vector2Int startPos, Vector2Int endPos)  //startPosからendPosへの斜め移動蟻の最短経路を返す（startPos、endPosどちらも含む）
+    {
+        return ConvertToDiagonalRoute(SearchShortestNonDiagonalRoute(startPos, endPos));
+    }
+
+    public static List<Vector2Int> SearchShortestRouteToCastle(Vector2Int startPos)
+    {
+        Vector2Int castlePos = GameManager.instance.mapMGR.GetEnemysCastlePos();
+        Vector2Int endPos = Vector2Int.zero;
+
+        if (GameManager.instance.mapMGR.GetMapValue(castlePos) % GameManager.instance.facilityID != 0)
+        {
+            Debug.LogWarning("SearchShortestRouteToCastleのendPosにfacilityが含まれていません");
+            return null;
+        }
+
+        // 1 3 5
+        // 2 * 7
+        // 4 6 8 の優先順位でendPosの周り判定していく
+
+        Vector2Int[] orderInDirectionArray = new Vector2Int[] { Vector2Int.left + Vector2Int.up, Vector2Int.left, Vector2Int.up, Vector2Int.left + Vector2Int.down, Vector2Int.right + Vector2Int.up, Vector2Int.down, Vector2Int.right, Vector2Int.right + Vector2Int.down };
+
+
+        foreach (Vector2Int direction in orderInDirectionArray)
+        {
+            if (GameManager.instance.mapMGR.GetMapValue(castlePos + direction) % GameManager.instance.groundID == 0)
+            {
+                endPos = castlePos + direction;
+            }
+        }
+
+        if (endPos == Vector2Int.zero)
+        {
+            Debug.LogError($"castlePos:{castlePos}の周りにgroundIDを含むマスがありません");
+            return null;
+        }
+
+        return SearchShortestDiagonalRoute(startPos,endPos);
+    }
+
+    private static List<Vector2Int> ConvertToDiagonalRoute(List<Vector2Int> nonDiagonalRoute)
+    {
+
+        for (int i = 0; i<nonDiagonalRoute.Count;i++)
+        {
+            if (i >= nonDiagonalRoute.Count - 2) break; //nonDiagonalRoute.Count - 3まで判定をする
+
+            Vector2Int gridPos = nonDiagonalRoute[i];
+            Vector2Int nextPos = nonDiagonalRoute[i + 1];
+            Vector2Int nextNextPos = nonDiagonalRoute[i + 2];
+
+            if ((((nextPos - gridPos).x == 0 && (nextNextPos - nextPos).y == 0) || ((nextPos - gridPos).y == 0 && (nextNextPos - nextPos).x == 0)) && CanMoveDiagonally(gridPos,nextNextPos))
+            {
+                Debug.Log($"斜め移動が可能なため、nextPos:{nextPos}をnextNextPos:{nextNextPos}で置き換えます gridPos:{gridPos}");
+
+                // nextPos = nextNextPosに対応する
+                nonDiagonalRoute[i + 1] = nonDiagonalRoute[i + 2];
+                nonDiagonalRoute.RemoveAt(i+1);
+                i++;
+            }
+        }
+
+        return nonDiagonalRoute;
+
+
+        //以下ローカル関数
+        bool CanMoveDiagonally(Vector2Int prePos, Vector2Int afterPos)
+        {
+            Vector2Int directionVector = afterPos - prePos;
+
+            //斜め移動の時にブロックの角を移動することはできない
+            if (directionVector.x != 0 && directionVector.y != 0)
+            {
+                //水平方向の判定
+                if (GameManager.instance.mapMGR.GetMapValue(prePos.x + directionVector.x, prePos.y) % GameManager.instance.wallID == 0)
+                {
+                    return false;
+                }
+
+                //垂直方向の判定
+                if (GameManager.instance.mapMGR.GetMapValue(prePos.x, prePos.y + directionVector.y) % GameManager.instance.wallID == 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
 

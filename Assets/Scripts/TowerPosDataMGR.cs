@@ -18,7 +18,7 @@ public class TowerPosDataMGR : MonoBehaviour
         {
             string data = Resources.Load<TextAsset>("JSON/towerPoss"+i).ToString();
             towerPosDataArray[i] = JsonUtility.FromJson<TowerPosData>(data);
-            Debug.Log(string.Join(",", towerPosDataArray[i].posData) );
+            //Debug.Log(string.Join(",", towerPosDataArray[i].posData) );
         }
 
     }

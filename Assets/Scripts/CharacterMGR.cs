@@ -659,13 +659,22 @@ public class CharacterMGR : MonoBehaviour
         //    return;
         //}
 
-        if (GameManager.instance.CanAttackTarget(gridPos, atkRange, GameManager.instance.facilityID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワーがあるとき
+        if (GameManager.instance.CanAttackTarget(gridPos, atkRange, GameManager.instance.facilityID, out targetFacilityPos) && targetFacilityPos != GameManager.instance.mapMGR.GetEnemysCastlePos()) //ルートに沿って移動しているときに、攻撃範囲内にタワー（城を除く）があるとき
         {
-            Debug.Log($"攻撃範囲内にタワーがあるのでInBatteleに切り替えます targetFacilityPos:{targetFacilityPos}");
+            Debug.Log($"攻撃範囲内にタワーがあるのでInBattleに切り替えます targetFacilityPos:{targetFacilityPos}");
             SetDirection(targetFacilityPos - gridPos);
             state = State.InBattle;
             return;
         }
+
+        if (moveAlongWithCounter == routeList.Count-1)  //ルートの最終地点に到達したら城への攻撃を開始する
+        {
+            Debug.Log($"ルートの最終地点にいるためInBattleに切り替えます");
+            SetDirection(GameManager.instance.mapMGR.GetEnemysCastlePos() - gridPos);
+            state = State.InBattle;
+            return;
+        }
+        
 
         nextPos = routeList[moveAlongWithCounter + 1];
 

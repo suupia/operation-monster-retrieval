@@ -16,7 +16,12 @@ public class PointerMGR : MonoBehaviour
     [SerializeField] List<Vector2Int> finalManualRoute;  //斜めに進むところは斜めにした状態のRouteを持たせる
     private bool isOnCastle;
 
-    private Vector3 startPos;
+    private Vector3 startPos; //初期化用
+
+    public bool inComplementingManualRoute; //ComplementManualRouteが実行されている間trueにする
+    public bool inSetComplementRoute; //SetComplementRouteが実行されている間trueにする
+    private List<Vector2Int> complementRoute; //現在のPointerから敵のCastleまでのルートをしまう
+    public List<GameObject> complementPointerTails;
 
     private void Start()
     {
@@ -24,6 +29,7 @@ public class PointerMGR : MonoBehaviour
         finalManualRoute = new List<Vector2Int>();
         pointerTails = new List<GameObject>();
         nonDiagonalPoints = new List<int>();
+        complementRoute = new List<Vector2Int>();
         startPos = GameManager.instance.ToWorldPosition(GameManager.instance.mapMGR.GetAllysCastlePos());
 
         manualRoute.Add(GameManager.instance.mapMGR.GetAllysCastlePos());
@@ -85,8 +91,12 @@ public class PointerMGR : MonoBehaviour
     {
         return manualRoute;
     }
+    public List<Vector2Int> GetComplementRoute()
+    {
+        return complementRoute;
+    }
 
-    public List<GameObject> GetPoinerTails()
+    public List<GameObject> GetPointerTails()
     {
         return pointerTails;
     }
@@ -124,14 +134,88 @@ public class PointerMGR : MonoBehaviour
         }
     }
 
+    public void SetComplementRoute(Vector2Int startPos) //startPosはmouseGridPosを想定している
+    {
+        if (inSetComplementRoute) return;
+
+        inSetComplementRoute = true;
+
+        if (complementRoute.Count != 0 && complementRoute[0] == startPos) return; //complementRouteの最初の点とPointerの座標がおなじとき
+
+        if (complementRoute.Count > 1 && startPos == complementRoute[1]) //前に計算したcomplementRouteの最初の点 == startPosのときは、complementRouteの0番目をRemoveする（極力SearchShortestRouteToCastleを呼ばないために）
+        {
+            complementRoute.RemoveAt(0);
+            return;
+        }
+        Debug.LogWarning($"check");
+        //以下、complementPointerTailsとcomplementRouteをclearしてもう一度入れる
+        if(complementRoute.Count != 0) complementRoute.Clear();
+        complementRoute = Function.SearchShortestRouteToCastle(startPos);
+        //inSetComplementRoute = false;
+    }
+    //private void ManageComplementPointerTails()
+    //{
+    //    Debug.LogWarning("manageComplementPointerTails");
+    //    while (complementRoute.Count > complementPointerTails.Count)
+    //    {
+    //        pointerTails.Add(Instantiate(pointerTailPrefab, GameManager.instance.ToWorldPosition(complementRoute[complementPointerTails.Count]), pointerTailPrefab.transform.rotation));
+    //        //pointerTailMGRs.Add(pointerTails[pointerTails.Count - 1].GetComponent<PointerTailMGR>());
+    //        SetOrder();
+    //    }
+
+    //    while (complementRoute.Count < complementPointerTails.Count)
+    //    {
+    //        Destroy(complementPointerTails[complementPointerTails.Count - 1]);
+    //        complementPointerTails.RemoveAt(complementPointerTails.Count - 1);
+    //        //pointerTailMGRs.RemoveAt(pointerTails.Count - 1);
+    //    }
+    //}
+
+    public void ComplementManualRoute(Vector2Int endPos)         //manualRouteの最後の点からendPosへの最短ルートにそってPointerを動かす処理をする
+    {
+        if (inComplementingManualRoute) return; //この関数が同時に複数個呼ばれるとエラーがでそうなので、回避しておく
+        inComplementingManualRoute = true;
+        Debug.Log("ComplementManualRouteが呼ばれました");
+
+        List<Vector2Int> shortestRoute;
+
+        if (endPos == GameManager.instance.mapMGR.GetEnemysCastlePos()) //endPosが敵のCastleのとき
+        {
+            shortestRoute = Function.SearchShortestRouteToCastle(manualRoute[manualRoute.Count - 1]);
+
+        }
+        else
+        {
+            shortestRoute = Function.SearchShortestNonDiagonalRoute(manualRoute[manualRoute.Count - 1], endPos);
+        }
+
+        Debug.LogWarning("ComplementManualRoute shortestRoute" + string.Join(",", shortestRoute));
+
+        //最短ルートが不適切だったときにはじく必要があるので、MoveByMouseをはさむ
+        foreach(Vector2Int v in shortestRoute)
+        {
+            //Debug.LogWarning($"ComplementManualRoute 座標{v}");
+            MoveByMouse(v);
+        }
+        inComplementingManualRoute = false;
+    }
     public void MoveByMouse(Vector2Int mouseGridPos) //マウスで移動
     {
+        int x = mouseGridPos.x; int y = mouseGridPos.y;
+
+        if ((x < 1 || y < 1 || x > GameManager.instance.mapMGR.GetMapWidth() - 2 || y > GameManager.instance.mapMGR.GetMapHeight() - 2) || GameManager.instance.mapMGR.GetMapValue(mouseGridPos) % GameManager.instance.groundID != 0)
+        {
+            Debug.Log("groundじゃないので移動不可");
+            return;           //groundじゃないので移動不可
+        }
+
         Vector2Int pointerGridPos = GameManager.instance.ToGridPosition(transform.position); //Updateで呼び出されるので毎回更新される
 
         SetFinalManualRoute();
         if ((mouseGridPos - pointerGridPos).magnitude > 1)       //mouseとpointerが隣接していない場合はなにもしない
         {
-            Debug.Log($"縦横のいずれかで隣接しているマスを選んでください　(mouseGridPos - pointerGridPos).magnitude:{(mouseGridPos - pointerGridPos).magnitude}");
+            ComplementManualRoute(mouseGridPos);
+            //Debug.Log($"縦横のいずれかで隣接しているマスを選んでください　(mouseGridPos - pointerGridPos).magnitude:{(mouseGridPos - pointerGridPos).magnitude}");
             return;
         }
 
@@ -153,18 +237,15 @@ public class PointerMGR : MonoBehaviour
             return;
         }
 
-        if (GameManager.instance.mapMGR.GetMapValue(mouseGridPos) % GameManager.instance.groundID != 0)
-        {
-            Debug.Log("groundじゃないので移動不可");
-            return;           //groundじゃないので移動不可
-        }
         transform.position = GameManager.instance.ToWorldPosition(mouseGridPos);       //Pointerを移動
 
 
         IsOnCastle();
         ManageManualRouteList();
-        ManageMPointerTails();
+        ManagePointerTails();
         ManageIsCrossing();
+        //SetComplementRoute(mouseGridPos);
+        //ManageComplementPointerTails();
     }
     private void ManageManualRouteList()
     {
@@ -183,11 +264,11 @@ public class PointerMGR : MonoBehaviour
     }
 
 
-    private void ManageMPointerTails()
+    private void ManagePointerTails()
     {
         while (manualRoute.Count - 1 > pointerTails.Count)
         {
-            pointerTails.Add(Instantiate(pointerTailPrefab, GameManager.instance.ToWorldPosition(manualRoute[pointerTails.Count]), pointerTailPrefab.transform.rotation));
+            pointerTails.Add(SpawnPointerTail(manualRoute[pointerTails.Count]));
             //pointerTailMGRs.Add(pointerTails[pointerTails.Count - 1].GetComponent<PointerTailMGR>());
             SetOrder();
         }
@@ -198,6 +279,11 @@ public class PointerMGR : MonoBehaviour
             pointerTails.RemoveAt(pointerTails.Count - 1);
             //pointerTailMGRs.RemoveAt(pointerTails.Count - 1);
         }
+    }
+
+    public GameObject SpawnPointerTail(Vector2Int pos)
+    {
+        return Instantiate(pointerTailPrefab, GameManager.instance.ToWorldPosition(pos), pointerTailPrefab.transform.rotation);
     }
 
     private void IsOnCastle()
@@ -216,9 +302,10 @@ public class PointerMGR : MonoBehaviour
 
     public void ResetPointer()
     {
-        manualRoute.Clear();
-        finalManualRoute = new List<Vector2Int>(); //ManualRouteに参照を渡しているので、次に使うためにnewする必要がある
+        manualRoute = new List<Vector2Int>(); //ManualRouteに参照を渡しているので、次に使うためにnewする必要がある
+        finalManualRoute = new List<Vector2Int>(); //同上
         nonDiagonalPoints = new List<int>(); //同上
+        complementRoute = new List<Vector2Int>();
         isOnCastle = false;
         transform.position = startPos;
         while (pointerTails.Count != 0)
@@ -230,7 +317,7 @@ public class PointerMGR : MonoBehaviour
         Debug.Log($"Pointerを初期化:manualRoute={string.Join(",", manualRoute)}, isOnCastle={isOnCastle}, pointerTails={string.Join(",", pointerTails)}");
     }
 
-    private void SetOrder()
+    private void SetOrder() //描画順を決める
     {
         this.GetComponent<SpriteRenderer>().sortingOrder = pointerTails.Count + 1;
     }

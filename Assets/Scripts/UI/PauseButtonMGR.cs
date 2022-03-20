@@ -12,18 +12,20 @@ public class PauseButtonMGR : MonoBehaviour
         if (GameManager.instance.state == GameManager.State.MakeTheFirstRoad)
         {
             isPausingAtMakeTheFirstRoad = true;
-            Debug.Log("PauseTheGameを呼びます");
             GameManager.instance.PauseTheGame();
             PauseTheGameCanvas.SetActive(true);
         }
         else
         {
-            Debug.Log("PauseTheGameを呼びます");
             GameManager.instance.PauseTheGame();
             PauseTheGameCanvas.SetActive(true);
+
+            //Pause時には、ManualRoute関連で操作中の物は全てリセットする
+            GameManager.instance.curveToMouseMGR.ResetCopyingManualRoue();
+            if(GameManager.instance.inputMGR.GetManualRouteNumber() != -1)
+            {
+                GameManager.instance.selectCharacterButtonMGRs[GameManager.instance.inputMGR.GetManualRouteNumber()].ResetToNormalColor();
+            }
         }
-        //Debug.Log("PauseTheGameを呼びます");
-        //GameManager.instance.PauseTheGame();
-        //PauseTheGameCanvas.SetActive(true);
     }
 }

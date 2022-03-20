@@ -126,7 +126,7 @@ MonoBehaviour:
   characterSkillMGR: {fileID: 2354317021843311762}
   skillIconParticle: {fileID: 6610183959110562001}
   characterName: Tuti
-  characterTypeID: 8
+  characterTypeID: 9
   level: 0
   maxHp: 6
   hp: 0
@@ -160,6 +160,7 @@ MonoBehaviour:
   skillNum: 2
   duration: 3
   amount: 3
+  skillRemainingeTime: 0
 --- !u!1001 &5653178021834791751
 PrefabInstance:
   m_ObjectHideFlags: 0

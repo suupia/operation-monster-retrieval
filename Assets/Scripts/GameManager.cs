@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] public TowerPosDataMGR towerPosDataMGR;
     [SerializeField] public SaveMGR saveMGR;
     [SerializeField] public CharacterSkillsDataMGR characterSkillsDataMGR;
+    [SerializeField] public CurveToMouseMGR curveToMouseMGR;
+    [SerializeField] public MusicMGR musicMGR;
     //[SerializeField] public CharacterSkillsMGR characterSkillsMGR; 
 
     [SerializeField] public GameObject selectStageCanvas; //SetActiveで表示を制御するのでゲームオブジェクトごと取得する必要がある インスペクター上でセットする
@@ -133,6 +135,10 @@ public class GameManager : MonoBehaviour
         get { return dragFlag; }
         set { dragFlag = value; }
     }
+
+    public int copyingSelectCharacterButtonNum = -1; //ManualRouteをコピーするとき、ドラッグした番号を保持しておくために必要
+    public bool copyingManualRoute; //ManualRouteをコピーするとき、SelectCharacterButtonを選択している間trueにする
+    public int mouseEnteredSelectCharacterButtonNum  = -1;
 
     float characterDisplacement= 0.03f; //キャラクターがスポーンしたときにどれくらいズレるかを決める(10回で一周するようにする)
 
@@ -269,6 +275,8 @@ public class GameManager : MonoBehaviour
     {
         state = State.SelectingStage;
 
+        musicMGR.StopAllBGM();
+
         resultCanvas.SetActive(false);
         selectStageCanvas.SetActive(true);
         //次のPlayingGameに備えて前の戦闘のデータをここでリセットする（今は特に書くことはない）
@@ -293,6 +301,7 @@ public class GameManager : MonoBehaviour
         frameCanvas.SetActive(false);    //戦闘画面ではFrameCanvasを非表示にする
 
         mapMGR.SetupMap();
+        musicMGR.StartStageBGM(mapMGR.GetStageNum());
 
         CurrentCharacterNum = 0;
         maxTowerNum = mapMGR.GetMaxTowerNum();
@@ -350,6 +359,7 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning($"StagesClearedNumを更新して:{StagesClearedNum}　にしました");
 
         }
+
 
         //Saveをする
         saveMGR.SaveEXPAmount(statusCanvasMGR.EXPRetained);

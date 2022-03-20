@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\InputMGR.cs" />
     <Compile Include="Assets\Scripts\UI\OpenSelectStageButton.cs" />
     <Compile Include="Assets\Scripts\Facility.cs" />
+    <Compile Include="Assets\Scripts\CannonballMGR.cs" />
     <Compile Include="Assets\Scripts\UI\CharacterInCombatMGR.cs" />
     <Compile Include="Assets\Scripts\CharacterMGR.cs" />
     <Compile Include="Assets\Scripts\AutoRouteData.cs" />
@@ -106,7 +107,8 @@
     <Compile Include="Assets\Shapes2D\Demos\Flappy Shapes\Game.cs" />
     <Compile Include="Assets\Scripts\UI\CharacterInReserveMGR.cs" />
     <Compile Include="Assets\Shapes2D\Scripts\PolyMap.cs" />
-    <Compile Include="Assets\Scripts\CannonballMGR.cs" />
+    <Compile Include="Assets\Scripts\CurveToMouseMGR.cs" />
+    <Compile Include="Assets\Scripts\MusicMGR.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Shapes2D\Shaders\Triangle.cginc" />
@@ -809,6 +811,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{CE988F7C-86CE-F644-FF42-5C4267E9D42D}</Project>
+      <Name>Assembly-CSharp-firstpass</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

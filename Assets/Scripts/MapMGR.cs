@@ -500,7 +500,7 @@ public class MapMGR : MonoBehaviour
         if (GameManager.instance.state == GameManager.State.MakeTheFirstRoad && map.GetValue(x,y) == GameManager.instance.wallID) //MakeTheFirstRoadの処理
         {
             numOfFristRoadCounter--;
-            Debug.Log($"numOfFristRoadCounterが{numOfFristRoadCounter}になりました");
+            //Debug.Log($"numOfFristRoadCounterが{numOfFristRoadCounter}になりました");
 
             if (isDisplayMakefristRoadAgainCoroutine) return; //コルーチンが作動している間は以下の処理を行わない
 
@@ -865,13 +865,13 @@ public class MapMGR : MonoBehaviour
 
         foreach (Vector2Int adjacentPos in adjacentPosList)
         {
-            if (Function.SearchShortestRoute(mapWidth, mapHeight, startPos, adjacentPos) == null)
+            if (Function.SearchShortestNonDiagonalRoute(startPos, adjacentPos) == null)
             {
                 result = false;
                 continue;
             }
 
-            if (Function.SearchShortestRoute(mapWidth, mapHeight, startPos ,adjacentPos).Count >=(mapWidth-3)+(mapHeight-3)-1) //少なくとも最短場合よりルートが長くなる (-3は城があるところは壁が確定していることに注意)
+            if (Function.SearchShortestNonDiagonalRoute(startPos ,adjacentPos).Count >=(mapWidth-3)+(mapHeight-3)-1) //少なくとも最短場合よりルートが長くなる (-3は城があるところは壁が確定していることに注意)
             {
                 result = true;
             }
