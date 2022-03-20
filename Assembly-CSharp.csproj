@@ -71,6 +71,7 @@
     <Compile Include="Assets\Scripts\CharacterSkillsDataMGR.cs" />
     <Compile Include="Assets\Scripts\TowerMGR.cs" />
     <Compile Include="Assets\Scripts\UI\BackToTheGameButtonMGR.cs" />
+    <Compile Include="Assets\Scripts\CurveToMouseMGR.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Shapes2D\Demos\InputUtils.cs" />
     <Compile Include="Assets\Scripts\MapMGR.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Assets\Scripts\PointerTailMGR.cs" />
     <Compile Include="Assets\Scripts\UI\SelectStageButtonMGR.cs" />
     <Compile Include="Assets\Scripts\UI\PauseButtonMGR.cs" />
+    <Compile Include="Assets\Scripts\MusicMGR.cs" />
     <Compile Include="Assets\Scripts\CharacterDatabase.cs" />
     <Compile Include="Assets\Scripts\DamageTextMGR.cs" />
     <Compile Include="Assets\Shapes2D\Demos\Simple Effect\TapEffect.cs" />
@@ -107,8 +109,6 @@
     <Compile Include="Assets\Shapes2D\Demos\Flappy Shapes\Game.cs" />
     <Compile Include="Assets\Scripts\UI\CharacterInReserveMGR.cs" />
     <Compile Include="Assets\Shapes2D\Scripts\PolyMap.cs" />
-    <Compile Include="Assets\Scripts\CurveToMouseMGR.cs" />
-    <Compile Include="Assets\Scripts\MusicMGR.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Shapes2D\Shaders\Triangle.cginc" />

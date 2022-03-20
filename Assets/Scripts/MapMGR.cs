@@ -223,7 +223,7 @@ public class MapMGR : MonoBehaviour
                     TowerMGR towerMGR = towerGO.GetComponent<TowerMGR>();
 
                     map.MultiplySetValue(towerSpawnPos, GameManager.instance.towerID); //数値データをセット
-                    map.SetTowerMGR(towerSpawnPos, towerMGR); //スクリプトをセット
+                    map.SetFacility(towerSpawnPos, towerMGR); //スクリプトをセット
 
                 }
             }
@@ -912,7 +912,6 @@ public class MapData
         }
         _facilities = new Facility[width * height];
 
-
         FillAll(GameManager.instance.wallID); //mapの初期化はwallIDで行う
     }
 
@@ -997,44 +996,6 @@ public class MapData
         }
         return _facilities[index];
     }
-    public TowerMGR GetTowerMGR(int x, int y)
-    {
-        if (IsOutOfDataRange(x, y))
-        {
-            Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
-            return null; //例外用の数字を設定できないため、nullを返す。
-        }
-        if(_facilities[ToSubscript(x, y)] is TowerMGR)
-        {
-            return (TowerMGR)_facilities[ToSubscript(x, y)];
-        }
-        else
-        {
-            Debug.LogError($"(x, y)=({x},{y})にtowerMGRが含まれていません");
-            return null;
-        }
-    }
-    public TowerMGR GetTowerMGR(Vector2Int vector)
-    {
-        return GetTowerMGR(vector.x, vector.y);
-    }
-    public TowerMGR GetTowerMGR(int index)
-    {
-        if (index < 0 || index > _values.Length)
-        {
-            Debug.LogError("領域外の値を習得しようとしました");
-            return null; //例外用の数字を設定できないため、nullを返す
-        }
-        if (_facilities[index] is TowerMGR)
-        {
-            return (TowerMGR)_facilities[index];
-        }
-        else
-        {
-            Debug.LogError($"_facilities[{index}]にtowerMGRが含まれていません");
-            return null;
-        }
-    }
     //Setter
     public void SetValue(int x, int y, int value)
     {
@@ -1089,19 +1050,6 @@ public class MapData
     public void SetFacility(Vector2Int vector, Facility facility)
     {
         SetFacility(vector.x,vector.y,facility);
-    }
-    public void SetTowerMGR(int x, int y, TowerMGR towerMGR)
-    {
-        if (IsOutOfDataRange(x, y))
-        {
-            Debug.LogError($"IsOutOfDataRange({x},{y})がtrueです");
-            return;
-        }
-        _facilities[ToSubscript(x, y)] = towerMGR;
-    }
-    public void SetTowerMGR(Vector2Int vector,TowerMGR towerMGR)
-    {
-        SetTowerMGR(vector.x,vector.y,towerMGR);
     }
     public void MultiplySetValue(Vector2Int vector, int value)
     {

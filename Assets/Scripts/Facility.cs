@@ -35,8 +35,7 @@ public abstract class Facility : MonoBehaviour
 
     protected bool isFristBattle = true;
 
-    bool isAlive = true;  //HPが0になったときにDie()が2回以上呼ばれるのを防ぐために必要
-
+    protected bool isAlive = true; //HPが0になったときにDie()が2回以上呼ばれるのを防ぐために必要
 
     State _state; //プロパティを定義してある
 
@@ -68,12 +67,11 @@ public abstract class Facility : MonoBehaviour
         get { return hp; }
         set
         {
-            int beforeHp = hp;
             hp = value;
             if (hp <=0 && isAlive)
             {
-                isAlive = false; //すぐにfalseにして、Die()が2回以上呼ばれないようにする
-                Defeated();
+                isAlive = false;  //すぐにfalseにして、Die()が2回以上呼ばれないようにする
+                Die();
             }
 
         }
@@ -231,6 +229,6 @@ public abstract class Facility : MonoBehaviour
         cannonballGO.GetComponent<CannonballMGR>().FiringCannonball(gridPos,timeToImpact,targetCharacter);
 
     }
-    public abstract void Defeated(); //抽象メソッド
+    public abstract void Die(); //抽象メソッド
 
 }

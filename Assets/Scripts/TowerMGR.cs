@@ -1,12 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-
 
 public class TowerMGR : Facility
 {
-
     SpriteRenderer spriteRenderer;
     [SerializeField] protected Sprite[] towerSprites; //下、左、上、左下、左上の順番でインスペクター上でセットする
 
@@ -21,12 +18,6 @@ public class TowerMGR : Facility
         DiagLeftFront,
         DiagRightBack,
         DiagLeftBack
-    }
-    private enum State
-    {
-        neutral,
-        allay,
-        enemy
     }
     new void Start() //オーバーライド
     {
@@ -106,7 +97,7 @@ public class TowerMGR : Facility
         }
     }
 
-    public　override void Defeated()
+    public override void Die()
     {
         //Debug.Log($"HPが0以下になったので、タワーを破壊します gridPos:{gridPos}のタワー");
         
