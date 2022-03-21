@@ -177,10 +177,10 @@ public class AutoRouteData
             while (!isComplete)
             {
                 int loopNum = searchQue.Count; //前のループでキューに追加された個数を数える
-                Debug.Log($"i:{i}のときloopNum:{loopNum}");
+                //Debug.Log($"i:{i}のときloopNum:{loopNum}");
                 for (int k = 0; k < loopNum; k++)
                 {
-                    Debug.Log($"PlaceNumAround({searchQue.Peek()})を実行します");
+                    //Debug.Log($"PlaceNumAround({searchQue.Peek()})を実行します");
                     if (isComplete) break;
                     PlaceNumAround(searchQue.Dequeue());
                 }
@@ -199,7 +199,7 @@ public class AutoRouteData
 
             if (distance < 0) return; //0までQueに入れれば十分
 
-            Debug.Log($"GetValue({centerPos})は{GetValue(centerPos)}、distance:{distance}");
+            //Debug.Log($"GetValue({centerPos})は{GetValue(centerPos)}、distance:{distance}");
 
             // 5 7 8
             // 3 * 6
@@ -235,13 +235,13 @@ public class AutoRouteData
                     {
                         SetValue(inspectPos, i);
                         searchQue.Enqueue(inspectPos);
-                        Debug.Log($"({inspectPos})を{i}にし、探索用キューに追加しました。");
+                        //Debug.Log($"({inspectPos})を{i}にし、探索用キューに追加しました。");
                     }
                     if (inspectPos == targetPos)
                     {
                         isComplete = true;
                         maxDistance = i - 1;
-                        Debug.Log($"isCompleteをtrueにしました。maxDistance:{maxDistance}");
+                        //Debug.Log($"isCompleteをtrueにしました。maxDistance:{maxDistance}");
                         break; //探索終了
                     }
                 }

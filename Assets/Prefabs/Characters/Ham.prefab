@@ -120,20 +120,22 @@ MonoBehaviour:
   gridPos: {x: 0, y: 0}
   targetCastlePos: {x: 0, y: 0}
   targetFacilityPos: {x: 0, y: 0}
-  directionVectorToTarget: {x: 0, y: 0}
+  targetUnitPos: {x: 0, y: 0}
   targetFacility: {fileID: 0}
+  targetUnit: {fileID: 0}
+  directionVectorToTarget: {x: 0, y: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
-  characterSkillMGR: {fileID: -4141556545710182207}
-  skillIconParticle: {fileID: 7980619988896784401}
-  characterName: Ham
-  characterTypeID: 1
-  level: 0
   maxHp: 300
   hp: 0
   atk: 15
   atkInterval: 1
   atkRange: 1
   spd: 1.5
+  characterSkillMGR: {fileID: -4141556545710182207}
+  skillIconParticle: {fileID: 7980619988896784401}
+  characterName: Ham
+  characterTypeID: 1
+  level: 0
   coolTime: 1
   cost: 100
   sprite: {fileID: 7066945721484374052, guid: 6ac9a60687fabd44ab362bc994bdb544, type: 3}
@@ -178,7 +180,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.3
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
       propertyPath: m_LocalPosition.z

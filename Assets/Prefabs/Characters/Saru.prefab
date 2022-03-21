@@ -120,20 +120,22 @@ MonoBehaviour:
   gridPos: {x: 0, y: 0}
   targetCastlePos: {x: 0, y: 0}
   targetFacilityPos: {x: 0, y: 0}
-  directionVectorToTarget: {x: 0, y: 0}
+  targetUnitPos: {x: 0, y: 0}
   targetFacility: {fileID: 0}
+  targetUnit: {fileID: 0}
+  directionVectorToTarget: {x: 0, y: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
-  characterSkillMGR: {fileID: -4412939502055063203}
-  skillIconParticle: {fileID: 4329749796588312826}
-  characterName: Saru
-  characterTypeID: 5
-  level: 0
   maxHp: 100
   hp: 0
   atk: 10
   atkInterval: 1
   atkRange: 1
   spd: 2
+  characterSkillMGR: {fileID: -4412939502055063203}
+  skillIconParticle: {fileID: 4329749796588312826}
+  characterName: Saru
+  characterTypeID: 5
+  level: 0
   coolTime: 1
   cost: 30
   sprite: {fileID: -1653429110502446582, guid: 2c5546c048609c54799931ce8f62aa6e, type: 3}
@@ -160,6 +162,7 @@ MonoBehaviour:
   skillNum: 0
   duration: 3
   amount: 3
+  skillRemainingeTime: 0
 --- !u!1001 &3016941449853825900
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -177,7 +180,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.3
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 1569513525494623121, guid: 56733fbd3a5627c44b1491ac97e03fa4, type: 3}
       propertyPath: m_LocalPosition.z

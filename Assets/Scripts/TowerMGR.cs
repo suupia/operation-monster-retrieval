@@ -97,31 +97,17 @@ public class TowerMGR : Facility
         }
     }
 
-    //public override void Die()
-    //{
-    //    //Debug.Log($"HPが0以下になったので、タワーを破壊します gridPos:{gridPos}のタワー");
-
-    //    GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos,GameManager.instance.towerID); //先にデータを消去する
-
-    //    GameManager.instance.CurrentTowerNum--;
-
-    //    GameManager.instance.mapMGR.MakeRoadByTowerDead(gridPos.x,gridPos.y);
-
-
-    //    Destroy(this.gameObject);
-
-    //    //Debug.Log($"{gridPos}のタワーをDestroyしました。");
-
-    //}
-
     public override void Die()
     {
-        Debug.LogWarning($"TowerMGRのDieを実行します　IsEnemySide:{IsEnemySide}");
+        Debug.Log($"TowerMGRのDieを実行します　IsEnemySide:{IsEnemySide}");
         if (IsEnemySide)
         {
             //制圧されたときの処理
             GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos, GameManager.instance.towerID);
             GameManager.instance.CurrentTowerNum--;
+
+            //リカバーする
+            StartCoroutine(RecoverCoroutine());
 
             //リセットの処理（FacilityのStart関数を参考にする）
             GameManager.instance.mapMGR.GetMap().MultiplySetValue(gridPos,GameManager.instance.allyTowerID);
@@ -138,6 +124,9 @@ public class TowerMGR : Facility
             GameManager.instance.mapMGR.GetMap().DivisionalSetValue(gridPos, GameManager.instance.allyTowerID);
             GameManager.instance.CurrentAllyTowerNum--;
 
+            //リカバーする
+            StartCoroutine(RecoverCoroutine());
+
             //リセットの処理
             GameManager.instance.mapMGR.GetMap().MultiplySetValue(gridPos, GameManager.instance.towerID);
             GameManager.instance.CurrentTowerNum++;
@@ -147,7 +136,15 @@ public class TowerMGR : Facility
             targetUnitID = GameManager.instance.characterID;
         }
 
+    }
 
-
+    private IEnumerator RecoverCoroutine()
+    {
+        isRecovering = true;
+        for (float timer = 0; timer < timeToRecover; timer += Time.deltaTime * GameManager.instance.gameSpeed)
+        {
+            yield return null;
+        }
+        isRecovering = false;
     }
 }

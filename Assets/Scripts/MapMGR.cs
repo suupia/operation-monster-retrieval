@@ -189,7 +189,6 @@ public class MapMGR : MonoBehaviour
         //プレイヤーの城を配置
         GameObject allyCastleGO = Instantiate(allysCastlePrefab, new Vector3(allysCastlePos.x, allysCastlePos.y + 1, 0), Quaternion.identity);//画像の中心が格子点にくるように、+1していることに注意
         CastleMGR allyCastleMGR = allyCastleGO.GetComponent<CastleMGR>();
-        Debug.LogWarning("allyCastleMGRのIsEnemySideをfalseにします");
 
         map.DivisionalSetValue(allysCastlePos, GameManager.instance.wallID); //城のマスの壁は取り除き、
         map.MultiplySetValue(allysCastlePos, GameManager.instance.groundID); //地面にする
@@ -200,7 +199,6 @@ public class MapMGR : MonoBehaviour
         //敵の城を配置
         GameObject enemyCastleGO = Instantiate(enemysCastlePrefab, new Vector3(enemysCastlePos.x + 1, enemysCastlePos.y, 0), Quaternion.identity);
         CastleMGR enemyCastleMGR = enemyCastleGO.GetComponent<CastleMGR>();
-
 
         map.DivisionalSetValue(enemysCastlePos, GameManager.instance.wallID); //城のマスの壁は取り除き、
         map.MultiplySetValue(enemysCastlePos, GameManager.instance.groundID); //地面にする

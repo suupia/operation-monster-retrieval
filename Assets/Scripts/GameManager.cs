@@ -384,12 +384,12 @@ public class GameManager : MonoBehaviour
 
         }
 
-        Debug.LogWarning($"StagesClearedNum:{StagesClearedNum}");
+        Debug.Log($"StagesClearedNum:{StagesClearedNum}");
         //StagesClearedNumを更新する
         if (StagesClearedNum < mapMGR.GetStageNum() + 1)
         {
             StagesClearedNum = mapMGR.GetStageNum() + 1;
-            Debug.LogWarning($"StagesClearedNumを更新して:{StagesClearedNum}　にしました");
+            Debug.Log($"StagesClearedNumを更新して:{StagesClearedNum}　にしました");
 
         }
 
@@ -440,7 +440,7 @@ public class GameManager : MonoBehaviour
         int characterTypeID = IDsOfCharactersInCombat[buttonNum];
 
         Vector3 displacement = new Vector3(characterDisplacement * (currentCharacterNum % 7) - 3 * characterDisplacement, 0.5f * (characterDisplacement * (currentCharacterNum % 7) - 3 * characterDisplacement), 0); //キャラクターを少しずらす y方向のズレはx方向のズレの0.5倍
-        Debug.Log($"displacement:{displacement}");
+        //Debug.Log($"displacement:{displacement}");
 
         GameObject characterGO = Instantiate(characterPrefabs[characterTypeID], new Vector3(vector.x + 0.5f, vector.y + 0.5f, 0) + displacement, Quaternion.identity);
 
@@ -505,7 +505,7 @@ public class GameManager : MonoBehaviour
 
 
         //ロボットのautoRoteを初期化する
-        robotMGR.SetCharacterData(robotTypeID);
+        robotMGR.SetRobotData(robotTypeID);
 
         mapMGR.MultiplySetMapValue(vector, robotID);
         mapMGR.GetMap().AddUnit(vector, robotMGR);

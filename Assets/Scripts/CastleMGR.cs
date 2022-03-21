@@ -39,7 +39,16 @@ public class CastleMGR : Facility
 
         Debug.Log($"HPが0以下になったので、城を破壊します gridPos:{gridPos}の城");
 
-        GameManager.instance.StartShowingResults(true);
+        if (IsEnemySide)
+        {
+            //プレイヤーの勝ち
+            GameManager.instance.StartShowingResults(true);
+        }
+        else
+        {
+            //プレイヤーの負け
+            GameManager.instance.StartShowingResults(false);
+        }
 
         GameManager.instance.mapMGR.MakeRoadByTowerDead(gridPos.x,gridPos.y);
 

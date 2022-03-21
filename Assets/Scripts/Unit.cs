@@ -11,12 +11,15 @@ public abstract class Unit : MonoBehaviour
 
     [SerializeField] protected Vector2Int gridPos;
 
-    [SerializeField] protected Vector2Int targetCastlePos;
-    [SerializeField] protected Vector2Int targetFacilityPos;
+    protected int targetUnitID;   //キャラクターとロボットで標的のユニットのIDが違う
     protected int targetTowerID;  //キャラクターとロボットで標的のタワーのIDが違う
     protected int targetCastleID; //キャラクターとロボットで標的の城のIDが違う
+    [SerializeField] protected Vector2Int targetCastlePos;  //デバッグ用にSerializeFieldにしておく
+    [SerializeField] protected Vector2Int targetFacilityPos;
+    [SerializeField] protected Vector2Int targetUnitPos;
+    [SerializeField] protected Facility targetFacility;     //スクリプトをInBattleのとき一回だけ取得する
+    [SerializeField] protected List<Unit> targetUnits;             //スクリプトを一回だけ取得する
     [SerializeField] protected Vector2Int directionVectorToTarget;
-    [SerializeField] protected Facility targetFacility;
 
     protected GameObject damageTextParent; //Findで取得する
     [SerializeField] protected GameObject damageTextPrefab; //インスペクター上でセットする
@@ -39,7 +42,7 @@ public abstract class Unit : MonoBehaviour
             }
             if (value - beforeHp < 0)
             {
-                Debug.Log("SetDamagedAnimationを呼びます");
+                //Debug.Log("SetDamagedAnimationを呼びます");
                 StartCoroutine(SetDamageAnimation());
             }
 
@@ -48,6 +51,7 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] protected int atk;
     [SerializeField] protected float atkInterval;
     [SerializeField] protected int atkRange;
+    [SerializeField] protected bool isAttackOfArea; //範囲攻撃か否か
     [SerializeField] protected float spd; //1秒間に進むマスの数 [マス/s]  とりあえず１にしておく
     protected float moveTime; // movetime = 1/spd [s]
 
@@ -74,7 +78,6 @@ public abstract class Unit : MonoBehaviour
                 case State.Marching:
                     break;
                 case State.InBattle:
-                    isFristBattle = true;
                     break;
             }
             _state = value;
@@ -87,7 +90,8 @@ public abstract class Unit : MonoBehaviour
     }
     protected bool isAttacking = false;
     protected bool isMoving = false;
-    protected bool isFristBattle = true;
+
+    protected bool isTargetUnit;   //攻撃目標がユニットかタワーのどちらであるか判断するために必要
     bool isAlive = true;  //HPが0になったときにDie()が2回以上呼ばれるのを防ぐために必要
 
 
@@ -266,12 +270,16 @@ public abstract class Unit : MonoBehaviour
 
         if (this is CharacterMGR)
         {
+            //CharacterMGRのとき
+            targetUnitID = GameManager.instance.robotID;
             targetTowerID = GameManager.instance.towerID;
             targetCastlePos = GameManager.instance.mapMGR.GetEnemysCastlePos();
             targetCastleID = GameManager.instance.enemyCastleID;
         }
         else
         {
+            //RobotMGRのとき
+            targetUnitID = GameManager.instance.characterID;
             targetTowerID = GameManager.instance.allyTowerID;
             targetCastlePos = GameManager.instance.mapMGR.GetAllysCastlePos();
             targetCastleID = GameManager.instance.allyCastleID;
@@ -371,7 +379,7 @@ public abstract class Unit : MonoBehaviour
     }
     private void MoveForward()
     {
-        Debug.Log("MoveForwardを実行します");
+        //Debug.Log("MoveForwardを実行します");
         if (!isMoving) StartCoroutine(MoveForwardCoroutine());
     }
 
@@ -466,10 +474,37 @@ public abstract class Unit : MonoBehaviour
 
         CheckIfCauseSkill();
 
+        if (Function.isWithinTheAttackRange(gridPos, atkRange, targetUnitID, out targetUnitPos))
+        {
+            Debug.Log($"攻撃範囲内にユニットがあるのでInBattleに切り替えます targetUnitPos:{targetUnitPos}");
+            if (isAttackOfArea)
+            {
+                //範囲攻撃
+                targetUnits.Clear();
+                foreach (Unit unit in GameManager.instance.mapMGR.GetMap().GetUnitList(targetUnitPos))
+                {
+                    targetUnits.Add(unit);
+                }
+            }
+            else
+            {
+                //単体攻撃
+                targetUnits.Clear();
+                targetUnits.Add(GameManager.instance.mapMGR.GetMap().GetUnitList(targetUnitPos)[0]);  //マスの中の先頭のユニットのスクリプトを取得
+            }
+            Debug.Log($"targetUnit:{targetUnits}");
+            SetDirection(targetUnitPos - gridPos);
+            isTargetUnit = true;
+            state = State.InBattle;
+            return;
+        }
+
         if (Function.isWithinTheAttackRange(gridPos, atkRange, targetTowerID, out targetFacilityPos) || Function.isWithinTheAttackRange(gridPos, atkRange, targetCastleID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワー（城を除く）があるとき
         {
             Debug.Log($"攻撃範囲内にタワーがあるのでInBattleに切り替えます targetFacilityPos:{targetFacilityPos}");
+            targetFacility = GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos); //タワーのスクリプトを取得
             SetDirection(targetFacilityPos - gridPos);
+            isTargetUnit = false;
             state = State.InBattle;
             return;
         }
@@ -503,14 +538,8 @@ public abstract class Unit : MonoBehaviour
 
     private void Battle()
     {
-        //Debug.LogWarning($"Battleを実行します targetTowerPos:{targetTowerPos}");
+        //Debug.Log($"Battleを実行します targetTowerPos:{targetTowerPos}");
 
-        if (isFristBattle)
-        {
-            isFristBattle = false;
-
-            targetFacility = GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos);
-        }
 
         Attack();
     }
@@ -519,18 +548,22 @@ public abstract class Unit : MonoBehaviour
     {
         //Debug.Log($"Attackを実行します");
 
-        //if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) == null)
-        //{ //towerMGRがないということはタワーを破壊したということなので、Marchingに切り替える
-        //    Debug.Log($"タワーを破壊したのでMarchingに切り替えます targetFacilityPos:{targetFacilityPos}");
-        //    state = State.Marching;
-        //    return;
-        //}
+        //ユニットがターゲットのとき
+        targetUnits.RemoveAll(unit => unit  == null); //倒したユニットへの参照はnullになっているためそれを取り除く
+        Debug.Log($"targetUnit:{targetUnits}");
+        if (isTargetUnit && targetUnits.Count == 0)
+        {
+            Debug.Log($"ターゲットのユニットを倒したのでMarchingに切り替えます targetUnitPos:{targetUnitPos}");
+            state = State.Marching;
+            return;
+        }
+
+        //ターゲットが施設のとき
         if (this is CharacterMGR)
         {
             //CharacterMGRのとき
-            if (!GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos).IsEnemySide)
+            if (!isTargetUnit && !targetFacility.IsEnemySide)
             {
-                //targetFacilityが味方ということは、制圧したということなので、Marchingに切り替える
                 Debug.Log($"敵のタワーを制圧したのでMarchingに切り替えます targetFacilityPos:{targetFacilityPos}");
                 state = State.Marching;
                 return;
@@ -538,10 +571,9 @@ public abstract class Unit : MonoBehaviour
         }
         else
         {
-            //RobotMGRのとき
-            if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos).IsEnemySide)
+            //RobatMGRのとき
+            if (!isTargetUnit && targetFacility.IsEnemySide)
             {
-                //targetFacilityが敵ということは、制圧したということなので、Marchingに切り替える
                 Debug.Log($"プレイヤーのタワーを制圧したのでMarchingに切り替えます targetFacilityPos:{targetFacilityPos}");
                 state = State.Marching;
                 return;
@@ -558,14 +590,38 @@ public abstract class Unit : MonoBehaviour
         float timer = 0;
         int damage;
 
-        Debug.Log($"AttackCoroutineを実行します");
+        Debug.Log($"AttackCoroutineを実行します targetUnitPos:{targetUnitPos}, targetFacilityPos{targetFacilityPos}");
 
         isAttacking = true;
 
         damage = CalcDamage(atk);
 
-        Debug.Log($"Facility({targetFacilityPos})に{damage}のダメージを与えた");
-        targetFacility.HP -= damage;
+        if (isTargetUnit)
+        {
+            //攻撃対象がユニットのとき
+            foreach (Unit unit in targetUnits)
+            {
+                if (unit == null)
+                {
+                    Debug.LogWarning("targetUnitsの中のunitがnullのため、次のループに入ります");
+                    continue;
+                }
+                Debug.Log($"Unit:{unit}(targetUnitPos:{targetUnitPos})に{damage}のダメージを与えます");
+                unit.HP -= damage;
+            }
+        }
+        else
+        {
+            //攻撃対象が施設のとき
+            if(targetFacility == null)
+            {
+                Debug.LogError("targetFacilitytがnullのです");
+                //コルーチンなのでreturnできないから、エラーのログだけ出しておく
+            }
+            Debug.Log($"targetFacility:{targetFacility}(targetFacilityPos:{targetFacilityPos})に{damage}のダメージを与えます");
+            targetFacility.HP -= damage;
+        }
+
         DrawDamage(damage);
 
         while (timer < atkInterval)
@@ -585,7 +641,7 @@ public abstract class Unit : MonoBehaviour
 
         int result = 0;
 
-        if (GameManager.instance.mapMGR.GetMap().GetFacility(targetFacilityPos) is CastleMGR) //今ターゲットとしている施設が城であった場合、タワーの数を考慮した計算式に変える
+        if (GameManager.instance.mapMGR.GetMap().GetValue(targetFacilityPos) % targetCastleID == 0) //今ターゲットとしている施設が城であった場合、タワーの数を考慮した計算式に変える
         {
             if (this is CharacterMGR)
             {
@@ -626,38 +682,29 @@ public abstract class Unit : MonoBehaviour
         switch (direction)
         {
             case Direction.Back:
-                Debug.Log($"{direction}のdamageアニメーションを設定します");
                 animator.SetTrigger("BackDamage");
                 break;
 
             case Direction.DiagLeftBack:
             case Direction.DiagRightBack:
-                Debug.Log($"{direction}のdamageアニメーションを設定します");
-
                 animator.SetTrigger("DiagonalBackDamage");
                 break;
 
             case Direction.Left:
             case Direction.Right:
-                Debug.Log($"{direction}のdamageアニメーションを設定します");
-
                 animator.SetTrigger("SideDamage");
                 break;
 
             case Direction.DiagLeftFront:
             case Direction.DiagRightFront:
-                Debug.Log($"{direction}のdamageアニメーションを設定します");
-
                 animator.SetTrigger("DiagonalFrontDamage");
                 break;
 
             case Direction.Front:
-                Debug.Log($"{direction}のdamageアニメーションを設定します");
-
                 animator.SetTrigger("FrontDamage");
                 break;
-
         }
+        //Debug.Log($"{direction}のdamageアニメーションを設定しました");
 
     }
 

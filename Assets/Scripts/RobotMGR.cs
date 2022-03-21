@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class RobotMGR : Unit
 {
-    public void SetCharacterData(int robotTypeID)
+    public void SetRobotData(int robotTypeID)
     {
         autoRoute = GameManager.instance.robotAutoRouteDatas[robotTypeID];
-        Debug.LogWarning($"autoRoute:{autoRoute}");
+        Debug.Log($"ÉçÉ{ÉbÉgÇÃautoRoute:{autoRoute}");
     }
 
 

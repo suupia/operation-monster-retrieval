@@ -176,7 +176,7 @@ public static class Function
                         isComplete = true;
                         SetValueByVector(inspectPos, n);
                         maxDistance = n;
-                        Debug.Log($"isComplete‚ğtrue‚É‚µ‚Ü‚µ‚½BmaxDistance:{maxDistance}");
+                        //Debug.Log($"isComplete‚ğtrue‚É‚µ‚Ü‚µ‚½BmaxDistance:{maxDistance}");
                         break; //’TõI—¹
                     }
                 }

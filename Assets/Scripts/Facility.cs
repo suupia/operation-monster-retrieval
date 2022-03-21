@@ -49,10 +49,11 @@ public abstract class Facility : MonoBehaviour
     protected int targetUnitID; //isEnemySideをもとにして、キャラクターを攻撃するかロボットを攻撃するかどうかを決める
 
     protected bool isAttacking = false;
-
     protected bool isFristBattle = true;
-
     protected bool isAlive = true; //HPが0になったときにDie()が2回以上呼ばれるのを防ぐために必要
+
+    [SerializeField] protected float timeToRecover;  //制圧されてから復旧するまでの時間(Tower用)
+    protected bool isRecovering; //コルーチン用
 
     State _state; //プロパティを定義してある
 
@@ -128,6 +129,8 @@ public abstract class Facility : MonoBehaviour
         {
             return;
         }
+
+        if (isRecovering) return;  //リカバー中のときはUpdateの処理をしない
 
         switch (state)
         {
@@ -216,7 +219,7 @@ public abstract class Facility : MonoBehaviour
 
         targetCharacter.HP -= damage;
 
-        Debug.LogWarning("BeHitCoroutineを開始します");
+        Debug.Log("BeHitCoroutineを開始します");
         StartCoroutine(BeHitCoroutine(damage));
 
 

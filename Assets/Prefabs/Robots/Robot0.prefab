@@ -119,12 +119,14 @@ MonoBehaviour:
   gridPos: {x: 0, y: 0}
   targetCastlePos: {x: 0, y: 0}
   targetFacilityPos: {x: 0, y: 0}
-  directionVectorToTarget: {x: 0, y: 0}
+  targetUnitPos: {x: 0, y: 0}
   targetFacility: {fileID: 0}
+  targetUnit: {fileID: 0}
+  directionVectorToTarget: {x: 0, y: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
   maxHp: 100
   hp: 0
-  atk: 5
+  atk: 20
   atkInterval: 1
   atkRange: 1
   spd: 3

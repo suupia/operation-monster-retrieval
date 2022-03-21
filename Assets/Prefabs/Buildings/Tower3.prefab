@@ -95,6 +95,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d59152f39674af6438cae6dae2437d39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isEnemySide: 1
   gridPos: {x: 0, y: 0}
   targetCharacterPos: {x: 0, y: 0}
   targetCharacter: {fileID: 0}
@@ -113,3 +114,4 @@ MonoBehaviour:
   - {fileID: 6259650567325851665, guid: e2d07a2f2c1998940b67797fcdaffe92, type: 3}
   - {fileID: 6432845762601783245, guid: e2d07a2f2c1998940b67797fcdaffe92, type: 3}
   - {fileID: -7550886670452958385, guid: e2d07a2f2c1998940b67797fcdaffe92, type: 3}
+  timeToRecover: 3
