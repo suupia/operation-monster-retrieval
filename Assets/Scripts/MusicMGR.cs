@@ -1,16 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using CriWare;
 
 public class MusicMGR : MonoBehaviour
 {
-    private CriAtomExPlayer atomExPlayer;
-    private CriAtomExAcb atomExStageBGMAcb;          //StageBGMシートのacbファイルを読み込む
-    private CriAtomEx.CueInfo[] stageBGMCueInfoList; //StageBGMシートのキュー情報
+    CriAtomExPlayer bgmAtomExPlayer;
+    CriAtomExPlayback bgmPlayback;  //パラメーター更新のために必要
+    CriAtomExPlayer seAtomExPlayer;
+    CriAtomExPlayback sePlayback;
+    CriAtomExAcb stageBGMAcb;          //StageBGMシートのacbファイルを読み込む
+    CriAtomEx.CueInfo[] stageBGMCueInfoList; //StageBGMシートのキュー情報
+    CriAtomExAcb combatSEAcb;
+
+    [SerializeField] Slider bgmVolSlider; //インスペクター上でセットする
+    [SerializeField] Slider seVolSlider;    //インスペクター上でセットする
+
+    bool isSetup; //スライダーを初期化したときにOnBGMVolSliderChangedなどでnull参照が起きないようにするために必要
 
     IEnumerator Start()
     {
+        isSetup = true;
+
+        //ボリューム調節のスライダーの位置をjsonから読み込む(保存は戦闘終了時に行う)
+        bgmVolSlider.value = GameManager.instance.saveMGR.GetBGMVolume();
+        seVolSlider.value = GameManager.instance.saveMGR.GetSEVolume();
+
+
         //キューシートファイルのロード待ち
         while (CriAtom.CueSheetsAreLoading)
         {
@@ -19,16 +36,22 @@ public class MusicMGR : MonoBehaviour
 
         //AtomExPlayerの生成
         Debug.Log("AtomExPlayerを生成します");
-        atomExPlayer = new CriAtomExPlayer();
+        bgmAtomExPlayer = new CriAtomExPlayer();
+        bgmAtomExPlayer.SetVolume(bgmVolSlider.value);
+        seAtomExPlayer = new CriAtomExPlayer();
+        seAtomExPlayer.SetVolume(seVolSlider.value);
 
         //Cue情報の取得
-        atomExStageBGMAcb = CriAtom.GetAcb("StageBGM");
-        stageBGMCueInfoList = atomExStageBGMAcb.GetCueInfoList();
+        stageBGMAcb = CriAtom.GetAcb("StageBGM");
+        combatSEAcb = CriAtom.GetAcb("CombatSE");
+        stageBGMCueInfoList = stageBGMAcb.GetCueInfoList();
+
+        isSetup = false;
     }
 
     private void OnDestroy()
     {
-        atomExPlayer.Dispose();
+        bgmAtomExPlayer.Dispose();
     }
 
     //public void StartAndStopSound(int index)
@@ -60,52 +83,88 @@ public class MusicMGR : MonoBehaviour
 
     //}
 
+    //StageBGM関連
     public void StartStageBGM(int index)
     {
-        //if (atomExPlayer == null)
-        //{
-        //    Debug.LogError($"atomExPlayerがインスタンス化されていません");
-        //    return;
-        //}
-
-        //if (atomExPlayer.GetStatus() == CriAtomExPlayer.Status.Stop)
-        //{
-        //    //プレイヤーにStageBGMシートのキューを設定
-        //    atomExPlayer.SetCue(atomExStageBGMAcb, stageBGMCueInfoList[index].name);
-        //    //再生
-        //    atomExPlayer.Start();
-        //}
-        //else
-        //{
-        //    Debug.LogError($"atomExPlayer.GetStatus()の状態が[Stop]でありません　atomExPlayer.GetStatus():{atomExPlayer.GetStatus()}");
-        //}
-
-    }
-
-    public void StopStageBGM(int index)
-    {
-        if (atomExPlayer == null)
+        if (bgmAtomExPlayer == null)
         {
             Debug.LogError($"atomExPlayerがインスタンス化されていません");
             return;
         }
 
-        if (atomExPlayer.GetStatus() == CriAtomExPlayer.Status.Playing)
+        if (bgmAtomExPlayer.GetStatus() == CriAtomExPlayer.Status.Stop)
         {
-            //プレイヤーにMUSICシートのキューを設定
-            atomExPlayer.SetCue(atomExStageBGMAcb, stageBGMCueInfoList[index].name);
-            //停止
-            atomExPlayer.Stop();
+            //プレイヤーにStageBGMシートのキューを設定
+            bgmAtomExPlayer.SetCue(stageBGMAcb, stageBGMCueInfoList[index].name);
+            //再生
+            bgmPlayback =  bgmAtomExPlayer.Start();
         }
         else
         {
-            Debug.LogError($"atomExPlayer.GetStatus()の状態が[Playing]でありません　atomExPlayer.GetStatus():{atomExPlayer.GetStatus()}");
+            Debug.LogError($"atomExPlayer.GetStatus()の状態が[Stop]でありません　atomExPlayer.GetStatus():{bgmAtomExPlayer.GetStatus()}");
+        }
+
+    }
+
+    public void StopStageBGM(int index)
+    {
+        if (bgmAtomExPlayer == null)
+        {
+            Debug.LogError($"bgmAtomExPlayerがインスタンス化されていません");
+            return;
+        }
+
+        if (bgmAtomExPlayer.GetStatus() == CriAtomExPlayer.Status.Playing)
+        {
+            //プレイヤーにMUSICシートのキューを設定
+            bgmAtomExPlayer.SetCue(stageBGMAcb, stageBGMCueInfoList[index].name);
+            //停止
+            bgmAtomExPlayer.Stop();
+        }
+        else
+        {
+            Debug.LogError($"bgmAtomExPlayer.GetStatus()の状態が[Playing]でありません　bgmAtomExPlayer.GetStatus():{bgmAtomExPlayer.GetStatus()}");
         }
     }
 
     public void StopAllBGM() //デバッグ用なのでずさんなつくり
     {
-        atomExPlayer.Stop();
+        bgmAtomExPlayer.Stop();
     }
 
+    //CombatSE関連
+    public void StartCombatSE(string queName)
+    {
+        if (seAtomExPlayer == null)
+        {
+            Debug.LogError($"seAtomExPlayerがインスタンス化されていません");
+            return;
+        }
+
+        //SEだから、seAtomExPlayerの状態によらず、StartでOK
+        seAtomExPlayer.SetCue(combatSEAcb, queName);
+        seAtomExPlayer.Start();
+
+    }
+
+    public void OnBGMVolSliderChanged() //スライダーのイベントコールバック用（インスペクター上でセットする）
+    {
+        if (isSetup) return;
+        bgmAtomExPlayer.SetVolume(bgmVolSlider.value);
+        bgmAtomExPlayer.Update(bgmPlayback);
+    }
+
+    public void OnSEVolSliderChanged()
+    {
+        if (isSetup) return;
+        seAtomExPlayer.SetVolume(seVolSlider.value);
+        seAtomExPlayer.Update(sePlayback);
+    }
+
+    public void SaveBGMAndSEVolume()
+    {
+        GameManager.instance.saveMGR.SaveBGMVolume(bgmVolSlider.value);
+        GameManager.instance.saveMGR.SaveSEVolume(seVolSlider.value);
+
+    }
 }

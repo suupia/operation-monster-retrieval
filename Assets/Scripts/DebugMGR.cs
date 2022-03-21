@@ -101,6 +101,10 @@ public class DebugMGR : MonoBehaviour
         {
             GameManager.instance.SpawnRobot();
         }
+        if (Input.GetKeyDown(KeyCode.F8))
+        {
+            DebugRoute(Function.SearchShortestNonDiagonalRouteToCastle(new Vector2Int(1,3)));
+        }
 
         if (isDebuggingMap) DebugMap();
         if (isDebuggingAutoRoute) DebugAutoRoute();

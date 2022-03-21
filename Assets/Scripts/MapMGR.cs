@@ -151,6 +151,17 @@ public class MapMGR : MonoBehaviour
             }
         }
 
+        //城の場所は地面にする
+        map.DivisionalSetValue(allysCastlePos, GameManager.instance.wallID); //城のマスの壁は取り除き、
+        map.MultiplySetValue(allysCastlePos, GameManager.instance.groundID); //地面にする
+        map.MultiplySetValue(allysCastlePos, GameManager.instance.allyCastleID); //城の数値データをセット
+
+        map.DivisionalSetValue(enemysCastlePos, GameManager.instance.wallID); //城のマスの壁は取り除き、
+        map.MultiplySetValue(enemysCastlePos, GameManager.instance.groundID); //地面にする
+        map.MultiplySetValue(enemysCastlePos, GameManager.instance.enemyCastleID); //城の数値データをセット
+
+
+
         numOfFristRoadCounter = GetNumOfFristRoad();
 
         makeTheFirstRoadText = makeTheFirstRoadGO.GetComponent<Text>();
@@ -665,13 +676,13 @@ public class MapMGR : MonoBehaviour
 
         foreach (Vector2Int adjacentPos in adjacentPosList)
         {
-            if (Function.SearchShortestNonDiagonalRoute(startPos, adjacentPos) == null)
+            if (Function.NonDiagonalSearchShortestRoute(startPos, adjacentPos) == null)
             {
                 result = false;
                 continue;
             }
 
-            if (Function.SearchShortestNonDiagonalRoute(startPos, adjacentPos).Count >= (mapWidth - 3) + (mapHeight - 3) - 1) //少なくとも最短場合よりルートが長くなる (-3は城があるところは壁が確定していることに注意)
+            if (Function.NonDiagonalSearchShortestRoute(startPos, adjacentPos).Count >= (mapWidth - 3) + (mapHeight - 3) - 1) //少なくとも最短場合よりルートが長くなる (-3は城があるところは壁が確定していることに注意)
             {
                 result = true;
             }

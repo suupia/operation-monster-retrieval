@@ -211,11 +211,7 @@ public abstract class Facility : MonoBehaviour
         //ダメージの表示や砲丸の表示を行う（targetCharacterの情報を使うため、先に処理する）
         DrawCannonBall();
 
-        //yield return new WaitForSeconds(timeToImpact);
-        //DrawDamage(damage);
-        ////キャラクターにダメージを与える（データの処理が後）
-        //targetCharacter.HP -= damage;
-        //Debug.Log($"Character({targetCharacterPos})に{damage}のダメージを与えた");
+        GameManager.instance.musicMGR.StartCombatSE("Cannon");
 
         targetCharacter.HP -= damage;
 

@@ -122,7 +122,7 @@ MonoBehaviour:
   targetFacilityPos: {x: 0, y: 0}
   targetUnitPos: {x: 0, y: 0}
   targetFacility: {fileID: 0}
-  targetUnit: {fileID: 0}
+  targetUnits: []
   directionVectorToTarget: {x: 0, y: 0}
   damageTextPrefab: {fileID: 1328902975400080137, guid: c8ba26305b54cb34a9c5f08f83fbcb54, type: 3}
   maxHp: 6
@@ -130,6 +130,7 @@ MonoBehaviour:
   atk: 3
   atkInterval: 1
   atkRange: 1
+  isAttackOfArea: 0
   spd: 3
   characterSkillMGR: {fileID: -7176052028087755538}
   skillIconParticle: {fileID: 3769738734650269796}
@@ -163,6 +164,7 @@ MonoBehaviour:
   duration: 3
   amount: 3
   skillRemainingeTime: 0
+  skillIconEffectPrefab: {fileID: 7159713530784304179, guid: 36ec400edd8e33143a7047f93dd953fe, type: 3}
 --- !u!1001 &2420901797089184754
 PrefabInstance:
   m_ObjectHideFlags: 0

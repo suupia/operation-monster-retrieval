@@ -2,14 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ManualRouteData : MonoBehaviour
+public class ManualRouteData
 {
     List<Vector2Int> manualRoute;
     List<Vector2Int> nonDiagonalManualRoute;
     List<int> nonDiagonalPoints;
 
     List<GameObject> pointerTails;
-    private bool inEditingPointerTails;
+    bool inEditingPointerTails;
+
+    bool wasEdited; //編集されてルートを持っているときtrue
+    List<Vector2Int> nonDiagonalAutoRoute;
+    List<Vector2Int> diagonalAutoRoute;
 
     //コンストラクタ
     public ManualRouteData()
@@ -40,10 +44,38 @@ public class ManualRouteData : MonoBehaviour
         return pointerTails;
     }
 
+    public bool GetWasEdited()
+    {
+        return wasEdited;
+    }
+
+    public List<Vector2Int> GetNonDiagonalAutoRoute()
+    {
+        return nonDiagonalAutoRoute;
+    }
+    public List<Vector2Int> GetDiagonalAutoRoute()
+    {
+        return diagonalAutoRoute;
+    }
+
+
+    public List<Vector2Int> GetNonDiagonalManualorAutoRoute() //ManualRouteが空のときはAutoRouteを返す PointerTailMGR用
+    {
+        if (wasEdited) return nonDiagonalManualRoute;
+        else return nonDiagonalAutoRoute;
+    }
+    public List<Vector2Int> GetDiagonalManualorAutoRoute() //ManualRouteが空のときはAutoRouteを返す PointerTailMGR用
+    {
+        if (wasEdited) return manualRoute;
+        else return diagonalAutoRoute;
+    }
+
+
     //Setter
     public void SetManualRoute(List<Vector2Int> route)
     {
         manualRoute = route;
+        wasEdited = true;
     }
 
     public void SetNonDiagonalManualRoute(List<Vector2Int> route)
@@ -62,6 +94,7 @@ public class ManualRouteData : MonoBehaviour
         nonDiagonalManualRoute.Clear();
         nonDiagonalPoints.Clear();
         DestroyPointerTails();
+        wasEdited = false;
     }
 
     public void ShowSelectedManualRoute()
@@ -69,9 +102,23 @@ public class ManualRouteData : MonoBehaviour
         if (inEditingPointerTails) return;
         inEditingPointerTails = true;
 
-        while (nonDiagonalManualRoute.Count - 1 > pointerTails.Count)
+        List<Vector2Int> diagonalRoute;
+        if (!wasEdited) //コピー開始時にManualRouteが空のときは、AutoRouteに代入して置いて、これをコピーする
         {
-            GameObject pointerTail = GameManager.instance.pointerMGR.SpawnPointerTail(nonDiagonalManualRoute[pointerTails.Count]);
+            nonDiagonalAutoRoute = Function.SearchShortestNonDiagonalRouteToCastle(GameManager.instance.mapMGR.GetAllysCastlePos());
+            diagonalAutoRoute = Function.SearchShortestDiagonalRouteToCastle(GameManager.instance.mapMGR.GetAllysCastlePos());
+
+            diagonalRoute = diagonalAutoRoute;
+        }
+        else
+        {
+            diagonalRoute = manualRoute;
+        }
+
+
+        while (diagonalRoute.Count - 1 > pointerTails.Count)
+        {
+            GameObject pointerTail = GameManager.instance.pointerMGR.SpawnPointerTail(diagonalRoute[pointerTails.Count]);
             pointerTails.Add(pointerTail);
         }
         inEditingPointerTails = false;
@@ -82,12 +129,24 @@ public class ManualRouteData : MonoBehaviour
         if (inEditingPointerTails) return;
         inEditingPointerTails = true;
 
-        while (0 < pointerTails.Count)
-        {
-            Destroy(pointerTails[pointerTails.Count - 1]);
-            pointerTails.RemoveAt(pointerTails.Count - 1);
-            //pointerTailMGRs.RemoveAt(pointerTails.Count - 1);
-        }
+        GameManager.instance.pointerMGR.DestroyPointerTails(pointerTails);
+
         inEditingPointerTails = false;
+    }
+
+    public void CopyManualRouteData(ManualRouteData manualRouteData)
+    {
+        if (manualRouteData.GetWasEdited())
+        {
+            SetManualRoute(manualRouteData.GetManualRoute());
+            SetNonDiagonalManualRoute(manualRouteData.GetNonDiagonalManualRoute());
+            //SetNonDiagonalPoints(manualRouteData.GetNonDiagonalPoints());
+        }
+        else
+        {
+            SetManualRoute(manualRouteData.GetDiagonalAutoRoute());
+            SetNonDiagonalManualRoute(manualRouteData.GetNonDiagonalAutoRoute());
+            //SetNonDiagonalPoints();
+        }
     }
 }

@@ -397,6 +397,7 @@ public class GameManager : MonoBehaviour
         //Save‚ð‚·‚é
         saveMGR.SaveEXPAmount(statusCanvasMGR.EXPRetained);
         saveMGR.SaveStagesCleardNum(StagesClearedNum);
+        musicMGR.SaveBGMAndSEVolume();
 
     }
     public void ResetData()

@@ -25,7 +25,7 @@ public class RobotMGR : Unit
         GameManager.instance.mapMGR.GetMap().RemoveUnit(gridPos, this);
         //GameManager.instance.mapMGR.GetMap().SetCharacterMGR(gridPos,null); //スクリプトをを消去する
 
-
+        GameManager.instance.musicMGR.StartCombatSE("Explosion");
         Destroy(this.gameObject);
     }
 }

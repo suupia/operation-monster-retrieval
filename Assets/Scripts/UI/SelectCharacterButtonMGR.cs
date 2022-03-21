@@ -31,6 +31,7 @@ public class SelectCharacterButtonMGR : MonoBehaviour
     Color notSelectedColor;
     [SerializeField] GameObject skillCanvas;
     [SerializeField] Image skillTriggerRouteImage;
+    [SerializeField] Image skillIconImage;
 
     //以下、CoolTime用の変数
     [SerializeField] Image emptyGauge;
@@ -54,13 +55,16 @@ public class SelectCharacterButtonMGR : MonoBehaviour
         emptyGauge.color = Color.clear;
         filledGauge.color = Color.clear;
 
-        skillTriggerRouteImage.sprite = GameManager.instance.characterSkillsDataMGR.skillTriggerImages[GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetSkillNum()] ;
         ResetToNormalColor();
 
         //画像の初期化
         SetSelectCharacterImage(GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[buttonNum]).GetThumbnailSprite());
 
         costText.text = GameManager.instance.GetCharacterDatabase(GameManager.instance.IDsOfCharactersInCombat[buttonNum]).GetCost() + "ene";
+
+        //スキル用
+        skillTriggerRouteImage.sprite = GameManager.instance.characterSkillsDataMGR.skillTriggerImages[GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetSkillNum()] ;
+        skillIconImage.sprite = GameManager.instance.characterSkillsDataMGR.skillIconSprites[GameManager.instance.GetCharacterMGRFromButtonNum(buttonNum).GetSkillNum()];
     }
 
     //Seeter
@@ -191,21 +195,25 @@ public class SelectCharacterButtonMGR : MonoBehaviour
     
     public void PasteManualRoute()
     {
-        if (GameManager.instance.copyingSelectCharacterButtonNum == buttonNum) return;
-        if(GameManager.instance.copyingSelectCharacterButtonNum < 0 || GameManager.instance.copyingSelectCharacterButtonNum > 3) //IndexOutOfRange
+        int copyingSelectCharacterButtonNum = GameManager.instance.copyingSelectCharacterButtonNum;
+
+        if (copyingSelectCharacterButtonNum == buttonNum) return; //自分自身にはコピーしない
+        if(copyingSelectCharacterButtonNum < 0 || copyingSelectCharacterButtonNum > 3) //IndexOutOfRange
         {
             return;
         }
+
         //ManualRouteをコピー
-        GameManager.instance.characterManualRouteDatas[buttonNum].SetManualRoute(GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetManualRoute());
-        GameManager.instance.characterManualRouteDatas[buttonNum].SetNonDiagonalManualRoute(GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalManualRoute());
-        GameManager.instance.characterManualRouteDatas[buttonNum].SetNonDiagonalPoints(GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalPoints());
-        Debug.LogWarning($"ManualRouteを{GameManager.instance.copyingSelectCharacterButtonNum}から{buttonNum}へコピーしました\nManualRoute[{buttonNum}]={string.Join(",", GameManager.instance.characterManualRouteDatas[buttonNum].GetManualRoute())}");
+        if (copyingSelectCharacterButtonNum != buttonNum)
+        {
+            GameManager.instance.characterManualRouteDatas[buttonNum].CopyManualRouteData(GameManager.instance.characterManualRouteDatas[copyingSelectCharacterButtonNum]);
+            Debug.LogWarning($"ManualRouteを{GameManager.instance.copyingSelectCharacterButtonNum}から{buttonNum}へコピーしました\nManualRoute[{buttonNum}]={string.Join(",", GameManager.instance.characterManualRouteDatas[buttonNum].GetManualRoute())}");
+        }
 
         //Paste時にコピー元の選択を外す
-        GameManager.instance.selectCharacterButtonMGRs[GameManager.instance.copyingSelectCharacterButtonNum].ResetToNormalColor();
+        GameManager.instance.selectCharacterButtonMGRs[copyingSelectCharacterButtonNum].ResetToNormalColor();
         //pointerTailを消す
-        GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].DestroyPointerTails();
+        GameManager.instance.characterManualRouteDatas[copyingSelectCharacterButtonNum].DestroyPointerTails();
         //CurvePointerを消す
         GameManager.instance.curveToMouseMGR.DestroyLineBetweenButtonAndPointer();
     }

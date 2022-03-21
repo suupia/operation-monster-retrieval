@@ -8,6 +8,8 @@ public class CharacterSkillsDataMGR : MonoBehaviour
 
     [SerializeField] public Material[] skillIconMaterials;
 
+    [SerializeField] public Sprite[] skillIconSprites;
+
     [SerializeField] public Material[] skillAuraMaterials;
 
 }

@@ -474,6 +474,7 @@ public abstract class Unit : MonoBehaviour
 
         CheckIfCauseSkill();
 
+        //ターゲットのユニットが攻撃範囲内にいるとき、InBattleに切り替える
         if (Function.isWithinTheAttackRange(gridPos, atkRange, targetUnitID, out targetUnitPos))
         {
             Debug.Log($"攻撃範囲内にユニットがあるのでInBattleに切り替えます targetUnitPos:{targetUnitPos}");
@@ -499,6 +500,7 @@ public abstract class Unit : MonoBehaviour
             return;
         }
 
+        //ターゲットの施設が攻撃範囲内にいるとき、InBattleに切り替える
         if (Function.isWithinTheAttackRange(gridPos, atkRange, targetTowerID, out targetFacilityPos) || Function.isWithinTheAttackRange(gridPos, atkRange, targetCastleID, out targetFacilityPos)) //ルートに沿って移動しているときに、攻撃範囲内にタワー（城を除く）があるとき
         {
             Debug.Log($"攻撃範囲内にタワーがあるのでInBattleに切り替えます targetFacilityPos:{targetFacilityPos}");
@@ -603,7 +605,7 @@ public abstract class Unit : MonoBehaviour
             {
                 if (unit == null)
                 {
-                    Debug.LogWarning("targetUnitsの中のunitがnullのため、次のループに入ります");
+                    Debug.Log("targetUnitsの中のunitがnullのため、次のループに入ります");
                     continue;
                 }
                 Debug.Log($"Unit:{unit}(targetUnitPos:{targetUnitPos})に{damage}のダメージを与えます");
@@ -615,12 +617,14 @@ public abstract class Unit : MonoBehaviour
             //攻撃対象が施設のとき
             if(targetFacility == null)
             {
-                Debug.LogError("targetFacilitytがnullのです");
-                //コルーチンなのでreturnできないから、エラーのログだけ出しておく
+                Debug.Log("targetFacilitytがnullです");
+                yield break;
             }
             Debug.Log($"targetFacility:{targetFacility}(targetFacilityPos:{targetFacilityPos})に{damage}のダメージを与えます");
             targetFacility.HP -= damage;
         }
+
+        GameManager.instance.musicMGR.StartCombatSE("Explosion2");
 
         DrawDamage(damage);
 

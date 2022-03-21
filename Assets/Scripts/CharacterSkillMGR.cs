@@ -9,6 +9,8 @@ public class CharacterSkillMGR : MonoBehaviour //各キャラクターのPrefabにinstanc
     [SerializeField] private int amount; //スキルによる変化量
     [SerializeField] private int skillRemainingeTime; //現在の、スキルが重複して発動した回数 デバッグ用に[SerializeField]しておく
 
+    [SerializeField] GameObject skillIconEffectPrefab;
+
     //Getter
     public int GetSkillNum()
     {
@@ -63,7 +65,7 @@ public class CharacterSkillMGR : MonoBehaviour //各キャラクターのPrefabにinstanc
                 (routeList[i].x == routeList[i + 1].x && routeList[i + 1].y == routeList[i + 2].y && routeList[i + 2].x == routeList[i + 3].x && routeList[i + 3].y == routeList[i].y) ||
                 (routeList[i].y == routeList[i + 1].y && routeList[i + 1].x == routeList[i + 2].x && routeList[i + 2].y == routeList[i + 3].y && routeList[i + 3].x == routeList[i].x))
             {
-                Debug.LogWarning("Skill_0の発動条件を満たしています:" + routeList[i] + routeList[i + 1] + routeList[i + 2] + routeList[i + 3] + routeList[i + 4]);
+                //Debug.LogWarning("Skill_0の発動条件を満たしています:" + routeList[i] + routeList[i + 1] + routeList[i + 2] + routeList[i + 3] + routeList[i + 4]);
                 causeSkillPoints.Add(i + 4);
                 i += 4;
             }
@@ -79,7 +81,7 @@ public class CharacterSkillMGR : MonoBehaviour //各キャラクターのPrefabにinstanc
                 (routeList[i].x == routeList[i + 2].x && routeList[i + 1].y == routeList[i + 3].y && Mathf.Abs(routeList[i].y - routeList[i + 2].y) == 2 && Mathf.Abs(routeList[i + 1].x - routeList[i + 3].x) == 2) ||
                 (routeList[i].y == routeList[i + 2].y && routeList[i + 1].x == routeList[i + 3].x && Mathf.Abs(routeList[i].x - routeList[i + 2].x) == 2 && Mathf.Abs(routeList[i + 1].y - routeList[i + 3].y) == 2))
             {
-                Debug.LogWarning("Skill_1の発動条件を満たしています:" + routeList[i] + routeList[i + 1] + routeList[i + 2] + routeList[i + 3] + routeList[i + 4]);
+                //Debug.LogWarning("Skill_1の発動条件を満たしています:" + routeList[i] + routeList[i + 1] + routeList[i + 2] + routeList[i + 3] + routeList[i + 4]);
                 causeSkillPoints.Add(i + 4);
                 i += 4;
             }
@@ -95,7 +97,7 @@ public class CharacterSkillMGR : MonoBehaviour //各キャラクターのPrefabにinstanc
                 (routeList[i].x == routeList[i + 2].x && routeList[i + 2].y == routeList[i + 4].y && routeList[i + 4].x == routeList[i + 6].x && routeList[i + 6].y == routeList[i].y) ||
                 (routeList[i].y == routeList[i + 2].y && routeList[i + 2].x == routeList[i + 4].x && routeList[i + 4].y == routeList[i + 6].y && routeList[i + 6].x == routeList[i].x))
             {
-                Debug.LogWarning("Skill_2の発動条件を満たしています:" + routeList[i] + routeList[i + 1] + routeList[i + 2] + routeList[i + 3] + routeList[i + 4] + routeList[i + 5] + routeList[i + 6] + routeList[i + 7] + routeList[i + 8]);
+                //Debug.LogWarning("Skill_2の発動条件を満たしています:" + routeList[i] + routeList[i + 1] + routeList[i + 2] + routeList[i + 3] + routeList[i + 4] + routeList[i + 5] + routeList[i + 6] + routeList[i + 7] + routeList[i + 8]);
                 causeSkillPoints.Add(i + 8);
                 i += 8;
             }
@@ -134,15 +136,15 @@ public class CharacterSkillMGR : MonoBehaviour //各キャラクターのPrefabにinstanc
     //以下、具体的なskillの内容をかく
     private IEnumerator Skill_0(CharacterMGR characterMGRInstace, ParticleSystem particleSystem, Material skillAuraMaterial) //SPDをあげる
     {
-        PlaySkillIconParticle(particleSystem);
+        PlaySkillIconParticle(particleSystem, 0);
         skillRemainingeTime++;
         if (skillRemainingeTime != 1)
         {
-            Debug.LogWarning("skill_0は発動中です。skillRemainingTime=" + skillRemainingeTime);
+            //Debug.LogWarning("skill_0は発動中です。skillRemainingTime=" + skillRemainingeTime);
             yield break;  //既にこのスキルのCoroutineが動いているので、このCoroutineは終わる
         }
 
-        Debug.LogWarning("Skill_0を発動します。Name=" + characterMGRInstace.gameObject.name);
+        //Debug.LogWarning("Skill_0を発動します。Name=" + characterMGRInstace.gameObject.name);
         characterMGRInstace.SetSpd(characterMGRInstace.GetSpd() + amount);
         PlaySkillAuraParticle(particleSystem, skillAuraMaterial);
 
@@ -155,26 +157,26 @@ public class CharacterSkillMGR : MonoBehaviour //各キャラクターのPrefabにinstanc
 
             yield return new WaitForSeconds(duration);
             skillRemainingeTime--;
-            Debug.LogWarning("Skill_0の発動からdurationが経過しました。skillRemainingTime=" + skillRemainingeTime);
+            //Debug.LogWarning("Skill_0の発動からdurationが経過しました。skillRemainingTime=" + skillRemainingeTime);
         }
 
         if (characterMGRInstace == null) yield break; //GameObjectがDestroyされた時などはコルーチンを破棄する
 
-        Debug.LogWarning("Skill_0を終了します。Name=" + characterMGRInstace.gameObject.name);
+        //Debug.LogWarning("Skill_0を終了します。Name=" + characterMGRInstace.gameObject.name);
         characterMGRInstace.SetSpd(characterMGRInstace.GetSpd() - amount);
         StopSkillAuraParticle(particleSystem, skillAuraMaterial);
     }
     private IEnumerator Skill_1(CharacterMGR characterMGRInstace, ParticleSystem particleSystem, Material skillAuraMaterial) //ATKをあげる
     {
-        PlaySkillIconParticle(particleSystem);
+        PlaySkillIconParticle(particleSystem, 1);
         skillRemainingeTime++;
         if (skillRemainingeTime != 1)
         {
-            Debug.LogWarning("skill_1は発動中です。skillRemainingTime=" + skillRemainingeTime);
+            //Debug.LogWarning("skill_1は発動中です。skillRemainingTime=" + skillRemainingeTime);
             yield break;  //既にこのスキルのCoroutineが動いているので、このCoroutineは終わる
         }
 
-        Debug.LogWarning("Skill_1を発動します。Name=" + characterMGRInstace.gameObject.name);
+        //Debug.LogWarning("Skill_1を発動します。Name=" + characterMGRInstace.gameObject.name);
         characterMGRInstace.SetAtk(characterMGRInstace.GetAtk() + amount);
         PlaySkillAuraParticle(particleSystem, skillAuraMaterial);
 
@@ -187,26 +189,26 @@ public class CharacterSkillMGR : MonoBehaviour //各キャラクターのPrefabにinstanc
 
             yield return new WaitForSeconds(duration);
             skillRemainingeTime--;
-            Debug.LogWarning("Skill_1の発動からdurationが経過しました。skillRemainingTime=" + skillRemainingeTime);
+            //Debug.LogWarning("Skill_1の発動からdurationが経過しました。skillRemainingTime=" + skillRemainingeTime);
         }
 
         if (characterMGRInstace == null) yield break; //GameObjectがDestroyされた時などはコルーチンを破棄する
 
-        Debug.LogWarning("Skill_1を終了します。Name=" + characterMGRInstace.gameObject.name);
+        //Debug.LogWarning("Skill_1を終了します。Name=" + characterMGRInstace.gameObject.name);
         characterMGRInstace.SetAtk(characterMGRInstace.GetAtk() - amount);
         StopSkillAuraParticle(particleSystem, skillAuraMaterial);
     }
     private IEnumerator Skill_2(CharacterMGR characterMGRInstace, ParticleSystem particleSystem, Material skillAuraMaterial) //残り時間延長
     {
-        PlaySkillIconParticle(particleSystem);
+        PlaySkillIconParticle(particleSystem, 2);
         skillRemainingeTime++;
         if (skillRemainingeTime != 1)
         {
-            Debug.LogWarning("skill_2は発動中です。skillRemainingTime=" + skillRemainingeTime);
+            //Debug.LogWarning("skill_2は発動中です。skillRemainingTime=" + skillRemainingeTime);
             yield break;  //既にこのスキルのCoroutineが動いているので、このCoroutineは終わる
         }
 
-        Debug.LogWarning("Skill_2を発動しました。Name=" + characterMGRInstace.gameObject.name);
+        //Debug.LogWarning("Skill_2を発動しました。Name=" + characterMGRInstace.gameObject.name);
         GameManager.instance.timerMGR.Timer -= amount;
         PlaySkillAuraParticle(particleSystem, skillAuraMaterial);
 
@@ -219,7 +221,7 @@ public class CharacterSkillMGR : MonoBehaviour //各キャラクターのPrefabにinstanc
 
             yield return new WaitForSeconds(duration);
             skillRemainingeTime--;
-            Debug.LogWarning("Skill_2の発動からdurationが経過しました。skillRemainingTime=" + skillRemainingeTime);
+            //Debug.LogWarning("Skill_2の発動からdurationが経過しました。skillRemainingTime=" + skillRemainingeTime);
         }
 
         yield return new WaitForSeconds(duration);
@@ -248,10 +250,23 @@ public class CharacterSkillMGR : MonoBehaviour //各キャラクターのPrefabにinstanc
         //スキル発動時のオーラを付ける
         skillAuraMaterial.SetInt("_isActivatingSkill", 0);
     }
-    private void PlaySkillIconParticle(ParticleSystem particleSystem)
+    private void PlaySkillIconParticle(ParticleSystem particleSystem, int skillNum)
     {
-        particleSystem.GetComponent<ParticleSystemRenderer>().material = GameManager.instance.characterSkillsDataMGR.skillIconMaterials[skillNum]; //iconパーティクル用の画像をskillNumに応じてセットする
-        particleSystem.Play();
+        //particleSystem.GetComponent<ParticleSystemRenderer>().material = GameManager.instance.characterSkillsDataMGR.skillIconMaterials[skillNum]; //iconパーティクル用の画像をskillNumに応じてセットする
+        //particleSystem.Play();
+
+        GameObject skillIconEffect = Instantiate(skillIconEffectPrefab, skillIconEffectPrefab.transform.position, skillIconEffectPrefab.transform.rotation);
+        skillIconEffect.transform.localPosition = transform.position + Vector3.up * 0.4f;
+        skillIconEffect.GetComponent<SpriteRenderer>().sprite = GameManager.instance.characterSkillsDataMGR.skillIconSprites[skillNum];
+
+        if (skillNum != 2) //ATK, SPDのスキルのとき
+        {
+            skillIconEffect.GetComponent<SkillIconMotionMGR>().StartSwingCoroutine(transform);
+        }
+        else //城のHP回復のとき
+        {
+            skillIconEffect.GetComponent<SkillIconMotionMGR>().StartMoveToCastleCoroutine(transform);
+        }
 
     }
 

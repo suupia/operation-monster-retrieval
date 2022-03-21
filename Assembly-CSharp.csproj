@@ -111,6 +111,7 @@
     <Compile Include="Assets\Shapes2D\Demos\Flappy Shapes\Game.cs" />
     <Compile Include="Assets\Scripts\UI\CharacterInReserveMGR.cs" />
     <Compile Include="Assets\Shapes2D\Scripts\PolyMap.cs" />
+    <Compile Include="Assets\Scripts\SkillIconMotionMGR.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Shapes2D\Shaders\Triangle.cginc" />

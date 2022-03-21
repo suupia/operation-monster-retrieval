@@ -36,6 +36,14 @@ public class SaveMGR : MonoBehaviour
     {
         return saveData.characterInCombatID[index];
     }
+    public float GetBGMVolume()
+    {
+        return saveData.bgmVolume;
+    }
+    public float GetSEVolume()
+    {
+        return saveData.seVolume;
+    }
     
     //Setter
     public void SaveStagesCleardNum(int stageNum)
@@ -58,6 +66,16 @@ public class SaveMGR : MonoBehaviour
     public void SaveCharacterInCombatID(int index,int id)
     {
         saveData.characterInCombatID[index] = id;
+        Save();
+    }
+    public void SaveBGMVolume(float volume)
+    {
+        saveData.bgmVolume = volume;
+        Save();
+    }
+    public void SaveSEVolume(float volume)
+    {
+        saveData.seVolume = volume;
         Save();
     }
 

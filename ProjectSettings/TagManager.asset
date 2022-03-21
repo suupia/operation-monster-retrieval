@@ -50,6 +50,9 @@ TagManager:
   - name: Cannonball
     uniqueID: 3487405631
     locked: 0
+  - name: SkillIcon
+    uniqueID: 1122719007
+    locked: 0
   - name: UI
     uniqueID: 4054307105
     locked: 0

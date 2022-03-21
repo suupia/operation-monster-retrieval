@@ -26,6 +26,8 @@ public class PointerTailMGR : MonoBehaviour
     [SerializeField] bool isDiagonal;      //斜めを向いてるとき、true
     //[SerializeField] public bool forComplement;      //このPoitnerTailが補完用のときtrue
 
+    bool isSubjectRouteDiagonal;
+
     //プロパティ
     public bool NonDiagonal
     {
@@ -63,10 +65,13 @@ public class PointerTailMGR : MonoBehaviour
         }
         else　if (GameManager.instance.copyingManualRoute) //ManualRouteコピー中に呼ばれたとき
         {
+            //pointerTails = GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetPointerTails();
+            //pointerTailIndex = pointerTails.IndexOf(gameObject);    //pointerTailsにPointeTailが順番に仕舞われているので、Indexを取得しておく
+            //subjectRoute = GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalManualorAutoRoute();
             pointerTails = GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetPointerTails();
             pointerTailIndex = pointerTails.IndexOf(gameObject);    //pointerTailsにPointeTailが順番に仕舞われているので、Indexを取得しておく
-            subjectRoute = GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetNonDiagonalManualRoute();
-
+            subjectRoute = GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetDiagonalManualorAutoRoute();
+            isSubjectRouteDiagonal = true;
             //色を少し透明にする
             noChangedColor.a *= 0.5f;
             changedColor.a *= 0.5f;
@@ -102,6 +107,13 @@ public class PointerTailMGR : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (isSubjectRouteDiagonal)
+        {
+            SetDirectionInDiagonalRoute();
+
+            ChangeColor();
+            return;
+        }
         ChangeColor();
 
         //if (pointerTailIndex < GameManager.instance.pointerMGR.GetPoinerTails().Count - 4)      //このPointerTailがある程度前のものだった場合、処理は行わない→一瞬でたくさんPointerTailが生成されたときに困るのでなし
@@ -118,14 +130,7 @@ public class PointerTailMGR : MonoBehaviour
         ManageNonDiagonal();
 
         bool pointerTailExistAfterThis = false;
-        if (GameManager.instance.inputMGR.isEditingManualRoute)
-        {
-            if (subjectRoute.Count >= pointerTailIndex + 2 && GameManager.instance.pointerMGR.GetPointerTails().Count > pointerTailIndex + 1) pointerTailExistAfterThis = true;
-        }
-        else if (GameManager.instance.copyingManualRoute)
-        {
-            if (subjectRoute.Count >= pointerTailIndex + 2 && GameManager.instance.characterManualRouteDatas[GameManager.instance.copyingSelectCharacterButtonNum].GetPointerTails().Count > pointerTailIndex + 1) pointerTailExistAfterThis = true;
-        }
+        if (subjectRoute.Count >= pointerTailIndex + 2 && GameManager.instance.pointerMGR.GetPointerTails().Count > pointerTailIndex + 1) pointerTailExistAfterThis = true;
 
         if (pointerTailExistAfterThis)       //pointerTailがこれ自身の後ろに存在する場合の処理
         {
@@ -263,10 +268,10 @@ public class PointerTailMGR : MonoBehaviour
     private void ChangeColor()
     {
         ManageIsCrossing();
-        for (int i = 0; i < subjectRoute.Count; i++)
+        for (int i = 0; i < pointerTailIndex; i++)
         {
             Vector2Int m = subjectRoute[i];
-            if(m.x == subjectRoute[pointerTailIndex].x && m.y == subjectRoute[pointerTailIndex].y && i < pointerTailIndex && pointerTails[i].activeInHierarchy)       //PointerTailが交差したとき
+            if(m.x == subjectRoute[pointerTailIndex].x && m.y == subjectRoute[pointerTailIndex].y && pointerTails[i].activeInHierarchy)       //PointerTailが交差したとき
             {
                 if ((pointerTails[i].transform.rotation.eulerAngles.z - transform.rotation.eulerAngles.z) % 360 == 0
                     && pointerTails[i].GetComponent<PointerTailMGR>().GetIsDiagonal() == GetIsDiagonal())    //PointerTailが同じ向きで重なったとき
@@ -292,16 +297,14 @@ public class PointerTailMGR : MonoBehaviour
             childSprites[horizontal2Index].color = changedColor;
             childSprites[diagonal2Index].color = changedColor;
         }
-        else          //Horizontal2, Diagonal2をnoChangedColorにするのはここだけ
+        else          //Horizontal2, Diagonal2をnoChangedColorにするのはここでだけ
         {
             childSprites[horizontal2Index].color = noChangedColor;
             childSprites[diagonal2Index].color = noChangedColor;
         }
 
-        for (int i = 0; i < subjectRoute.Count; i++)
-        {
-            if (i >= pointerTailIndex) break;    //Thisより手前のPointerTailと重なっているかが知りたいので
-
+        for (int i = 0; i < pointerTailIndex; i++)
+        { 
             Vector2Int m = subjectRoute[i];
             if (m.x == subjectRoute[pointerTailIndex].x && m.y == subjectRoute[pointerTailIndex].y && pointerTails[i].activeInHierarchy)       //PointerTailが交差したとき
             {
@@ -324,38 +327,99 @@ public class PointerTailMGR : MonoBehaviour
 
     }
 
-    private void IsOverlapWith(Vector2Int manualPoint, int index)       //与えられた座標のPointerTailと、このPointerTailが重なっているかどうか判定する
+    private void SetDirectionInDiagonalRoute()
     {
-        if (manualPoint.x == subjectRoute[pointerTailIndex].x && manualPoint.y == subjectRoute[pointerTailIndex].y)      //与えられた点と自身の点の座標が等しいとき
+        float angle = 0;
+
+        if (subjectRoute[pointerTailIndex] + Vector2Int.up + Vector2Int.right == subjectRoute[pointerTailIndex + 1])
         {
-            if (pointerTails[index].GetComponent<PointerTailMGR>().GetIsDiagonal())        //与えられた座標のPointerTailが斜めのとき
+            angle = 45;
+        }
+        else if (subjectRoute[pointerTailIndex] + Vector2Int.up + Vector2Int.left == subjectRoute[pointerTailIndex + 1])
+        {
+            angle = 135;
+        }
+        else if (subjectRoute[pointerTailIndex] + Vector2Int.down + Vector2Int.right == subjectRoute[pointerTailIndex + 1])
+        {
+            angle = -45;
+        }
+        else if (subjectRoute[pointerTailIndex] + Vector2Int.down + Vector2Int.left == subjectRoute[pointerTailIndex + 1])
+        {
+            angle = -135;
+        }
+
+        if(angle != 0)
+        {
+            transform.rotation = Quaternion.AngleAxis(angle - 45, Vector3.forward);
+            ChangeToDiagonal(true);                                   //斜めのSpriteを表示する
+                                                                      //大丈夫だと思うけど、この次のPointerTailのUpdateが先に呼ばれると困る気がするので、一応メモとして
+            SetIsDiagonal(true);
+            return;    //斜めを向いたときはここでreturnされる
+
+        }
+
+
+        if (subjectRoute[pointerTailIndex].x == subjectRoute[pointerTailIndex + 1].x)      //以下、縦横を向かせる
+        {
+            if (subjectRoute[pointerTailIndex].y < subjectRoute[pointerTailIndex + 1].y)
             {
-                if (GetIsDiagonal() && subjectRoute[index + 2].x == subjectRoute[pointerTailIndex + 2].x && subjectRoute[index + 2].y == subjectRoute[pointerTailIndex + 2].y)      //同じ向きで重なるとき
-                {
-                    SetIsCrossing(true);
-                    return;
-                }
-                else if (pointerTails[pointerTailIndex - 2].GetComponent<PointerTailMGR>().GetIsDiagonal() && 
-                    subjectRoute[index + 2].x == subjectRoute[pointerTailIndex - 2].x && 
-                    subjectRoute[index + 2].y == subjectRoute[pointerTailIndex - 2].y)         //逆向きで重なるとき(逆向きなので、一つ前のPointerTailをisCrossingにする)
-                {
-                    pointerTails[pointerTailIndex - 2].GetComponent<PointerTailMGR>().SetIsCrossing(true);
-                    return;
-                }
+                angle = 90;
             }
-            else        //与えられた座標のPointerTailが縦or横のとき
+            else
             {
-                if (subjectRoute[index + 1].x == subjectRoute[pointerTailIndex + 1].x && subjectRoute[index + 1].y == subjectRoute[pointerTailIndex + 1].y)             //同じ向きで重なるとき
-                {
-                    SetIsCrossing(true);
-                    return;
-                }
-                else if (subjectRoute[index + 1].x == subjectRoute[pointerTailIndex - 1].x && subjectRoute[index + 1].y == subjectRoute[pointerTailIndex - 1].y)     //逆向きで重なるとき(ないけど、一応)
-                {
-                    pointerTails[pointerTailIndex - 1].GetComponent<PointerTailMGR>().SetIsCrossing(true);
-                    return;
-                }
+                angle = -90;
+
             }
         }
+        else if (subjectRoute[pointerTailIndex].y == subjectRoute[pointerTailIndex + 1].y)
+        {
+            if (subjectRoute[pointerTailIndex].x < subjectRoute[pointerTailIndex + 1].x)
+            {
+                angle = 0;
+            }
+            else
+            {
+                angle = 180;
+            }
+        }
+
+        SetIsDiagonal(false);
+        ChangeToDiagonal(false);                 //SpriteをHorizontalにする
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
+
+    //private void IsOverlapWith(Vector2Int manualPoint, int index)       //与えられた座標のPointerTailと、このPointerTailが重なっているかどうか判定する
+    //{
+    //    if (manualPoint.x == subjectRoute[pointerTailIndex].x && manualPoint.y == subjectRoute[pointerTailIndex].y)      //与えられた点と自身の点の座標が等しいとき
+    //    {
+    //        if (pointerTails[index].GetComponent<PointerTailMGR>().GetIsDiagonal())        //与えられた座標のPointerTailが斜めのとき
+    //        {
+    //            if (GetIsDiagonal() && subjectRoute[index + 2].x == subjectRoute[pointerTailIndex + 2].x && subjectRoute[index + 2].y == subjectRoute[pointerTailIndex + 2].y)      //同じ向きで重なるとき
+    //            {
+    //                SetIsCrossing(true);
+    //                return;
+    //            }
+    //            else if (pointerTails[pointerTailIndex - 2].GetComponent<PointerTailMGR>().GetIsDiagonal() && 
+    //                subjectRoute[index + 2].x == subjectRoute[pointerTailIndex - 2].x && 
+    //                subjectRoute[index + 2].y == subjectRoute[pointerTailIndex - 2].y)         //逆向きで重なるとき(逆向きなので、一つ前のPointerTailをisCrossingにする)
+    //            {
+    //                pointerTails[pointerTailIndex - 2].GetComponent<PointerTailMGR>().SetIsCrossing(true);
+    //                return;
+    //            }
+    //        }
+    //        else        //与えられた座標のPointerTailが縦or横のとき
+    //        {
+    //            if (subjectRoute[index + 1].x == subjectRoute[pointerTailIndex + 1].x && subjectRoute[index + 1].y == subjectRoute[pointerTailIndex + 1].y)             //同じ向きで重なるとき
+    //            {
+    //                SetIsCrossing(true);
+    //                return;
+    //            }
+    //            else if (subjectRoute[index + 1].x == subjectRoute[pointerTailIndex - 1].x && subjectRoute[index + 1].y == subjectRoute[pointerTailIndex - 1].y)     //逆向きで重なるとき(ないけど、一応)
+    //            {
+    //                pointerTails[pointerTailIndex - 1].GetComponent<PointerTailMGR>().SetIsCrossing(true);
+    //                return;
+    //            }
+    //        }
+    //    }
+    //}
 }

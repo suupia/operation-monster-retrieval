@@ -150,7 +150,7 @@ public class PointerMGR : MonoBehaviour
         Debug.LogWarning($"check");
         //ˆÈ‰ºAcomplementPointerTails‚ÆcomplementRoute‚ğclear‚µ‚Ä‚à‚¤ˆê“x“ü‚ê‚é
         if(complementRoute.Count != 0) complementRoute.Clear();
-        complementRoute = Function.SearchShortestRouteToCastle(startPos);
+        complementRoute = Function.SearchShortestDiagonalRouteToCastle(startPos);
         //inSetComplementRoute = false;
     }
     //private void ManageComplementPointerTails()
@@ -181,12 +181,12 @@ public class PointerMGR : MonoBehaviour
 
         if (endPos == GameManager.instance.mapMGR.GetEnemysCastlePos()) //endPos‚ª“G‚ÌCastle‚Ì‚Æ‚«
         {
-            shortestRoute = Function.SearchShortestRouteToCastle(manualRoute[manualRoute.Count - 1]);
+            shortestRoute = Function.SearchShortestDiagonalRouteToCastle(manualRoute[manualRoute.Count - 1]);
 
         }
         else
         {
-            shortestRoute = Function.SearchShortestNonDiagonalRoute(manualRoute[manualRoute.Count - 1], endPos);
+            shortestRoute = Function.NonDiagonalSearchShortestRoute(manualRoute[manualRoute.Count - 1], endPos);
         }
 
         Debug.LogWarning("ComplementManualRoute shortestRoute" + string.Join(",", shortestRoute));
@@ -315,6 +315,15 @@ public class PointerMGR : MonoBehaviour
         }
         manualRoute.Add(GameManager.instance.mapMGR.GetAllysCastlePos());
         Debug.Log($"Pointer‚ğ‰Šú‰»:manualRoute={string.Join(",", manualRoute)}, isOnCastle={isOnCastle}, pointerTails={string.Join(",", pointerTails)}");
+    }
+
+    public void DestroyPointerTails(List<GameObject> pointerTailsList)
+    {
+        while (pointerTailsList.Count != 0)
+        {
+            Destroy(pointerTailsList[pointerTailsList.Count - 1]);
+            pointerTailsList.RemoveAt(pointerTailsList.Count - 1);
+        }
     }
 
     private void SetOrder() //•`‰æ‡‚ğŒˆ‚ß‚é

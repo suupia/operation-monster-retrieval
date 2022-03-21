@@ -213,6 +213,7 @@ public class CharacterMGR : Unit
         if (causeSkillPoints.Contains(moveAlongWithCounter))
         {
             characterSkillMGR.CauseSkill(this, skillIconParticle, skillAuraMaterial);
+            GameManager.instance.musicMGR.StartCombatSE("Skill");
         }
     }
     public override void Die()
@@ -224,7 +225,7 @@ public class CharacterMGR : Unit
         GameManager.instance.mapMGR.GetMap().RemoveUnit(gridPos, this);
         //GameManager.instance.mapMGR.GetMap().SetCharacterMGR(gridPos,null); //スクリプトをを消去する
 
-
+        GameManager.instance.musicMGR.StartCombatSE("Explosion");
         Destroy(this.gameObject);
     }
 }
